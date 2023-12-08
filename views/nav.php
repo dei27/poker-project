@@ -1,7 +1,8 @@
 <nav class="navbar sticky-top">
     <div class="container-fluid">
-        <a class="navbar-brand text-secondary fs-3" href="./guest.php"><i class="bi bi-house-door-fill fs-2"></i></a>
-        <a class="navbar-toggler border-0" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar"
+        <a class="navbar-brand text-darkfs-3" href="./guest.php"><i class="bi bi-house-door-fill fs-2"></i></a>
+        <a class="navbar-brand fs-5 text-white btn btn-dark" href="torneos.php">Torneos</a>
+        <!-- <a class="navbar-toggler border-0" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar"
             aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
             <i class="bi bi-list fs-1 text-secondary"></i>
         </a>
@@ -23,6 +24,6 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> -->
     </div>
 </nav>
