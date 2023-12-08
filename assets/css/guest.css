@@ -1,0 +1,79 @@
+@import url('https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Archivo+Black&family=Bebas+Neue&family=Bitter:ital,wght@0,200;1,400&family=Gasoek+One&family=Lato:ital,wght@0,400;1,300&family=Londrina+Solid&family=Love+Ya+Like+A+Sister&family=Luckiest+Guy&family=Merriweather:wght@300;700&family=Montserrat+Alternates:wght@300;500&family=Oswald&family=PT+Sans+Caption:wght@700&family=Playfair+Display+SC:wght@700&family=Poppins:wght@300&family=Raleway:wght@300&family=Roboto+Slab:wght@200;500&family=Ubuntu+Mono:wght@400;700&display=swap');
+
+/* font-family: 'Abril Fatface', serif;
+font-family: 'Archivo Black', sans-serif;
+font-family: 'Bebas Neue', sans-serif;
+font-family: 'Bitter', serif;
+font-family: 'Gasoek One', sans-serif;
+font-family: 'Lato', sans-serif;
+font-family: 'Londrina Solid', sans-serif;
+font-family: 'Love Ya Like A Sister', cursive;
+font-family: 'Luckiest Guy', cursive;
+font-family: 'Merriweather', serif;
+font-family: 'Montserrat Alternates', sans-serif;
+font-family: 'Oswald', sans-serif;
+font-family: 'Playfair Display SC', serif;
+font-family: 'Poppins', sans-serif;
+font-family: 'PT Sans Caption', sans-serif;
+font-family: 'Raleway', sans-serif;
+font-family: 'Roboto Slab', serif;
+font-family: 'Ubuntu Mono', monospace; */
+
+:root{
+    --rojo : #A52222;
+    --rojo02 : #641515;
+    --gris: #817D7D;
+    --gris02: #403D3D;
+
+    
+}
+
+body{
+    background-image: url(../images/fondoNavidad.png);
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.btnRed{
+    background-color: var(--rojo);
+}
+
+.btnGray{
+    background-color: var(--gris);
+}
+
+.btnRed:hover{
+    background-color: var(--rojo02);
+}
+
+.btnGray:hover{
+    background-color: var(--gris02);
+}
+
+.display-1{
+    font-family: 'Archivo Black', sans-serif;
+    /* font-family: 'Bebas Neue', sans-serif;
+    font-family: 'Bitter', serif;
+    font-family: 'Gasoek One', sans-serif;
+    font-family: 'Lato', sans-serif;
+    font-family: 'Londrina Solid', sans-serif;
+    font-family: 'Love Ya Like A Sister', cursive; */
+}
+
+.falling-letters {
+    display: inline-block;
+    position: relative;
+    animation: fall 1.5s ease-in-out forwards;
+}
+
+@keyframes fall {
+    0% {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
