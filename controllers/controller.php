@@ -1,5 +1,7 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 include('../models/db.php');
 
 if (isset($_POST['action'])) {
@@ -17,10 +19,10 @@ if (isset($_POST['action'])) {
                 $_SESSION['user'] = $user;
                 header("Location: " . ($user['role'] == '1' ? '../views/dashboard.php' : '../views/guest.php'));
             } else {
-                header("Location: ../views/login.php");
+                header("Location: ../views/login.php?credenciales=0");
             }
         }else {
-            header("Location: ../views/login.php");
+            header("Location: ../views/login.php?credenciales=0");
         }
 
         

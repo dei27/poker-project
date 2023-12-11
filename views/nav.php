@@ -1,7 +1,13 @@
 <nav class="navbar sticky-top">
     <div class="container-fluid">
-        <a class="navbar-brand text-darkfs-3" href="./guest.php"><i class="bi bi-house-door-fill fs-2"></i></a>
-        <a class="navbar-brand fs-5 text-white btn btn-dark" href="torneos.php">Torneos</a>
+    <?php
+        $currentFile = basename($_SERVER["SCRIPT_FILENAME"]);
+        $textClass = ($currentFile == 'torneos.php') ? 'text-white' : 'text-dark';
+        $textClassTorneos = ($currentFile == 'torneos.php') ? 'text-dark btn btn-light' : 'text-white btn btn-dark';
+        ?>
+
+        <a class="navbar-brand <?php echo $textClass; ?> fs-3" href="./guest.php"><i class="bi bi-house-door-fill fs-2"></i></a>
+        <a class="navbar-brand fs-5 <?php echo $textClassTorneos; ?>" href="torneos.php">Torneos</a>
         <!-- <a class="navbar-toggler border-0" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar"
             aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
             <i class="bi bi-list fs-1 text-secondary"></i>

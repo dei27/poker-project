@@ -1,5 +1,7 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 ?>
 
 <!DOCTYPE html>
@@ -40,6 +42,23 @@ session_start();
             </div>
         </div>
     </div>
+    <?php
+        if (isset($_GET['credenciales']) && $_GET['credenciales'] == 0) {
+            // Mostrar la alerta de eliminación exitosa con SweetAlert2
+            echo '
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            <script>
+                Swal.fire({
+                    icon: "error",
+                    title: "Inicio no valido",
+                    timer: 3000,
+                    text: "Credenciales incorrectas, intente de nuevo.",
+                    showConfirmButton: false
+                });
+            </script>
+            ';
+        }
+    ?>
 </div>
 <script src="../assets/js/main.js"></script>
 </body>

@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "aos": "^2.3.4",
-    "bootstrap-icons": "^1.11.2"
+    "bootstrap-icons": "^1.11.2",
+    "datatables.net-dt": "^1.13.8"
   }
 }

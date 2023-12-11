@@ -1,18 +1,17 @@
 <?php
+define('DB_HOST', 'localhost');
+define('DB_NAME', 'poker');
+define('DB_USER', 'root');
+define('DB_PASSWORD', '');
+
 function connectDB()
 {
-    $host = "localhost";
-    $database = "poker";
-    $username = "root";
-    $password = "";
-
     try {
-        $dsn = "mysql:host=$host;dbname=$database";
-        $conn = new PDO($dsn, $username, $password);
+        $dsn = "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME;
+        $conn = new PDO($dsn, DB_USER, DB_PASSWORD);
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         return $conn;
     } catch (PDOException $e) {
         die("Connection failed: " . $e->getMessage());
     }
 }
-?>
