@@ -28,6 +28,18 @@ class Jugador extends BaseModel {
         }
     }
 
+    public function getAllPlayersNotInRecords($idTorneo) {
+        try {
+            $query = "SELECT * FROM jugadores WHERE id NOT IN (SELECT jugador_id FROM registros where torneo_id = :idTorneo)";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':idTorneo', $idTorneo, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            die("Error: " . $e->getMessage());
+        }
+    }
+
     public function deleteById($id) {
         try {
             $query = "DELETE FROM jugadores WHERE id = :id";

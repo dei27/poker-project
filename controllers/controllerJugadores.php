@@ -10,6 +10,12 @@ function getAllPlayers() {
     return json_encode($jugadores);
 }
 
+function getAllPlayersNotInRecords($idTorneo) {
+    $jugadorModel = new Jugador();
+    $jugadores = $jugadorModel->getAllPlayersNotInRecords($idTorneo);
+    return json_encode($jugadores);
+}
+
 if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])) {
     $id = $_GET['id'];
 

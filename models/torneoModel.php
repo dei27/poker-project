@@ -140,5 +140,25 @@ class Torneo extends BaseModel {
             die("Error: " . $e->getMessage());
         }
     }
+
+    public function insertTournament() {
+        try {
+            $query = "INSERT INTO torneo (nombre, lugar, fecha, hora, entrada, recompra, add_on) VALUES (:nombre, :lugar, :fecha, :hora, :entrada, :recompra, :add_on)";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':nombre', $this->nombre, PDO::PARAM_STR);
+            $stmt->bindParam(':lugar', $this->lugar, PDO::PARAM_INT);
+            $stmt->bindParam(':fecha', $this->fecha, PDO::PARAM_STR);
+            $stmt->bindParam(':hora', $this->hora, PDO::PARAM_STR);
+            $stmt->bindParam(':entrada', $this->entrada, PDO::PARAM_INT);
+            $stmt->bindParam(':recompra', $this->recompra, PDO::PARAM_INT);
+            $stmt->bindParam(':add_on', $this->add_on, PDO::PARAM_INT);
+            $stmt->execute();
+            return true; 
+
+        } catch (PDOException $e) {
+            die("Error: " . $e->getMessage());
+            return false;
+        }
+    }
     
 }
