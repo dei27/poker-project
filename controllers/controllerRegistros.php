@@ -4,44 +4,42 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 include('../models/registrosModel.php');
 
-function getAllRecordsArray($torneoId) {
-    $registroModel = new Registros();
-    $registros = $registroModel->getAllRecords($torneoId);
-    return json_encode($registros, true);
-}
 
-
-function countPlayers($idTorneo){
-    $registroModel = new Registros();
-    $totalJugadores = $registroModel->CountPlayersByIdTournament($idTorneo);
-    return json_encode($totalJugadores);
-}
-
-if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id']) && isset($_GET['idTournament'])) {
-    $id = $_GET['id'];
-    $torneoId = $_GET['idTournament'];
-    $registroModel = new Registros();
-    $registroModel->deletePlayerRecordById($id, $torneoId );
-    
-    header("Location: ../views/torneos.php?deletePlayer=1");
-    exit();
-}
-
-if (isset($_GET['action']) && $_GET['action'] === 'add' && isset($_GET['idPlayer']) && isset($_GET['idTournament'])) {
-    $torneoId = $_GET['idTournament'];
-    $jugadorId = $_GET['idPlayer'];
+if (isset($_POST['action']) && $_POST['action'] === 'add' && isset($_POST['id_usuario'])) {
+    $id_usuario = $_POST['id_usuario'];
+    $tipoRegistro = isset($_POST['tipoRegistro']) ? $_POST['tipoRegistro'] : 0;
+    date_default_timezone_set('America/Costa_Rica');
+    $horaRegistro = isset($_POST['horaRegistro']) ? $_POST['horaRegistro'] : date('Y-m-d H:i:s');
 
     $registroModel = new Registros();
-    $registroModel->setTorneoId($torneoId);
-    $registroModel->setJugadorId($jugadorId);
+    $registroModel->setIdUsuario($id_usuario);
+    $registroModel->setTipo($tipoRegistro);
+    $registroModel->setHora($horaRegistro);
 
-    if ($registroModel->addPlayerRecordById()) {
-        header("Location: ../views/torneos.php?addPlayer=1");
-        exit();
-    } else {
-        header("Location: ../views/torneos.php?addPlayer=0");
+    if($tipoRegistro == 0){
+        header("Location: ../views/dashboard.php?noTypeAvailable=0");
         exit();
     }
+
+    if (empty($id_usuario)) {
+        header("Location: ../views/dashboard.php?noSession=1");
+        exit();
+    }else{
+        if ($registroModel->addRecordByIdUser()) {
+            header("Location: ../views/dashboard.php?addRecord=1");
+            exit();
+        } else {
+            header("Location: ../views/dashboard.php?addRecord=0");
+            exit();
+        }
+    }   
+}
+
+function getAllTimesByUserId($idUsuario) {
+    $recordModel = new Registros();
+    $recordModel->setIdUsuario($idUsuario);
+    $record = $recordModel->getAllTimesByUserId();
+    return json_encode($record);
 }
 
 

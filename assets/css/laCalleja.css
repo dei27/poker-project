@@ -29,7 +29,7 @@ font-family: 'Ubuntu Mono', monospace; */
 }
 
 body{
-    background-image: url(../images/cooking05.jpg);
+    background-image: url(../images/lacallejaFondo.jpg);
     background-position: center center;
     background-repeat: no-repeat;
     background-size: cover;
@@ -54,4 +54,21 @@ body{
 
 .display-1{
     font-family: 'Londrina Solid', sans-serif !important;
+}
+
+.falling-letters {
+    display: inline-block;
+    position: relative;
+    animation: fall 1.5s ease-in-out forwards;
+}
+
+@keyframes fall {
+    0% {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }

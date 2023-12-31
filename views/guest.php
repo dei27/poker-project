@@ -13,9 +13,9 @@ if (session_status() === PHP_SESSION_NONE) {
     <meta name="keywords" content="poker, casino, juegos de azar, Occidente, Costa Rica">
     <meta name="author" content="Deivi Campos">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../node_modules/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="../assets/css/guest.css">
-    <title>Home</title>
+    <title>Inicio</title>
 </head>
 <body>
     <header>

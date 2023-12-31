@@ -3,80 +3,47 @@ require_once('dbModel.php');
 
 class Registros extends BaseModel {
 
-    private $id;
-    private $torneoId;
-    private $jugadorId;
+    private $id_registro;
+    private $id_usuario;
+    private $tipo;
+    private $hora;
 
-    public function setTorneoId($torneoId) {
-        $this->torneoId = $torneoId;
+    public function setIdRegistro($id_registro)
+    {
+        $this->id_registro = $id_registro;
     }
 
-    public function setJugadorId($jugadorId) {
-        $this->jugadorId = $jugadorId;
+    public function setIdUsuario($id_usuario)
+    {
+        $this->id_usuario = $id_usuario;
     }
 
-    public function getTorneoId() {
-        return $this->torneoId;
+    public function setTipo($tipo)
+    {
+        $this->tipo = $tipo;
     }
 
-    public function getJugadorId() {
-        return $this->jugadorId;
-    }
-
-
-    public function __construct($torneoId = null, $jugadorId = null) {
-        parent::__construct();
-        $this->torneoId = $torneoId;
-        $this->jugadorId = $jugadorId;
-    }
-
-    public function getAllRecords($torneoId) {
-        try {
-            $query = "SELECT jugador_id, nickname FROM registros r INNER JOIN jugadores j on j.id = r.jugador_id where torneo_id = :torneoId";
-            $stmt = $this->conn->prepare($query);
-            $stmt->bindParam(':torneoId', $torneoId, PDO::PARAM_INT);
-            $stmt->execute();
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            die("Error: " . $e->getMessage());
-        }
+    public function setHora($hora)
+    {
+        $this->hora = $hora;
     }
     
 
-    public function CountPlayersByIdTournament($torneoId) {
-        try {
-            $query = "SELECT COUNT(jugador_id) as total FROM registros WHERE torneo_id = :torneoId";
-            $stmt = $this->conn->prepare($query);
-            $stmt->bindParam(':torneoId', $torneoId, PDO::PARAM_INT);
-            $stmt->execute();
-
-            $result = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            return ($result !== false) ? $result['total'] : 0;
-        } catch (PDOException $e) {
-            die("Error: " . $e->getMessage());
-        }
+    public function __construct($id_registro = null, $id_usuario = null , $tipo = null, $hora = null) {
+        parent::__construct();
+        $this->id_registro = $id_registro;
+        $this->id_usuario = $id_usuario;
+        $this->tipo = $tipo;
+        $this->hora = $hora;
     }
 
-    public function deletePlayerRecordById($id, $idTournament) {
+    public function addRecordByIdUser() {
         try {
-            $query = "DELETE FROM registros WHERE jugador_id = :id and torneo_id = :idTournament";
+            $query = "INSERT INTO registros_horarios (id_usuario, tipo, hora) VALUES (:id_usuario, :tipo, :hora)";
             $stmt = $this->conn->prepare($query);
-            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-            $stmt->bindParam(':idTournament', $idTournament, PDO::PARAM_INT);
-            $stmt->execute();
-            return true; 
-        } catch (PDOException $e) {
-            die("Error: " . $e->getMessage());
-        }
-    }
-
-    public function addPlayerRecordById() {
-        try {
-            $query = "INSERT INTO registros (torneo_id, jugador_id) VALUES (:torneoId, :jugadorId)";
-            $stmt = $this->conn->prepare($query);
-            $stmt->bindParam(':torneoId', $this->torneoId, PDO::PARAM_INT);
-            $stmt->bindParam(':jugadorId', $this->jugadorId, PDO::PARAM_INT);
+            $stmt->bindParam(':id_usuario', $this->id_usuario, PDO::PARAM_INT);
+            $stmt->bindParam(':tipo', $this->tipo, PDO::PARAM_INT);
+            $stmt->bindParam(':hora', $this->hora, PDO::PARAM_STR);
             $stmt->execute();
             return true; 
 
@@ -85,6 +52,17 @@ class Registros extends BaseModel {
             return false;
         }
     }
-    
+
+    public function getAllTimesByUserId() {
+        try {
+            $query = "SELECT DISTINCT t.id_tipo_registro, t.nombre_tipo FROM tipos_registro_horarios t WHERE t.id_tipo_registro NOT IN (SELECT DISTINCT rh.tipo FROM registros_horarios rh WHERE rh.id_usuario = :id_usuario AND DATE_FORMAT(rh.hora, '%Y-%m-%d') = DATE_FORMAT(NOW(), '%Y-%m-%d'))";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id_usuario', $this->id_usuario, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            die("Error: " . $e->getMessage());
+        }
+    }
     
 }

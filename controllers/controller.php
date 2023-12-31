@@ -17,6 +17,7 @@ if (isset($_POST['action'])) {
         
             if ($user) {
                 $_SESSION['user'] = $user;
+                $_SESSION['userId'] = $user['id'];
                 header("Location: " . ($user['role'] == '1' ? '../views/dashboard.php' : '../views/guest.php'));
             } else {
                 header("Location: ../views/login.php?credenciales=0");

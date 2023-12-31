@@ -1,6 +1,6 @@
 <?php
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'poker');
+define('DB_NAME', 'monchister');
 define('DB_USER', 'root');
 define('DB_PASSWORD', '');
 
