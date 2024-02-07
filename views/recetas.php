@@ -4,6 +4,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 include('../controllers/controllerRecetas.php');
+include('../controllers/controllerIngredientesRecetas.php');
 $recetasPrincipales = json_decode(getAllRecetas(),true);
 ?>
 
@@ -18,6 +19,8 @@ $recetasPrincipales = json_decode(getAllRecetas(),true);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/colreorder/1.5.5/css/colReorder.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.0.0/css/buttons.dataTables.min.css">
     <link rel="stylesheet" href="../assets/css/style.css">
     <title>Recetas</title>
 </head>
@@ -39,13 +42,14 @@ $recetasPrincipales = json_decode(getAllRecetas(),true);
 if (isset($_SESSION["user"])) {
 ?>
     <div class="container-fluid mt-5 vh-100 p-5">
-        <div class="table-responsive card p-3">
+        <div class="card p-3">
             <div class="card-header mb-3 py-3">Recetas principales</div>
             <h5 class="card-text">
                 <a href="#" class="text-decoration-none text-info" data-bs-toggle="modal" data-bs-target="#addTournament">
                 <img src="../assets/images/recetas.png" alt="Crear torneo" class="img-fluid"> Agregar una nueva receta.
                 </a>
             </h5>
+            <div class="table-responsive">
             <table id="example" class="table table-dark table-striped table-hover">
                 <thead class="table-warning">
                     <tr>
@@ -70,14 +74,45 @@ if (isset($_SESSION["user"])) {
                                     <div class="modal-dialog modal-lg modal-dialog-centered">
                                         <div class="modal-content">
                                             <div class="modal-header bg-dark">
-                                                <h5 class="modal-title" id="modalRecetaLabel"><?php echo $receta['nombre_receta']; ?></h5>
+                                                <h5 class="modal-title" id="modalRecetaLabel">Receta: <?php echo $receta['nombre_receta']; ?></h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
-                                            <div class="modal-body">
-                                                
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                            <div class="modal-body bg-light">
+                                                <h5 class="">
+                                                    <a href="#" class="text-decoration-none text-info" data-bs-toggle="modal" data-bs-target="#addTournament">
+                                                        <img src="../assets/images/ingredientes.png" alt="logo ingredientes" class="img-fluid"> Agregar nuevo ingrediente.
+                                                    </a>
+                                                </h5>
+                                                <form action="procesar_seleccion_ingredientes.php" method="post">
+                                                    <div class="table-responsive">
+                                                    <table id="recetas" class="table table-dark table-striped table-hover">
+                                                        <thead class="table-warning">
+                                                            <tr>
+                                                                <th>Check</th>
+                                                                <th>Nombre</th>
+                                                                <th>Cantidad</th>
+                                                                <th>Medida</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <?php
+                                                            $ingredientesReceta = json_decode(getAllIngredientesByReceta($receta['id_receta']), true);
+                                                            foreach ($ingredientesReceta as $ingrediente) {
+                                                                echo '<tr>';
+                                                                echo '<td><input type="checkbox" name="ingredientes_seleccionados[]" value="' . $ingrediente['id_ingrediente'] . '" checked></td>';
+                                                                echo '<td>' . $ingrediente['nombre'] . '</td>';
+                                                                echo '<td>' . $ingrediente['cantidad'] . '</td>';
+                                                                echo '<td>' . $ingrediente['nombre_unidad'] . '</td>';
+                                                                echo '</tr>';
+                                                            }
+                                                            ?>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div class="form-group mb-3 text-center">
+                                                    <button type="submit" class="btn btn-primary">Guardar selección</button>
+                                                </div>
+                                                </form>
                                             </div>
                                         </div>
                                     </div>
@@ -164,14 +199,15 @@ if (isset($_SESSION["user"])) {
                     <?php endforeach; ?>
                 </tbody>
             </table>
+            </div>
         </div>
     </div>
-<!-- modal agregar categoria -->
+<!-- modal agregar receta -->
 <div class="modal fade" id="addTournament" tabindex="-1" aria-labelledby="addTournamentLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                 <div class="modal-header text-bg-dark">
-                    <h5 class="modal-title" id="addTournament">Agregar Nueva Categoría</h5>
+                    <h5 class="modal-title" id="addTournament">Agregar Nueva Receta</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                     <div class="modal-body">
@@ -320,10 +356,6 @@ if (isset($_GET['insertedReceta'])) {
 }
 ?>
 
-
-
-
-
 <!-- Move these script tags to the end of the body -->
 <script src="../assets/js/main.js"></script>
 <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
@@ -331,17 +363,40 @@ if (isset($_GET['insertedReceta'])) {
 <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
+<!-- Incluye ColReorder (JavaScript) -->
+<script src="https://cdn.datatables.net/colreorder/1.5.5/js/dataTables.colReorder.min.js"></script>
+
+<!-- Incluye DataTables Buttons (JavaScript) -->
+<script src="https://cdn.datatables.net/buttons/2.0.0/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.0.0/js/buttons.colVis.min.js"></script>
+
+
 <script>
     $(document).ready(function() {
-        $('#example').DataTable({
+        $('#recetas, #example').DataTable({
             lengthChange: false,
             pageLength: 10,
             info: false,
-            "language": {
-                "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
+            responsive: true,
+            language: {
+                url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
+            },
+            colReorder: true, // Habilita ColReorder
+            dom: 'lBfrtip',
+            buttons: [
+                'copy', 'csv', 'excel', 'pdf', 'print',
+                {
+                    extend: 'colvis', // Agrega el botón para elegir columnas
+                    text: 'Elegir columnas',
+                    className: 'btn btn-secondary'
+                }
+            ],
+            initComplete: function(settings, json) {
+                $(".dataTables_filter label").addClass("text-dark");
             }
         });
     });
 </script>
+
 </body>
 </html>
