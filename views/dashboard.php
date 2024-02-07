@@ -67,12 +67,27 @@ if (isset($_SESSION["userId"])) {
                     <div class='row'>
                         <div class='col-6'>
                             <a href='ordenes.php' class='col-6 text-center w-100 my-5 p-1 rounded-pill border-0 btn btn-light py-3' data-bs-toggle='tooltip' data-bs-placement='top' data-bs-custom-class='custom-tooltip' data-bs-title='Ver órdenes'><img src='../assets/images/pedidos.png' alt='libro de recetas' class='img-fluid'></a>
-                            <a href='productos.php' class='col-6 text-center w-100 my-5 p-1 rounded-pill border-0 btn btn-light py-3' data-bs-toggle='tooltip' data-bs-placement='top' data-bs-custom-class='custom-tooltip' data-bs-title='Ver productos'><img src='../assets/images/ingredientes.png' alt='libro de recetas' class='img-fluid'></a>
-                            
                         </div>
                         <div class='col-6'>
                             <a href='recetas.php' class='col-6 text-center w-100 my-5 p-1 rounded-pill border-0 btn btn-light py-3' data-bs-toggle='tooltip' data-bs-placement='top' data-bs-custom-class='custom-tooltip' data-bs-title='Ver recetas'><img src='../assets/images/recetas.png' alt='libro de recetas' class='img-fluid'></a>
-                            <a href='categorias.php' class='col-6 text-center w-100 my-5 p-1 rounded-pill border-0 btn btn-light py-3' data-bs-toggle='tooltip' data-bs-placement='top' data-bs-custom-class='custom-tooltip' data-bs-title='Ver categorías'><img src='../assets/images/categorias.png' alt='libro de recetas' class='img-fluid'></a>    
+                            
+                        </div>
+                    </div>
+                    <div class='row'>
+                        <div class='col-6'>
+                            <a href='productos.php' class='col-6 text-center w-100 my-5 p-1 rounded-pill border-0 btn btn-light py-3' data-bs-toggle='tooltip' data-bs-placement='top' data-bs-custom-class='custom-tooltip' data-bs-title='Ver ingredientes'><img src='../assets/images/ingredientes.png' alt='libro de recetas' class='img-fluid'></a>
+                        </div>
+                        <div class='col-6'>
+                            <a href='categorias.php' class='col-6 text-center w-100 my-5 p-1 rounded-pill border-0 btn btn-light py-3' data-bs-toggle='tooltip' data-bs-placement='top' data-bs-custom-class='custom-tooltip' data-bs-title='Ver categorías'><img src='../assets/images/categorias.png' alt='libro de recetas' class='img-fluid'></a>  
+                        </div>
+                    </div>
+
+                    <div class='row'>
+                        <div class='col-6'>
+                            <a href='bebidas.php' class='col-6 text-center w-100 my-5 p-1 rounded-pill border-0 btn btn-light py-3' data-bs-toggle='tooltip' data-bs-placement='top' data-bs-custom-class='custom-tooltip' data-bs-title='Ver bebidas'><img src='../assets/images/bebidas.png' alt='imagen de te' class='img-fluid'></a>
+                        </div>
+                        <div class='col-6'>
+                            <a href='categorias.php' class='col-6 text-center w-100 my-5 p-1 rounded-pill border-0 btn btn-light py-3' data-bs-toggle='tooltip' data-bs-placement='top' data-bs-custom-class='custom-tooltip' data-bs-title='Ver categorías'><img src='../assets/images/categorias.png' alt='libro de recetas' class='img-fluid'></a> 
                         </div>
                     </div>
                 </div>
