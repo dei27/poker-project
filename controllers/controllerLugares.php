@@ -2,7 +2,8 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-include('../models/lugaresModel.php');
+
+include(__DIR__ . '/../models/lugaresModel.php');
 
 function getAllPlaces() {
     $lugarModel = new Lugar();

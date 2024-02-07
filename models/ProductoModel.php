@@ -56,6 +56,27 @@ class Producto extends BaseModel {
         }
     }
 
+    public function getAllProductsNotIn($id_receta) {
+        try {
+            $query = "SELECT p.*, cp.nombre_categoria, um.nombre_unidad
+            FROM productos p
+            LEFT JOIN recetas_ingredientes ri ON p.id_producto = ri.id_ingrediente AND ri.id_receta = :id_receta
+            INNER JOIN unidades_medidas um
+            ON p.id_unidad = um.id_unidad
+            INNER JOIN categorias_productos cp
+            ON p.id_categoria = cp.id_categoria
+            WHERE ri.id_receta IS NULL;";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id_receta', $id_receta, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            die("Error: " . $e->getMessage());
+        }
+    }
+
+    
+
     public function deleteProductById($id) {
         try {
             $query = "DELETE FROM productos WHERE id_producto = :id";

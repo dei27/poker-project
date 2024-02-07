@@ -11,6 +11,12 @@ function getAll() {
     return json_encode($products);
 }
 
+function getAllProductsNotIn($id_receta) {
+    $productModel = new Producto();
+    $products = $productModel->getAllProductsNotIn($id_receta);
+    return json_encode($products);
+}
+
 if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])) {
     $id = $_GET['id'];
 

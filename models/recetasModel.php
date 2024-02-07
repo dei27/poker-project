@@ -5,7 +5,7 @@ class RecetaModel extends BaseModel {
 
     private $id_receta;
     private $nombre_receta;
-    private $instrucciones;
+    private $precio;
     private $tiempo_preparacion;
     private $principal;
     private $complementaria;
@@ -20,8 +20,8 @@ class RecetaModel extends BaseModel {
         $this->nombre_receta = $nombre_receta;
     }
 
-    public function setInstrucciones($instrucciones) {
-        $this->instrucciones = $instrucciones;
+    public function setPrecio($precio) {
+        $this->precio = $precio;
     }
 
     public function setTiempo($tiempo_preparacion) {
@@ -41,10 +41,10 @@ class RecetaModel extends BaseModel {
     }
 
 
-    public function __construct($nombre_receta = null,$instrucciones = null,$tiempo_preparacion = null,$principal = null,$complementaria = null,$especial = null) {
+    public function __construct($nombre_receta = null, $precio = null, $tiempo_preparacion = null,$principal = null,$complementaria = null,$especial = null) {
         parent::__construct();
         $this->nombre_receta = $nombre_receta;
-        $this->instrucciones = $instrucciones;
+        $this->precio = $precio;
         $this->tiempo_preparacion = $tiempo_preparacion;
         $this->principal = $principal;
         $this->complementaria = $complementaria;
@@ -78,9 +78,10 @@ class RecetaModel extends BaseModel {
 
     public function newReceta() {
         try {
-            $query = "INSERT INTO recetas (nombre_receta, tiempo_preparacion, principal, complementaria, especial ) VALUES (:nombre_receta,:tiempo_preparacion,:principal,:complementaria,:especial)";
+            $query = "INSERT INTO recetas (nombre_receta, precio, tiempo_preparacion, principal, complementaria, especial ) VALUES (:nombre_receta, :precio, :tiempo_preparacion,:principal,:complementaria,:especial)";
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':nombre_receta', $this->nombre_receta, PDO::PARAM_STR);
+            $stmt->bindParam(':precio', $this->precio, PDO::PARAM_STR);
             $stmt->bindParam(':tiempo_preparacion', $this->tiempo_preparacion, PDO::PARAM_INT);
             $stmt->bindParam(':principal', $this->principal, PDO::PARAM_INT);
             $stmt->bindParam(':complementaria', $this->complementaria, PDO::PARAM_INT);
@@ -108,10 +109,11 @@ class RecetaModel extends BaseModel {
 
     public function updateRecipeById() {
         try {
-            $query = "UPDATE recetas SET nombre_receta = :nombre_receta, tiempo_preparacion = :tiempo_preparacion, principal = :principal, complementaria = :complementaria, especial = :especial WHERE id_receta = :id_receta";
+            $query = "UPDATE recetas SET nombre_receta = :nombre_receta, precio = :precio, tiempo_preparacion = :tiempo_preparacion, principal = :principal, complementaria = :complementaria, especial = :especial WHERE id_receta = :id_receta";
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':id_receta', $this->id_receta, PDO::PARAM_INT);
             $stmt->bindParam(':nombre_receta', $this->nombre_receta, PDO::PARAM_STR);
+            $stmt->bindParam(':precio', $this->precio, PDO::PARAM_STR);
             $stmt->bindParam(':tiempo_preparacion', $this->tiempo_preparacion, PDO::PARAM_INT);
             $stmt->bindParam(':principal', $this->principal, PDO::PARAM_INT);
             $stmt->bindParam(':complementaria', $this->complementaria, PDO::PARAM_INT);

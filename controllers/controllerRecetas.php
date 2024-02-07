@@ -19,6 +19,8 @@ function getRecetasByCondicion($condicion, $valor) {
 
 if (isset($_POST['action']) && $_POST['action'] === 'add') {
     $nombre = isset($_POST['nombreRecetaI']) ? htmlspecialchars($_POST['nombreRecetaI'], ENT_QUOTES, 'UTF-8') : "Sin nombre";
+    $precio = isset($_POST['precioRecetaI']) ? $_POST['precioRecetaI'] : 0.0;
+    $precio = filter_var($precio, FILTER_VALIDATE_FLOAT);
     $tiempo = isset($_POST['tiempoRecetaI']) ? filter_input(INPUT_POST, 'tiempoRecetaI', FILTER_SANITIZE_NUMBER_INT) : 0;
     $principal = isset($_POST['isPrincipalI']) ? filter_input(INPUT_POST, 'isPrincipalI', FILTER_SANITIZE_NUMBER_INT) : 0;
     $complementaria = isset($_POST['isComplementariaI']) ? filter_input(INPUT_POST, 'isComplementariaI', FILTER_SANITIZE_NUMBER_INT) : 0;
@@ -27,6 +29,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'add') {
     if ($nombre !== null && !empty($nombre)) {
         $recetaModel = new RecetaModel();
         $recetaModel->setNombre($nombre);
+        $recetaModel->setPrecio($precio);
         $recetaModel->setTiempo($tiempo);
         $recetaModel->setPrincipal($principal);
         $recetaModel->setComplementaria($complementaria);
@@ -49,7 +52,8 @@ if (isset($_POST['action']) && $_POST['action'] === 'add') {
 if (isset($_POST['action']) && $_POST['action'] === 'edit') {
     $id = filter_input(INPUT_POST, 'id_receta', FILTER_SANITIZE_NUMBER_INT);
     $nombre = isset($_POST['nombreReceta']) ? htmlspecialchars($_POST['nombreReceta'], ENT_QUOTES, 'UTF-8') : "Sin nombre";
-    $instrucciones = isset($_POST['instruccionesReceta']) ? htmlspecialchars($_POST['instruccionesReceta'], ENT_QUOTES, 'UTF-8') : null;
+    $precio = isset($_POST['precioReceta']) ? $_POST['precioReceta'] : 0.0;
+    $precio = filter_var($precio, FILTER_VALIDATE_FLOAT);
     $tiempo = isset($_POST['tiempoReceta']) ? filter_input(INPUT_POST, 'tiempoReceta', FILTER_SANITIZE_NUMBER_INT) : 0;
     $principal = isset($_POST['isPrincipal']) ? filter_input(INPUT_POST, 'isPrincipal', FILTER_SANITIZE_NUMBER_INT) : 0;
     $complementaria = isset($_POST['isComplementaria']) ? filter_input(INPUT_POST, 'isComplementaria', FILTER_SANITIZE_NUMBER_INT) : 0;
@@ -59,6 +63,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'edit') {
         $recetaModel = new RecetaModel();
         $recetaModel->setId($id);
         $recetaModel->setNombre($nombre);
+        $recetaModel->setPrecio($precio);
         $recetaModel->setTiempo($tiempo);
         $recetaModel->setPrincipal($principal);
         $recetaModel->setComplementaria($complementaria);

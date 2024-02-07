@@ -50,6 +50,36 @@ class RecetaIngredienteModel extends BaseModel {
         }
     }
 
+    public function newRecetaIngredientes() {
+        try {
+            $query = "INSERT INTO recetas_ingredientes (id_receta, id_ingrediente, cantidad, unidad_medida) VALUES (:id_receta, :id_ingrediente, :cantidad, :unidad_medida)";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id_receta', $this->id_receta, PDO::PARAM_INT);
+            $stmt->bindParam(':id_ingrediente', $this->id_ingrediente, PDO::PARAM_INT);
+            $stmt->bindParam(':cantidad', $this->cantidad, PDO::PARAM_STR);
+            $stmt->bindParam(':unidad_medida', $this->unidad_medida, PDO::PARAM_INT);
+            $stmt->execute();
+            return true; 
+
+        } catch (PDOException $e) {
+            die("Error: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function deleteIngredientesByIdReceta() {
+    try {
+            $query = "DELETE FROM recetas_ingredientes WHERE id_receta = :id_receta AND id_ingrediente = :id_ingrediente";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id_receta', $this->id_receta, PDO::PARAM_INT);
+            $stmt->bindParam(':id_ingrediente', $this->id_ingrediente, PDO::PARAM_INT);
+            $stmt->execute();
+            return true; 
+        } catch (PDOException $e) {
+            die("Error: " . $e->getMessage());
+        }
+    }
+
     // public function getRecetasByCondicion($campo, $valor) {
     //     try {
     //         $query = "SELECT * FROM recetas WHERE $campo = :valor";

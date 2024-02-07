@@ -11,40 +11,71 @@ function getAllIngredientesByReceta($idReceta) {
     return json_encode($recetasIngredientes);
 }
 
-// function getRecetasByCondicion($condicion, $valor) {
-//     $recetaModel = new RecetaModel();
-//     $recetas = $recetaModel->getRecetasByCondicion($condicion, $valor);
-//     return json_encode($recetas);
-// }
+if (isset($_POST['action']) && $_POST['action'] === 'add') {
+    $id_receta = filter_input(INPUT_POST, 'idReceta', FILTER_SANITIZE_NUMBER_INT);
+    $ingredientes_nuevos = isset($_POST['ingredientes_nuevos']) ? $_POST['ingredientes_nuevos'] : [];
+    $resultQuery = false;
 
-// if (isset($_POST['action']) && $_POST['action'] === 'add') {
-//     $nombre = isset($_POST['nombreRecetaI']) ? htmlspecialchars($_POST['nombreRecetaI'], ENT_QUOTES, 'UTF-8') : "Sin nombre";
-//     $tiempo = isset($_POST['tiempoRecetaI']) ? filter_input(INPUT_POST, 'tiempoRecetaI', FILTER_SANITIZE_NUMBER_INT) : 0;
-//     $principal = isset($_POST['isPrincipalI']) ? filter_input(INPUT_POST, 'isPrincipalI', FILTER_SANITIZE_NUMBER_INT) : 0;
-//     $complementaria = isset($_POST['isComplementariaI']) ? filter_input(INPUT_POST, 'isComplementariaI', FILTER_SANITIZE_NUMBER_INT) : 0;
-//     $especial = isset($_POST['isEspecialI']) ? filter_input(INPUT_POST, 'isEspecialI', FILTER_SANITIZE_NUMBER_INT) : 0;
+    if ($id_receta !== null && !empty($id_receta) && !empty($ingredientes_nuevos)) {
+        $recetaIngredienteModel = new RecetaIngredienteModel();
 
-//     if ($nombre !== null && !empty($nombre)) {
-//         $recetaModel = new RecetaModel();
-//         $recetaModel->setNombre($nombre);
-//         $recetaModel->setTiempo($tiempo);
-//         $recetaModel->setPrincipal($principal);
-//         $recetaModel->setComplementaria($complementaria);
-//         $recetaModel->setEspecial($especial);
-//         $resultQuery = $recetaModel->newReceta();
+        // Iterar sobre los ingredientes seleccionados y realizar la inserción
+        foreach ($ingredientes_nuevos as $id_producto) {
+            // Obtener cantidad
+            $cantidad = isset($_POST['cantidades'][$id_producto]) ? filter_var($_POST['cantidades'][$id_producto], FILTER_VALIDATE_FLOAT) : 0.0;
 
-//         if($resultQuery){
-//             header("Location: ../views/recetas.php?insertedReceta=1");
-//             exit();
-//         }else {
-//             header("Location: ../views/recetas.php?insertedReceta=0");
-//             exit();
-//         }
-//     } else {
-//         header("Location: ../views/recetas.php?insertedReceta=0");
-//         exit();
-//     }
-// }
+            // Obtener unidad
+            $unidad = isset($_POST['unidades'][$id_producto]) ? filter_var($_POST['unidades'][$id_producto], FILTER_SANITIZE_NUMBER_INT) : 1;
+
+            $recetaIngredienteModel->setIdReceta($id_receta);
+            $recetaIngredienteModel->setIdIngrediente($id_producto);
+            $recetaIngredienteModel->setCantidad($cantidad);
+            $recetaIngredienteModel->setUnidadMedida($unidad);
+            $resultQuery = $recetaIngredienteModel->newRecetaIngredientes();
+        }
+
+        if ($resultQuery) {
+            header("Location: ../views/recetas.php?insertedIngredientes=1");
+            exit();
+        } else {
+            header("Location: ../views/recetas.php?insertedIngredientes=0");
+            exit();
+        }
+    } else {
+        header("Location: ../views/recetas.php?insertedIngredientes=0");
+        exit();
+    }
+}
+
+
+if (isset($_POST['action']) && $_POST['action'] === 'delete') {
+    $id_receta = filter_input(INPUT_POST, 'idRecetaDelete', FILTER_SANITIZE_NUMBER_INT);
+    $ingredientes_nuevos = isset($_POST['ingredientes_seleccionados']) ? $_POST['ingredientes_seleccionados'] : [];
+    $resultQuery = false;
+
+    print_r($ingredientes_nuevos);
+
+    if ($id_receta !== null && !empty($id_receta) && !empty($ingredientes_nuevos)) {
+        $recetaIngredienteModel = new RecetaIngredienteModel();
+        $recetaIngredienteModel->setIdReceta($id_receta);
+
+        // Iterar sobre los ingredientes seleccionados y realizar la inserción
+        foreach ($ingredientes_nuevos as $id_ingrediente) {
+            $recetaIngredienteModel->setIdIngrediente($id_ingrediente);
+            $resultQuery = $recetaIngredienteModel->deleteIngredientesByIdReceta();
+        }
+
+        if($resultQuery){
+            header("Location: ../views/recetas.php?deletedIngredientes=1");
+            exit();
+        }else {
+            header("Location: ../views/recetas.php?deletedIngredientes=0");
+            exit();
+        }
+       
+    }
+}
+
 
 // if (isset($_POST['action']) && $_POST['action'] === 'edit') {
 //     $id = filter_input(INPUT_POST, 'id_receta', FILTER_SANITIZE_NUMBER_INT);
@@ -78,24 +109,6 @@ function getAllIngredientesByReceta($idReceta) {
 //         header("Location: ../views/recetas.php?updatedReceta=0");
 //         exit();
 //     }
-// }
-
-// if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])) {
-//     $id = $_GET['id'];
-//     $recetaModel = new RecetaModel();
-//     $recetaModel->setId($id);
-//     $resultQuery = $recetaModel->deleteRecipeById($id);
-
-//     if($resultQuery){
-//         header("Location: ../views/recetas.php?deletedReceta=1");
-//         exit();
-//     }else {
-//         header("Location: ../views/recetas.php?deletedReceta=0");
-//         exit();
-//     }
-    
-//     header("Location: ../views/recetas.php?deletedReceta=1");
-//     exit();
 // }
 
 
