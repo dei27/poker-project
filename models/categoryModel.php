@@ -22,7 +22,7 @@ class Category extends BaseModel {
 
     public function getAllCategories() {
         try {
-            $query = "SELECT * FROM categorias_productos";
+            $query = "SELECT * FROM categorias_productos ORDER BY nombre_categoria ASC;";
             $stmt = $this->conn->prepare($query);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);

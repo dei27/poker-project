@@ -11,7 +11,8 @@ $products = json_decode(getAll(),true);
 if (isset($_GET['idPedido'])) {
     $id_pedido = $_GET['idPedido'];
     $pedido = getPedidoById($id_pedido);
-    $detallesPedidos =  json_decode(getAllDetalles($id_pedido),true);
+    $detallesPedidos =  json_decode(getAllDetallesMontos($id_pedido),true);
+    $bebidasPlatillos = json_decode(getAllBebidasAndPlatillos(),true);
 }
 
 
@@ -64,10 +65,11 @@ if (isset($_GET['idPedido'])) {
                     <div class="card-body">
                         <div class="table-responsive">
                             <table id="productosOrden" class="table table-dark table-striped table-hover">
-                                <thead class="table-warning">
+                            <thead class="table-warning">
                                     <tr>
                                         <th>Id</th>  
-                                        <th>Nombre</th>  
+                                        <th>Precio</th>  
+                                        <th>Nombre</th> 
                                         <?php 
                                             if(isset($_SESSION["user"])){
                                                 echo '<th class="text-center">Acciones</th>';
@@ -76,13 +78,14 @@ if (isset($_GET['idPedido'])) {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php foreach ($products as $product):?>
+                                    <?php foreach ($bebidasPlatillos as $product):?>
                                         <tr>
-                                            <td><?php echo $product['id_producto']; ?></td>
-                                            <td><?php echo $product['nombre']; ?></td>
+                                            <td><?php echo $product['id']; ?></td>
+                                            <td><?php echo $product['precio']; ?></td>
+                                            <td><?php echo $product['producto']; ?></td>
                                             <td class="text-center">
                                                 <?php if(isset($_SESSION["user"])): ?>
-                                                    <span id="cart_<?php echo $product['id_producto']; ?>" class="btn cart-button text-white">
+                                                    <span id="cart_<?php echo $product['id']; ?>" class="btn cart-button text-white">
                                                         <i class="bi bi-cart-plus-fill"></i>
                                                     </span>
                                                 <?php endif; ?>
@@ -100,27 +103,29 @@ if (isset($_GET['idPedido'])) {
                     <h4 class="card-header mb-3 py-3">Orden #<?php echo $id_pedido; ?></h4>
                     <div class="card-body">
                         <form action="../controllers/controllerPedidos.php" method="post">
+                            <input type="hidden" name="action" value="updateOrden">
+                            <input type="hidden" name="idOrden" value="<?php echo $id_pedido; ?>">
                             <div class="row mb-3">
                                 <div class="col">
-                                    <label for="nombreCliente" class="form-label">Nombre del Cliente</label>
-                                    <input type="text" class="form-control" id="nombreCliente" name="nombreCliente" required value="<?php echo isset($pedido['nombre_cliente']) && !empty($pedido['nombre_cliente']) ? $pedido['nombre_cliente'] : ''; ?>" placeholder="Nombre...">
+                                    <label for="nombreClienteUpdate" class="form-label">Nombre del Cliente</label>
+                                    <input type="text" class="form-control" id="nombreClienteUpdate" name="nombreClienteUpdate" required value="<?php echo isset($pedido['nombre_cliente']) && !empty($pedido['nombre_cliente']) ? $pedido['nombre_cliente'] : ''; ?>" placeholder="Nombre...">
                                 </div>
                                 <div class="col">
-                                    <label for="telefonoCliente" class="form-label">Teléfono del Cliente</label>
-                                    <input type="tel" class="form-control" id="telefonoCliente" name="telefonoCliente" required value="<?php echo isset($pedido['telefono_cliente']) && !empty($pedido['telefono_cliente']) ? $pedido['telefono_cliente'] : ''; ?>">
+                                    <label for="telefonoClienteUpdate" class="form-label">Teléfono del Cliente</label>
+                                    <input type="tel" class="form-control" id="telefonoClienteUpdate" name="telefonoClienteUpdate" required value="<?php echo isset($pedido['telefono_cliente']) && !empty($pedido['telefono_cliente']) ? $pedido['telefono_cliente'] : ''; ?>">
                                 </div>
                             </div>
                             <div class="row mb-3">
                                 <div class="col">
-                                    <label for="servicioOrden" class="form-label">Servicio</label>
-                                    <select class="form-select" id="servicioOrden" name="servicioOrden">
+                                    <label for="servicioOrdenUpdate" class="form-label">Servicio</label>
+                                    <select class="form-select" id="servicioOrdenUpdate" name="servicioOrdenUpdate">
                                         <option value="0">0%</option>
                                         <option value="10" selected>10%</option>
                                     </select>
                                 </div>
                                 <div class="col">
-                                    <label for="ivaOrden" class="form-label">IVA</label>
-                                    <select class="form-select" id="ivaOrden" name="ivaOrden">
+                                    <label for="ivaOrdenUpdate" class="form-label">IVA</label>
+                                    <select class="form-select" id="ivaOrdenUpdate" name="ivaOrdenUpdate">
                                         <option value="0">0%</option>
                                         <option value="13" selected>13%</option>
                                     </select>
@@ -128,18 +133,19 @@ if (isset($_GET['idPedido'])) {
                             </div>
                             <div class="row mb-3">
                                 <div class="col">
-                                    <label for="direccionCliente" class="form-label">Dirección del Cliente</label>
-                                    <textarea class="form-control" id="direccionCliente" name="direccionCliente" rows="3" required><?php echo isset($pedido['direccion_cliente']) ? $pedido['direccion_cliente'] : ''; ?></textarea>
+                                    <label for="direccionClienteUpdate" class="form-label">Dirección del Cliente</label>
+                                    <textarea class="form-control" id="direccionClienteUpdate" name="direccionClienteUpdate" rows="3" required><?php echo isset($pedido['direccion_cliente']) ? $pedido['direccion_cliente'] : ''; ?></textarea>
                                 </div>
                             </div>
                             <div class="row mb-3">
                                 <div class="col">
-                                    <label for="direccionCliente" class="form-label">Productos de la orden:</label>
+                                    <h6>Productos de la orden:</h6>
                                     <div id="tablaProductos" class="table-responsive">
                                         <table id="tablaProductosTable" class="table table-light table-striped">
                                             <thead>
                                                 <tr>
                                                     <th>Nombre</th>
+                                                    <th>Precio</th>
                                                     <th>Cantidad</th>
                                                     <th>Acción</th>
                                                 </tr>
@@ -149,7 +155,8 @@ if (isset($_GET['idPedido'])) {
                                                     <?php foreach ($detallesPedidos as $detalle) { ?>
                                                         <tr>
                                                             <td><?php echo $detalle['producto']; ?></td>
-                                                            <td><input type="number" class="form-control cantidad" name="cantidad[<?php echo $detalle['id_detalle']; ?>]" value="<?php echo $detalle['cantidad']; ?>"></td>
+                                                            <td><?php echo $detalle['precio']; ?></td>
+                                                            <td><input type="number" class="form-control cantidad" name="cantidad[<?php echo $detalle['product_id']; ?>]" value="<?php echo $detalle['cantidad']; ?>"></td>
                                                             <td><span class="btn remove-button"><i class="bi bi-cart-x-fill"></i></span></td>
                                                         </tr>
                                                     <?php } ?>
@@ -229,6 +236,21 @@ if (isset($_GET['idPedido'])) {
             </script>
             ';
         }
+
+        if (isset($_GET['emptyProducts']) && $_GET['emptyProducts'] == 0) {
+            echo '
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            <script>
+                Swal.fire({
+                    icon: "error",
+                    title: "No se puedo procesar",
+                    timer: 2500,
+                    text: "No se agregaron productos a la orden.",
+                    showConfirmButton: false
+                });
+            </script>
+            ';
+        }
     ?>
 
 </div>
@@ -260,25 +282,20 @@ if (isset($_GET['idPedido'])) {
             }
         });
 
-        $('#productosOrden th:first-child, #productosOrden td:first-child').css('display', 'none');
+        $('#productosOrden th:first-child, #productosOrden td:first-child, #productosOrden th:nth-child(2), #productosOrden td:nth-child(2)').css('display', 'none');
 
         $("span.cart-button").click(function(){
             let productId = $(this).closest("tr").find("td:first").text();
-            let productName = $(this).closest("tr").find("td:eq(1)").text();
+            let productPrice = $(this).closest("tr").find("td:eq(1)").text();
+            let productName = $(this).closest("tr").find("td:eq(2)").text();
             let cantidad = 1;
-            let tableRow = "<tr><td>" + productName + "</td><td><input type='number' class='form-control cantidad' name='cantidad[" + productId + "]' value='" + cantidad + "'></td><td><span class='btn remove-button'><i class='bi bi-cart-x-fill'></i></span></td></tr>";
+            let tableRow = "<tr><td>" + productName + "</td><td>" + productPrice + "</td><td><input type='number' class='form-control cantidad' name='cantidad[" + productId + "]' value='" + cantidad + "' min=1 required></td><td><span class='btn remove-button'><i class='bi bi-cart-x-fill'></i></span></td></tr>";
 
             $("#tablaProductosTable tbody").append(tableRow);
-            
-            let totalProductos = parseInt($("#totalProductos").val()) + 1;
-            $("#totalProductos").val(totalProductos);
         });
 
         $(document).on("click", ".remove-button", function(){
             $(this).closest("tr").remove();
-            
-            let totalProductos = parseInt($("#totalProductos").val()) - 1;
-            $("#totalProductos").val(totalProductos);
         });
 
     });  

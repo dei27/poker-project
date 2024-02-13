@@ -67,8 +67,8 @@ class BebidaModel extends BaseModel {
         try {
             $query = "INSERT INTO bebidas (nombre_bebida, precio_bebida) VALUES (:nombre_bebida, :precio_bebida)";
             $stmt = $this->conn->prepare($query);
-            $stmt->bindParam(':nombre', $this->nombre_bebida, PDO::PARAM_STR);
-            $stmt->bindParam(':descripcion', $this->precio_bebida, PDO::PARAM_STR);
+            $stmt->bindParam(':nombre_bebida', $this->nombre_bebida, PDO::PARAM_STR);
+            $stmt->bindParam(':precio_bebida', $this->precio_bebida, PDO::PARAM_STR);
             $stmt->execute();
             return true; 
 

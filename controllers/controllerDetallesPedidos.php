@@ -11,6 +11,22 @@ function getAllDetalles($id_pedido) {
     return json_encode($detalles);
 }
 
+function getAllDetallesMontos($id_pedido) {
+    $detallesPedidos = new DetallesPedidos();
+    $detalles = $detallesPedidos->getAllDetallesPedidosAndPrecios($id_pedido);
+    return json_encode($detalles);
+}
+
+function getAllBebidasAndPlatillos() {
+    $detallesPedidos = new DetallesPedidos();
+    $detalles = $detallesPedidos->getAllBebidasAndPlatillos();
+    return json_encode($detalles);
+}
+
+
+
+
+
 
 
 

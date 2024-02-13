@@ -30,7 +30,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])
 if (isset($_POST['id'], $_POST['action']) && $_POST['action'] === 'edit') {
     $id = filter_input(INPUT_POST, 'id', FILTER_SANITIZE_NUMBER_INT);
     $nombre = isset($_POST['nombreProducto']) ? htmlspecialchars($_POST['nombreProducto'], ENT_QUOTES, 'UTF-8') : "Sin nombre";
-    $descripcion = isset($_POST['descripcionProducto']) ? htmlspecialchars($_POST['descripcionProducto'], ENT_QUOTES, 'UTF-8') : "Sin descripcion";
+    $cantidad = isset($_POST['cantidadProducto']) ? htmlspecialchars($_POST['cantidadProducto'], ENT_QUOTES, 'UTF-8') : "Sin cantidad";
     $precio = isset($_POST['precioProducto']) ? $_POST['precioProducto'] : 0.0;
     $precio = filter_var($precio, FILTER_VALIDATE_FLOAT);
     $categoria = isset($_POST['categoriaProducto']) ? filter_input(INPUT_POST, 'categoriaProducto', FILTER_SANITIZE_NUMBER_INT) : 0;
@@ -40,7 +40,7 @@ if (isset($_POST['id'], $_POST['action']) && $_POST['action'] === 'edit') {
         $productModel = new Producto();
         $productModel->setId($id);
         $productModel->setNombre($nombre);
-        $productModel->setDescripcion($descripcion);
+        $productModel->setCantidad($cantidad);
         $productModel->setPrecio($precio);
         $productModel->setCategoria($categoria);
         $productModel->setUnidad($unidad);
@@ -56,7 +56,7 @@ if (isset($_POST['id'], $_POST['action']) && $_POST['action'] === 'edit') {
 
 if (isset($_POST['action']) && $_POST['action'] === 'add') {
     $nombre = isset($_POST['nombreProductoI']) ? htmlspecialchars($_POST['nombreProductoI'], ENT_QUOTES, 'UTF-8') : "Sin nombre";
-    $descripcion = isset($_POST['descripcionProductoI']) ? htmlspecialchars($_POST['descripcionProductoI'], ENT_QUOTES, 'UTF-8') : null;
+    $cantidad = isset($_POST['cantidadProductoI']) ? htmlspecialchars($_POST['cantidadProductoI'], ENT_QUOTES, 'UTF-8') : null;
     $precio = isset($_POST['precioProductoI']) ? $_POST['precioProductoI'] : 0.0;
     $precio = filter_var($precio, FILTER_VALIDATE_FLOAT);
     $categoria = isset($_POST['categoriaProductoI']) ? filter_input(INPUT_POST, 'categoriaProductoI', FILTER_SANITIZE_NUMBER_INT) : 0;
@@ -65,7 +65,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'add') {
     if ($nombre !== null && !empty($nombre)) {
         $productModel = new Producto();
         $productModel->setNombre($nombre);
-        $productModel->setDescripcion($descripcion);
+        $productModel->setCantidad($cantidad);
         $productModel->setPrecio($precio);
         $productModel->setCategoria($categoria);
         $productModel->setUnidad($unidad);

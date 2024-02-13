@@ -148,6 +148,9 @@ $pedidos = json_decode($pedidosData, true);
                                     <a href="#" class="text-decoration-none text-white" data-bs-toggle="modal" data-bs-target="#editModal<?php echo $pedido['id_pedido']; ?>">
                                         <i class="bi bi-pencil-fill text-white"></i>
                                     </a>
+                                    <a href="facturar.php?idFactura=<?php echo $pedido['id_pedido']; ?>" onclick="return confirm('¿Estás seguro de que quieres facturar este pedido?')" class="text-decoration-none text-white mx-3" target="_blank">
+                                        <i class="bi bi-credit-card-2-back-fill text-white"></i>
+                                    </a>
                                 </td>
 
                                 <div class="modal fade" id="editModal<?php echo $pedido['id_pedido']; ?>" tabindex="-1" aria-labelledby="editModalLabel<?php echo $pedido['id_pedido']; ?>" aria-hidden="true">
@@ -179,7 +182,7 @@ $pedidos = json_decode($pedidosData, true);
 
                                                     <div class="form-group mb-3">
                                                         <label for="estadoPedido">Estado</label>
-                                                        <select class="form-select" id="estadoPedido" name="estadoPedido" required>
+                                                        <select class="form-select" id="estadoPedido" name="estadoPedido" required readonly>
                                                             <option value="Pendiente" <?php if($pedido['estado_pedido'] == 'Pendiente') echo 'selected'; ?>>Pendiente</option>
                                                             <option value="Cancelado" <?php if($pedido['estado_pedido'] == 'Cancelado') echo 'selected'; ?>>Cancelado</option>
                                                         </select>
@@ -234,6 +237,69 @@ $pedidos = json_decode($pedidosData, true);
             </script>
             ';
         }
+
+        
+
+        if (isset($_GET['updatedOrden'])) {
+            $status = $_GET['updatedOrden'];
+            
+            $messageConfig = ($status == 1)
+                ? [
+                    'icon' => 'success',
+                    'title' => 'Modicada con éxito',
+                    'text' => 'Orden actualizada.',
+                ]
+                : [
+                    'icon' => 'error',
+                    'title' => 'Error al actualizar',
+                    'text' => 'No se pudo modificar la orden.',
+                ];
+
+            echo '
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            <script>
+                Swal.fire({
+                    icon: "' . $messageConfig['icon'] . '",
+                    title: "' . $messageConfig['title'] . '",
+                    timer: 2500,
+                    text: "' . $messageConfig['text'] . '",
+                    showConfirmButton: false
+                });
+            </script>
+            ';
+        }
+
+        if (isset($_GET['orderAdd'])) {
+            $status = $_GET['orderAdd'];
+            
+            $messageConfig = ($status == 1)
+                ? [
+                    'icon' => 'success',
+                    'title' => 'Añadida con éxito',
+                    'text' => 'Orden agregada.',
+                ]
+                : [
+                    'icon' => 'error',
+                    'title' => 'Error al añadir',
+                    'text' => 'No se pudo agregar la orden.',
+                ];
+
+            echo '
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            <script>
+                Swal.fire({
+                    icon: "' . $messageConfig['icon'] . '",
+                    title: "' . $messageConfig['title'] . '",
+                    timer: 2500,
+                    text: "' . $messageConfig['text'] . '",
+                    showConfirmButton: false
+                });
+            </script>
+            ';
+        }
+
+
+        
 
         if (isset($_GET['deletePedido'])) {
             $status = $_GET['deletePedido'];

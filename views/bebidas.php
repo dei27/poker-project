@@ -43,7 +43,7 @@ $bebidas = json_decode(getAllBebidas(), true);
             if(isset($_SESSION["user"])){
             echo '<h5 class="card-text">
                     <a href="#" class="text-decoration-none text-info" data-bs-toggle="modal" data-bs-target="#addTournament">
-                    <img src="../assets/images/addProduct.png" alt="Crear torneo" class="img-fluid"> Agregar nuevo producto.
+                    <img src="../assets/images/bebidas.png" alt="Crear torneo" class="img-fluid"> Agregar nuevo bebida.
                     </a>
                 </h5>';
             }
@@ -76,11 +76,11 @@ $bebidas = json_decode(getAllBebidas(), true);
                                 </a>
                             </td>
 
-                                <div class="modal fade" id="editModal<?php echo $bebida['id_producto']; ?>" tabindex="-1" aria-labelledby="editModalLabel<?php echo $bebida['id_producto']; ?>" aria-hidden="true">
+                                <div class="modal fade" id="editModal<?php echo $bebida['id_bebida']; ?>" tabindex="-1" aria-labelledby="editModalLabel<?php echo $bebida['id_bebida']; ?>" aria-hidden="true">
                                     <div class="modal-dialog modal-dialog-centered">
                                         <div class="modal-content">
                                             <div class="modal-header text-bg-dark">
-                                                <h5 class="modal-title" id="editModalLabel<?php echo $bebida['id_producto']; ?>">Editar Bebida</h5>
+                                                <h5 class="modal-title" id="editModalLabel<?php echo $bebida['id_bebida']; ?>">Editar Bebida</h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
                                             <div class="modal-body">
@@ -121,7 +121,7 @@ $bebidas = json_decode(getAllBebidas(), true);
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                     <div class="modal-body">
-                        <form action="../controllers/controllerProducts.php" method="post" class="form-floating">
+                        <form action="../controllers/controllerBebidas.php" method="post" class="form-floating">
                             <input type="hidden" name="action" value="add">
                             <div class="form-group mb-3">
                                 <label for="nombreBebidaI">Nombre</label>
@@ -143,84 +143,95 @@ $bebidas = json_decode(getAllBebidas(), true);
             </div>
         </div>
     </div>
+
     <?php
-        if (isset($_GET['delete']) && $_GET['delete'] == 1) {
+        if (isset($_GET['updatedBebida'])) {
+            $status = $_GET['updatedBebida'];
+            
+            $messageConfig = ($status == 1)
+                ? [
+                    'icon' => 'success',
+                    'title' => 'Actualizado con éxito',
+                    'text' => 'Bebida actualizada.',
+                ]
+                : [
+                    'icon' => 'error',
+                    'title' => 'Error al actualizar',
+                    'text' => 'No se pudo actualizar la bebida.',
+                ];
+
             echo '
             <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
             <script>
                 Swal.fire({
-                    icon: "success",
-                    title: "Eliminado con éxito",
+                    icon: "' . $messageConfig['icon'] . '",
+                    title: "' . $messageConfig['title'] . '",
                     timer: 2500,
-                    text: "El producto ha sido eliminado.",
+                    text: "' . $messageConfig['text'] . '",
+                    showConfirmButton: false
+                });
+            </script>
+            ';
+        }
+
+        if (isset($_GET['deleteBebida'])) {
+            $status = $_GET['deleteBebida'];
+            
+            $messageConfig = ($status == 1)
+                ? [
+                    'icon' => 'success',
+                    'title' => 'Eliminado con éxito',
+                    'text' => 'Bebida eliminada.',
+                ]
+                : [
+                    'icon' => 'error',
+                    'title' => 'Error al eliminar',
+                    'text' => 'No se pudo eliminar la bebida.',
+                ];
+
+            echo '
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            <script>
+                Swal.fire({
+                    icon: "' . $messageConfig['icon'] . '",
+                    title: "' . $messageConfig['title'] . '",
+                    timer: 2500,
+                    text: "' . $messageConfig['text'] . '",
+                    showConfirmButton: false
+                });
+            </script>
+            ';
+        }
+
+        if (isset($_GET['insertedBebida'])) {
+            $status = $_GET['insertedBebida'];
+            
+            $messageConfig = ($status == 1)
+                ? [
+                    'icon' => 'success',
+                    'title' => 'Agregada con éxito',
+                    'text' => 'Bebida agrega.',
+                ]
+                : [
+                    'icon' => 'error',
+                    'title' => 'Error al eliminar',
+                    'text' => 'No se pudo agregar la bebida.',
+                ];
+
+            echo '
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            <script>
+                Swal.fire({
+                    icon: "' . $messageConfig['icon'] . '",
+                    title: "' . $messageConfig['title'] . '",
+                    timer: 2500,
+                    text: "' . $messageConfig['text'] . '",
                     showConfirmButton: false
                 });
             </script>
             ';
         }
     ?>
-
-    <?php
-        if (isset($_GET['updatedProduct']) && $_GET['updatedProduct'] == 1) {
-            // Mostrar la alerta de eliminación exitosa con SweetAlert2
-            echo '
-            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-            <script>
-                Swal.fire({
-                    icon: "success",
-                    title: "Actualizado con éxito",
-                    timer: 2500,
-                    text: "Producto actualizado.",
-                    showConfirmButton: false
-                });
-            </script>
-            ';
-        }elseif(isset($_GET['updatedProduct']) && $_GET['updatedProduct'] == 0){
-            echo '
-            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-            <script>
-                Swal.fire({
-                    icon: "error",
-                    title: "Notificación",
-                    timer: 2500,
-                    text: "El producto no se ha podido actualizar",
-                    showConfirmButton: false
-                });
-            </script>
-            ';
-        }
-    ?>
-
-    <?php
-        if (isset($_GET['insertedProduct']) && $_GET['insertedProduct'] == 1) {
-            echo '
-            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-            <script>
-                Swal.fire({
-                    icon: "success",
-                    title: "Agregado con éxito",
-                    timer: 2500,
-                    text: "Producto creado.",
-                    showConfirmButton: false
-                });
-            </script>
-            ';
-        }elseif(isset($_GET['insertedProduct']) && $_GET['insertedProduct'] == 0){
-            echo '
-            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-            <script>
-                Swal.fire({
-                    icon: "error",
-                    title: "Notificación",
-                    timer: 2500,
-                    text: "No se pudo crear el producto, intente de nuevo",
-                    showConfirmButton: false
-                });
-            </script>
-            ';
-        }
-    ?>
-
 </div>
 <?php
 }else{

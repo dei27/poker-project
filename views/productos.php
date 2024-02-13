@@ -24,7 +24,7 @@ $products = json_decode($prodcutsData, true);
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="../assets/css/style.css">
-    <title>Admin</title>
+    <title>Inventario</title>
 </head>
 <body>
     <header>
@@ -43,7 +43,7 @@ $products = json_decode($prodcutsData, true);
 <?php if (isset($_SESSION["user"])) { ?>
     <div class="container-fluid mt-5 p-5">
         <div class="card p-3">
-            <h4 class="card-header mb-3 py-3">Productos</h4>
+            <h4 class="card-header mb-3 py-3">Inventario</h4>
             <?php
             if(isset($_SESSION["user"])){
             echo '<h5 class="card-text">
@@ -58,7 +58,7 @@ $products = json_decode($prodcutsData, true);
                 <thead class="table-warning">
                     <tr>
                         <th>Nombre</th>
-                        <th>Descripción</th>
+                        <th>Cantidad</th>
                         <th>Precio</th>
                         <th>Categoría</th>
                         <th>Medida</th>
@@ -75,7 +75,7 @@ $products = json_decode($prodcutsData, true);
                     <?php foreach ($products as $product):?>
                         <tr>
                             <td><?php echo $product['nombre']; ?></td>
-                            <td><?php echo empty($product['descripcion']) ? 'Sin descripción' : $product['descripcion']; ?></td>
+                            <td><?php echo empty($product['cantidad']) ? 'Sin cantidad' : $product['cantidad']; ?></td>
                             <td><?php echo $product['precio']; ?></td>
                             <td>
                             <?php
@@ -137,8 +137,8 @@ $products = json_decode($prodcutsData, true);
                                                     </div>
 
                                                     <div class="form-group mb-3">
-                                                        <label for="descripcionProducto" class="form-label">Descripción</label>
-                                                        <textarea class="form-control" id="descripcionProducto" name="descripcionProducto" placeholder="Descripción del producto..."><?php echo htmlspecialchars($product['descripcion']); ?></textarea>
+                                                        <label for="cantidadProducto" class="form-label">Cantidad</label>
+                                                        <input type="number" class="form-control" id="cantidadProducto" name="cantidadProducto" placeholder="Cantidad..." step="any" value="<?php echo htmlspecialchars($product['cantidad']); ?>" min=1 required>
                                                     </div>
 
                                                     <div class="form-group mb-3">
@@ -207,8 +207,8 @@ $products = json_decode($prodcutsData, true);
                             </div>
 
                             <div class="form-group mb-3">
-                                <label for="descripcionProductoI">Descripción</label>
-                                <textarea class="form-control" id="descripcionProductoI" name="descripcionProductoI" placeholder="Descripción..."></textarea>
+                                <label for="cantidadProductoI">Descripción</label>
+                                <textarea class="form-control" id="cantidadProductoI" name="cantidadProductoI" placeholder="Descripción..."></textarea>
                             </div>
 
                             <div class="form-group mb-3">

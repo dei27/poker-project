@@ -26,9 +26,6 @@ if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])
         header("Location: ../views/bebidas.php?deleteBebida=0");
         exit();
     }  
-}else{
-    header("Location: ../views/bebidas.php?deleteBebida=0");
-    exit();
 }
 
 if (isset($_POST['id'], $_POST['action']) && $_POST['action'] === 'edit') {
@@ -41,18 +38,15 @@ if (isset($_POST['id'], $_POST['action']) && $_POST['action'] === 'edit') {
     $bebidasModel->setId($id);
     $bebidasModel->setNombre($nombre);
     $bebidasModel->setPrecio($precio);
-    $result = $productModel->updateProductById();
+    $result = $bebidasModel->updateBebidaById();
 
     if($result){
-        header("Location: ../views/productos.php?updatedBebida=1");
+        header("Location: ../views/bebidas.php?updatedBebida=1");
         exit();
     }else{
-        header("Location: ../views/productos.php?updatedBebida=1");
+        header("Location: ../views/bebidas.php?updatedBebida=1");
         exit();
     }
-}else{
-    header("Location: ../views/bebidas.php?updatedBebida=0");
-    exit();
 }
 
 if (isset($_POST['action']) && $_POST['action'] === 'add') {
@@ -66,15 +60,12 @@ if (isset($_POST['action']) && $_POST['action'] === 'add') {
     $result = $bebidasModel->newBebida();
 
     if($result){
-        header("Location: ../views/productos.php?insertedBebida=1");
+        header("Location: ../views/bebidas.php?insertedBebida=1");
         exit();
     }else{
-        header("Location: ../views/productos.php?insertedBebida=0");
+        header("Location: ../views/bebidas.php?insertedBebida=0");
         exit();
     }  
-}else{
-    header("Location: ../views/productos.php?insertedBebida=0");
-    exit();
 }
 
 

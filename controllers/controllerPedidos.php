@@ -17,6 +17,12 @@ function getPedidoById($id_pedido){
     return $pedido; 
 }
 
+function facturarPedidoById($id_pedido){
+    $pedidosModel = new PedidosModel();
+    $pedido = $pedidosModel->facturarById($id_pedido);
+    return $pedido; 
+}
+
 
 if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])) {
     $id = $_GET['id'];
@@ -64,30 +70,179 @@ if (isset($_POST['id'], $_POST['action']) && $_POST['action'] === 'edit') {
     }
 }
 
-if (isset($_POST['action']) && $_POST['action'] === 'add') {
-    $nombre = isset($_POST['nombreProductoI']) ? htmlspecialchars($_POST['nombreProductoI'], ENT_QUOTES, 'UTF-8') : "Sin nombre";
-    $descripcion = isset($_POST['descripcionProductoI']) ? htmlspecialchars($_POST['descripcionProductoI'], ENT_QUOTES, 'UTF-8') : null;
-    $precio = isset($_POST['precioProductoI']) ? $_POST['precioProductoI'] : 0.0;
-    $precio = filter_var($precio, FILTER_VALIDATE_FLOAT);
-    $categoria = isset($_POST['categoriaProductoI']) ? filter_input(INPUT_POST, 'categoriaProductoI', FILTER_SANITIZE_NUMBER_INT) : 0;
-    $unidad = isset($_POST['unidadProductoI']) ? filter_input(INPUT_POST, 'unidadProductoI', FILTER_SANITIZE_NUMBER_INT) : 0;
+if (isset($_POST['action']) && $_POST['action'] === 'addOrden') {
+    $nombre = isset($_POST['nombreClienteOrden']) ? htmlspecialchars($_POST['nombreClienteOrden'], ENT_QUOTES, 'UTF-8') : "Sin nombre";    
+    $telefono = isset($_POST['telefonoClienteOrden']) ? htmlspecialchars($_POST['telefonoClienteOrden'], ENT_QUOTES, 'UTF-8') : "Sin teléfono";   
+    $servicio = isset($_POST['servicioOrden']) ? htmlspecialchars($_POST['servicioOrden'], ENT_QUOTES, 'UTF-8') : "10";
+    $iva = isset($_POST['ivaOrden']) ? htmlspecialchars($_POST['ivaOrden'], ENT_QUOTES, 'UTF-8') : "13"; 
+    $direccion = isset($_POST['direccionClienteOrden']) ? htmlspecialchars($_POST['direccionClienteOrden'], ENT_QUOTES, 'UTF-8') : "Sin dirección"; 
+    $inputs = $_POST['cantidad'];
+    $bebidas = [];
+    $platillos = [];
+    
+    if(!empty($inputs)){
+        $pedidosModel = new PedidosModel();
+        $pedidosModel->setNombreCliente($nombre);
+        $pedidosModel->setTelefonoCliente($telefono);
+        $pedidosModel->setDireccionCliente($direccion);
+        $insertedId = $pedidosModel->newPedido();
+        $insertedBebidas = false;
+        $insertedPlatillos = false;
+        $montoTotal = 0;
+        
 
-    if ($nombre !== null && !empty($nombre)) {
-        $productModel = new Producto();
-        $productModel->setNombre($nombre);
-        $productModel->setDescripcion($descripcion);
-        $productModel->setPrecio($precio);
-        $productModel->setCategoria($categoria);
-        $productModel->setUnidad($unidad);
+        if($insertedId != 0){
+            
+            foreach ($inputs as $clave => $valor) {
+                if (strpos($clave, 'B') === 0) {
+                    $bebidas[substr($clave, 1)] = $valor;
+                } elseif (strpos($clave, 'R') === 0) {
+                    $platillos[substr($clave, 1)] = $valor;
+                }
+            }
 
-        $productModel->newProduct();
+            if(!empty($bebidas)){
+                
+                foreach ($bebidas as $id_bebida => $cantidad) {
+                    if (!empty($cantidad)) {
+                        $insertedBebidas = $pedidosModel->newDetallePedidoBebida($insertedId, $id_bebida, $cantidad);
+                    }
+                }
+            }
 
-        header("Location: ../views/productos.php?insertedProduct=1");
-        exit();
-    } else {
-        header("Location: ../views/productos.php?insertedProduct=0");
+            if(!empty($platillos)){
+
+                foreach ($platillos as $id_platillo  => $cantidad) {
+                    if (!empty($cantidad)) {
+                        $insertedPlatillos = $pedidosModel->newDetallePedidoPlatillo($insertedId, $id_platillo, $cantidad);
+                    }
+                }
+            }
+
+            if($insertedPlatillos || $insertedBebidas){
+
+                $montoTotal = $pedidosModel->getMontoProductos($insertedId);
+
+                $montoTotalConServicio = $montoTotal + ($montoTotal * $servicio / 100);
+
+                $pedidosUpdate = new PedidosModel();
+                $pedidosUpdate->setIdPedido($insertedId);
+                $pedidosUpdate->setTotalPedido($montoTotalConServicio);
+                $updateMonto = $pedidosUpdate->updateTotalPedidoById();
+
+                if($updateMonto){
+                    header("Location: ../views/ordenes.php?orderAdd=1");
+                    exit();
+                }else{
+                    header("Location: ../views/ordenes.php?orderAdd=0");
+                    exit();
+                }
+
+                
+                
+            }else{
+                header("Location: ../views/ordenes.php?orderAdd=0");
+                exit();
+            }
+        }
+        
+    }else{
+        header("Location: ../views/nuevaOrden.php?emptyProducts=0");
         exit();
     }
+    
+}
+
+if (isset($_POST['action']) && $_POST['action'] === 'updateOrden') {
+    $id_orden = filter_input(INPUT_POST, 'idOrden', FILTER_SANITIZE_NUMBER_INT);
+    $nombre = isset($_POST['nombreClienteUpdate']) ? htmlspecialchars($_POST['nombreClienteUpdate'], ENT_QUOTES, 'UTF-8') : "Sin nombre";    
+    $telefono = isset($_POST['telefonoClienteUpdate']) ? htmlspecialchars($_POST['telefonoClienteUpdate'], ENT_QUOTES, 'UTF-8') : "Sin teléfono";   
+    $servicio = isset($_POST['servicioOrdenUpdate']) ? htmlspecialchars($_POST['servicioOrdenUpdate'], ENT_QUOTES, 'UTF-8') : "10";
+    $iva = isset($_POST['ivaOrdenUpdate']) ? htmlspecialchars($_POST['ivaOrdenUpdate'], ENT_QUOTES, 'UTF-8') : "13"; 
+    $direccion = isset($_POST['direccionClienteUpdate']) ? htmlspecialchars($_POST['direccionClienteUpdate'], ENT_QUOTES, 'UTF-8') : "Sin dirección"; 
+    $inputs = $_POST['cantidad'];
+    $bebidas = [];
+    $platillos = [];
+    
+    if(!empty($inputs)){
+        $pedidosModel = new PedidosModel();
+        $pedidosModel->setIdPedido($id_orden);
+        $pedidosModel->setNombreCliente($nombre);
+        $pedidosModel->setTelefonoCliente($telefono);
+        $pedidosModel->setDireccionCliente($direccion);
+        $pedidosModel->setEstadoPedido("Pendiente");
+
+        $updatedPedido = $pedidosModel->updatePedidoById();
+
+        $deletedPedidos = $pedidosModel->deleteAllDetallesByIdPedido();
+        
+        $insertedBebidas = false;
+        $insertedPlatillos = false;
+        $montoTotal = 0;
+        
+        if($updatedPedido && $deletedPedidos){
+            
+            foreach ($inputs as $clave => $valor) {
+                if (strpos($clave, 'B') === 0) {
+                    $bebidas[substr($clave, 1)] = $valor;
+                } elseif (strpos($clave, 'R') === 0) {
+                    $platillos[substr($clave, 1)] = $valor;
+                }
+            }
+
+            if(!empty($bebidas)){
+                
+                foreach ($bebidas as $id_bebida => $cantidad) {
+                    if (!empty($cantidad)) {
+                        $insertedBebidas = $pedidosModel->newDetallePedidoBebida($id_orden, $id_bebida, $cantidad);
+                    }
+                }
+            }
+
+            if(!empty($platillos)){
+
+                foreach ($platillos as $id_platillo  => $cantidad) {
+                    if (!empty($cantidad)) {
+                        $insertedPlatillos = $pedidosModel->newDetallePedidoPlatillo($id_orden, $id_platillo, $cantidad);
+                    }
+                }
+            }
+
+            if($insertedPlatillos || $insertedBebidas){
+
+                $montoTotal = $pedidosModel->getMontoProductos($id_orden);
+
+                $montoTotalConServicio = $montoTotal + ($montoTotal * $servicio / 100);
+
+                $pedidosUpdate = new PedidosModel();
+                $pedidosUpdate->setIdPedido($id_orden);
+                $pedidosUpdate->setTotalPedido($montoTotalConServicio);
+                $updateMonto = $pedidosUpdate->updateTotalPedidoById();
+
+                if($updateMonto){
+                    header("Location: ../views/ordenes.php?updatedOrden=1");
+                    exit();
+                }else{
+                    header("Location: ../views/ordenes.php?updatedOrden=0");
+                    exit();
+                }
+
+                
+                
+            }else{
+                header("Location: ../views/ordenes.php?updatedOrden=0");
+                exit();
+            }
+        }else{
+            header("Location: ../views/ordenes.php?updateData=0");
+            exit();
+        }
+        
+    }else{
+        header("Location: ../views/actualizarOrden.php?idPedido=$id_orden&emptyProducts=0");
+        exit();
+    }
+    
 }
 
 

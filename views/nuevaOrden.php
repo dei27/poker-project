@@ -3,8 +3,10 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 include('../controllers/controllerProducts.php');
+include('../controllers/controllerDetallesPedidos.php');
 
 $products = json_decode(getAll(),true);
+$bebidasPlatillos = json_decode(getAllBebidasAndPlatillos(),true);
 ?>
 
 <!DOCTYPE html>
@@ -55,7 +57,8 @@ $products = json_decode(getAll(),true);
                                 <thead class="table-warning">
                                     <tr>
                                         <th>Id</th>  
-                                        <th>Nombre</th>  
+                                        <th>Precio</th>  
+                                        <th>Nombre</th> 
                                         <?php 
                                             if(isset($_SESSION["user"])){
                                                 echo '<th class="text-center">Acciones</th>';
@@ -64,13 +67,14 @@ $products = json_decode(getAll(),true);
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php foreach ($products as $product):?>
+                                    <?php foreach ($bebidasPlatillos as $product):?>
                                         <tr>
-                                            <td><?php echo $product['id_producto']; ?></td>
-                                            <td><?php echo $product['nombre']; ?></td>
+                                            <td><?php echo $product['id']; ?></td>
+                                            <td><?php echo $product['precio']; ?></td>
+                                            <td><?php echo $product['producto']; ?></td>
                                             <td class="text-center">
                                                 <?php if(isset($_SESSION["user"])): ?>
-                                                    <span id="cart_<?php echo $product['id_producto']; ?>" class="btn cart-button text-white">
+                                                    <span id="cart_<?php echo $product['id']; ?>" class="btn cart-button text-white">
                                                         <i class="bi bi-cart-plus-fill"></i>
                                                     </span>
                                                 <?php endif; ?>
@@ -88,14 +92,15 @@ $products = json_decode(getAll(),true);
                     <h4 class="card-header mb-3 py-3">Orden nueva</h4>
                     <div class="card-body">
                         <form action="../controllers/controllerPedidos.php" method="post">
+                            <input type="hidden" name="action" value="addOrden">
                             <div class="row mb-3">
                                 <div class="col">
-                                    <label for="nombreCliente" class="form-label">Nombre del Cliente</label>
-                                    <input type="text" class="form-control" id="nombreCliente" name="nombreCliente" required>
+                                    <label for="nombreClienteOrden" class="form-label">Nombre del Cliente</label>
+                                    <input type="text" class="form-control" id="nombreClienteOrden" name="nombreClienteOrden" required placeholder="Nombre...">
                                 </div>
                                 <div class="col">
-                                    <label for="telefonoCliente" class="form-label">Teléfono del Cliente</label>
-                                    <input type="tel" class="form-control" id="telefonoCliente" name="telefonoCliente" required>
+                                    <label for="telefonoClienteOrden" class="form-label">Teléfono del Cliente</label>
+                                    <input type="tel" class="form-control" id="telefonoClienteOrden" name="telefonoClienteOrden" required placeholder="Teléfono...">
                                 </div>
                             </div>
                             <div class="row mb-3">
@@ -116,18 +121,19 @@ $products = json_decode(getAll(),true);
                             </div>
                             <div class="row mb-3">
                                 <div class="col">
-                                    <label for="direccionCliente" class="form-label">Dirección del Cliente</label>
-                                    <textarea class="form-control" id="direccionCliente" name="direccionCliente" rows="3" required></textarea>
+                                    <label for="direccionClienteOrden" class="form-label">Dirección del Cliente</label>
+                                    <textarea class="form-control" id="direccionClienteOrden" name="direccionClienteOrden" rows="3" required placeholder="Dirección..."></textarea>
                                 </div>
                             </div>
                             <div class="row mb-3">
                                 <div class="col">
-                                <label for="direccionCliente" class="form-label">Productos de la orden:</label>
+                                <h6>Productos de la orden:</h6>
                                 <div id="tablaProductos" class="table-responsive">
                                     <table id="tablaProductosTable" class="table table-light table-striped">
                                         <thead>
                                             <tr>
                                                 <th>Nombre</th>
+                                                <th>Precio</th>
                                                 <th>Cantidad</th>
                                                 <th>Acción</th>
                                             </tr>
@@ -207,6 +213,21 @@ $products = json_decode(getAll(),true);
             </script>
             ';
         }
+
+        if (isset($_GET['emptyProducts']) && $_GET['emptyProducts'] == 0) {
+            echo '
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            <script>
+                Swal.fire({
+                    icon: "error",
+                    title: "No se puedo procesar",
+                    timer: 2500,
+                    text: "No se agregaron productos a la orden.",
+                    showConfirmButton: false
+                });
+            </script>
+            ';
+        }
     ?>
 
 </div>
@@ -238,25 +259,20 @@ $products = json_decode(getAll(),true);
             }
         });
 
-        $('#productosOrden th:first-child, #productosOrden td:first-child').css('display', 'none');
+        $('#productosOrden th:first-child, #productosOrden td:first-child, #productosOrden th:nth-child(2), #productosOrden td:nth-child(2)').css('display', 'none');
 
         $("span.cart-button").click(function(){
             let productId = $(this).closest("tr").find("td:first").text();
-            let productName = $(this).closest("tr").find("td:eq(1)").text();
+            let productPrice = $(this).closest("tr").find("td:eq(1)").text();
+            let productName = $(this).closest("tr").find("td:eq(2)").text();
             let cantidad = 1;
-            let tableRow = "<tr><td>" + productName + "</td><td><input type='number' class='form-control cantidad' name='cantidad[" + productId + "]' value='" + cantidad + "'></td><td><span class='btn remove-button'><i class='bi bi-cart-x-fill'></i></span></td></tr>";
+            let tableRow = "<tr><td>" + productName + "</td><td>" + productPrice + "</td><td><input type='number' class='form-control cantidad' name='cantidad[" + productId + "]' value='" + cantidad + "' min=1 required></td><td><span class='btn remove-button'><i class='bi bi-cart-x-fill'></i></span></td></tr>";
 
             $("#tablaProductosTable tbody").append(tableRow);
-            
-            let totalProductos = parseInt($("#totalProductos").val()) + 1;
-            $("#totalProductos").val(totalProductos);
         });
 
         $(document).on("click", ".remove-button", function(){
             $(this).closest("tr").remove();
-            
-            let totalProductos = parseInt($("#totalProductos").val()) - 1;
-            $("#totalProductos").val(totalProductos);
         });
 
     });  
