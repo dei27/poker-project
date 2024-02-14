@@ -37,15 +37,7 @@ if (isset($_GET['idPedido'])) {
     <header>
     <?php 
         if(isset($_SESSION["user"])){
-            echo '<nav class="navbar sticky-top">
-                <a href="./ordenes.php" class="text-decoration-none text-dark navbar-brand"><i class="bi bi-arrow-left-circle-fill text-dark fs-3 px-3"></i></a>
-                <div class="navbar-brand">
-                    <form action="../controllers/controller.php" method="post">
-                        <input type="hidden" name="action" value="logout">
-                        <button type="submit navbar-brand" class="btn btn-danger">Cerrar sesión</button>
-                    </form>
-                </div>
-            </nav>';
+            include("menu.php");
         }else{
             echo 
             '<nav class="navbar sticky-top">
@@ -57,7 +49,7 @@ if (isset($_GET['idPedido'])) {
 
 <?php if (isset($_SESSION["user"])) { 
     ?>
-    <div class="container-fluid mt-5 p-5">
+    <div class="container-fluid p-5">
         <div class="row">
             <div class="col-sm-12 col-md-6 mb-3">
                 <div class="card p-3">
@@ -115,26 +107,27 @@ if (isset($_GET['idPedido'])) {
                                     <input type="tel" class="form-control" id="telefonoClienteUpdate" name="telefonoClienteUpdate" required value="<?php echo isset($pedido['telefono_cliente']) && !empty($pedido['telefono_cliente']) ? $pedido['telefono_cliente'] : ''; ?>">
                                 </div>
                             </div>
-                            <div class="row mb-3">
-                                <div class="col">
-                                    <label for="servicioOrdenUpdate" class="form-label">Servicio</label>
-                                    <select class="form-select" id="servicioOrdenUpdate" name="servicioOrdenUpdate">
-                                        <option value="0">0%</option>
-                                        <option value="10" selected>10%</option>
-                                    </select>
+
+                            <?php if ($pedido['mesa'] !== null): ?>
+                                <div class="row mb-3">
+                                    <div class="col">
+                                        <label for="mesaOrdenUpdate" class="form-label">Mesa</label>
+                                        <input type="number" class="form-control" id="mesaOrdenUpdate" name="mesaOrdenUpdate" required placeholder="Número de mesa..." min="1" max="10" value="<?php echo $pedido['mesa']; ?>">
+                                    </div>
+                                    <div class="col">
+                                        <label for="servicioOrdenUpdate" class="form-label">Servicio</label>
+                                        <select class="form-select" id="servicioOrdenUpdate" name="servicioOrdenUpdate">
+                                            <option value="0">0%</option>
+                                            <option value="10" selected>10%</option>
+                                        </select>
+                                    </div>
                                 </div>
-                                <div class="col">
-                                    <label for="ivaOrdenUpdate" class="form-label">IVA</label>
-                                    <select class="form-select" id="ivaOrdenUpdate" name="ivaOrdenUpdate">
-                                        <option value="0">0%</option>
-                                        <option value="13" selected>13%</option>
-                                    </select>
-                                </div>
-                            </div>
+                            <?php endif; ?>
+
                             <div class="row mb-3">
                                 <div class="col">
                                     <label for="direccionClienteUpdate" class="form-label">Dirección del Cliente</label>
-                                    <textarea class="form-control" id="direccionClienteUpdate" name="direccionClienteUpdate" rows="3" required><?php echo isset($pedido['direccion_cliente']) ? $pedido['direccion_cliente'] : ''; ?></textarea>
+                                    <textarea class="form-control" id="direccionClienteUpdate" name="direccionClienteUpdate" rows="3"><?php echo isset($pedido['direccion_cliente']) ? $pedido['direccion_cliente'] : ''; ?></textarea>
                                 </div>
                             </div>
                             <div class="row mb-3">
@@ -155,8 +148,8 @@ if (isset($_GET['idPedido'])) {
                                                     <?php foreach ($detallesPedidos as $detalle) { ?>
                                                         <tr>
                                                             <td><?php echo $detalle['producto']; ?></td>
-                                                            <td><?php echo $detalle['precio']; ?></td>
-                                                            <td><input type="number" class="form-control cantidad" name="cantidad[<?php echo $detalle['product_id']; ?>]" value="<?php echo $detalle['cantidad']; ?>"></td>
+                                                            <td>₡<?php echo $detalle['precio']; ?></td>
+                                                            <td><input type="number" class="form-control cantidad" name="cantidad[<?php echo $detalle['product_id']; ?>]" value="<?php echo $detalle['cantidad']; ?>" min=1 required></td>
                                                             <td><span class="btn remove-button"><i class="bi bi-cart-x-fill"></i></span></td>
                                                         </tr>
                                                     <?php } ?>
@@ -274,11 +267,25 @@ if (isset($_GET['idPedido'])) {
     $(document).ready(function() {
         $('#productosOrden').DataTable({
             lengthChange: false,
-            pageLength: 10,
+            pageLength: 5,
             info: false,
             responsive: true,
             "language": {
                 "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
+            }
+        });
+
+        $('#detallesHorarios').DataTable({
+            lengthChange: false,
+            pageLength: 5,
+            info: false,
+            responsive: true,
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
+            },
+            "order": [[1, 'asc']],
+            initComplete: function(settings, json) {
+                $(".dataTables_filter label").addClass("text-dark");
             }
         });
 
@@ -289,7 +296,7 @@ if (isset($_GET['idPedido'])) {
             let productPrice = $(this).closest("tr").find("td:eq(1)").text();
             let productName = $(this).closest("tr").find("td:eq(2)").text();
             let cantidad = 1;
-            let tableRow = "<tr><td>" + productName + "</td><td>" + productPrice + "</td><td><input type='number' class='form-control cantidad' name='cantidad[" + productId + "]' value='" + cantidad + "' min=1 required></td><td><span class='btn remove-button'><i class='bi bi-cart-x-fill'></i></span></td></tr>";
+            let tableRow = "<tr><td>" + productName + "</td><td>₡" + productPrice + "</td><td><input type='number' class='form-control cantidad' name='cantidad[" + productId + "]' value='" + cantidad + "' min=1 required></td><td><span class='btn remove-button'><i class='bi bi-cart-x-fill'></i></span></td></tr>";
 
             $("#tablaProductosTable tbody").append(tableRow);
         });

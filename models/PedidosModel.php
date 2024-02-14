@@ -5,6 +5,7 @@ class PedidosModel extends BaseModel {
 
     private $id_pedido;
     private $nombre_cliente;
+    private $mesa;
     private $telefono_cliente;
     private $direccion_cliente;
     private $fecha_pedido;
@@ -67,9 +68,14 @@ class PedidosModel extends BaseModel {
         $this->total_pedido = $total_pedido;
     }
 
-    public function __construct($nombre_cliente = null,$telefono_cliente = null,$direccion_cliente = null,$fecha_pedido = null,$estado_pedido = null,$total_pedido = null) {
+    public function setMesa($mesa) {
+        $this->mesa = $mesa;
+    }
+
+    public function __construct($nombre_cliente = null,$mesa = null, $telefono_cliente = null,$direccion_cliente = null,$fecha_pedido = null,$estado_pedido = null,$total_pedido = null) {
         parent::__construct();
         $this->nombre_cliente = $nombre_cliente;
+        $this->mesa = $mesa;
         $this->telefono_cliente = $telefono_cliente;
         $this->direccion_cliente = $direccion_cliente;
         $this->fecha_pedido = $fecha_pedido;
@@ -113,13 +119,14 @@ class PedidosModel extends BaseModel {
 
     public function updatePedidoById() {
         try {
-            $query = "UPDATE pedidos SET nombre_cliente = :nombre_cliente, telefono_cliente = :telefono_cliente, direccion_cliente = :direccion_cliente, estado_pedido = :estado_pedido WHERE id_pedido = :id_pedido";
+            $query = "UPDATE pedidos SET nombre_cliente = :nombre_cliente, mesa = :mesa, telefono_cliente = :telefono_cliente, direccion_cliente = :direccion_cliente WHERE id_pedido = :id_pedido";
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':id_pedido', $this->id_pedido, PDO::PARAM_INT);
             $stmt->bindParam(':nombre_cliente', $this->nombre_cliente, PDO::PARAM_STR);
+            $stmt->bindParam(':mesa', $this->mesa, PDO::PARAM_INT);
             $stmt->bindParam(':telefono_cliente', $this->telefono_cliente, PDO::PARAM_STR);
             $stmt->bindParam(':direccion_cliente', $this->direccion_cliente, PDO::PARAM_STR);
-            $stmt->bindParam(':estado_pedido', $this->estado_pedido, PDO::PARAM_STR);
+            // $stmt->bindParam(':estado_pedido', $this->estado_pedido, PDO::PARAM_STR);
             $stmt->execute();
             return true;
         } catch (PDOException $e) {
@@ -129,22 +136,28 @@ class PedidosModel extends BaseModel {
 
     public function newPedido() {
         try {
-            $query = "INSERT INTO pedidos (nombre_cliente, telefono_cliente, direccion_cliente) VALUES (:nombre_cliente, :telefono_cliente, :direccion_cliente)";
+            $hora_actual = gmdate("Y-m-d H:i:s", time() - 6 * 3600);
+    
+            $query = "INSERT INTO pedidos (nombre_cliente, mesa, telefono_cliente, direccion_cliente, fecha_pedido)
+            VALUES (:nombre_cliente, :mesa, :telefono_cliente, :direccion_cliente, :fecha_pedido)";
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':nombre_cliente', $this->nombre_cliente, PDO::PARAM_STR);
+            $stmt->bindParam(':mesa', $this->mesa, PDO::PARAM_INT);
             $stmt->bindParam(':telefono_cliente', $this->telefono_cliente, PDO::PARAM_STR);
             $stmt->bindParam(':direccion_cliente', $this->direccion_cliente, PDO::PARAM_STR);
+            $stmt->bindParam(':fecha_pedido', $hora_actual, PDO::PARAM_STR);
             $stmt->execute();
-
+    
             $id_insertado = $this->conn->lastInsertId();
-
+    
             return $id_insertado;
-
+    
         } catch (PDOException $e) {
             die("Error: " . $e->getMessage());
             return false;
         }
     }
+    
 
     public function deletePedidoById() {
     try {

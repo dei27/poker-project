@@ -30,7 +30,7 @@ $products = json_decode($prodcutsData, true);
     <header>
     <?php 
         if(isset($_SESSION["user"])){
-            include('nav_admin.php');
+            include('menu.php');
         }else{
             echo 
             '<nav class="navbar sticky-top">
@@ -41,7 +41,7 @@ $products = json_decode($prodcutsData, true);
     </header>
 
 <?php if (isset($_SESSION["user"])) { ?>
-    <div class="container-fluid mt-5 p-5">
+    <div class="container-fluid p-5">
         <div class="card p-3">
             <h4 class="card-header mb-3 py-3">Inventario</h4>
             <?php
@@ -207,8 +207,8 @@ $products = json_decode($prodcutsData, true);
                             </div>
 
                             <div class="form-group mb-3">
-                                <label for="cantidadProductoI">Descripción</label>
-                                <textarea class="form-control" id="cantidadProductoI" name="cantidadProductoI" placeholder="Descripción..."></textarea>
+                                <label for="cantidadProductoI">Cantidad</label>
+                                <input type="number" class="form-control" id="cantidadProductoI" name="cantidadProductoI" placeholder="Precio..." step="any" required min=1>
                             </div>
 
                             <div class="form-group mb-3">
@@ -350,11 +350,25 @@ $products = json_decode($prodcutsData, true);
     $(document).ready(function() {
         $('#example').DataTable({
             lengthChange: false,
-            pageLength: 10,
+            pageLength: 5,
             info: false,
             responsive: true,
             "language": {
                 "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
+            }
+        });
+
+        $('#detallesHorarios').DataTable({
+            lengthChange: false,
+            pageLength: 5,
+            info: false,
+            responsive: true,
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
+            },
+            "order": [[1, 'asc']],
+            initComplete: function(settings, json) {
+                $(".dataTables_filter label").addClass("text-dark");
             }
         });
     });  

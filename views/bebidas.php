@@ -25,7 +25,7 @@ $bebidas = json_decode(getAllBebidas(), true);
     <header>
     <?php 
         if(isset($_SESSION["user"])){
-            include('nav_admin.php');
+            include('menu.php');
         }else{
             echo 
             '<nav class="navbar sticky-top">
@@ -36,14 +36,14 @@ $bebidas = json_decode(getAllBebidas(), true);
     </header>
 
 <?php if (isset($_SESSION["user"])) { ?>
-    <div class="container-fluid mt-5 p-5">
+    <div class="container-fluid p-5">
         <div class="card p-3">
             <h4 class="card-header mb-3 py-3">Bebidas</h4>
             <?php
             if(isset($_SESSION["user"])){
             echo '<h5 class="card-text">
                     <a href="#" class="text-decoration-none text-info" data-bs-toggle="modal" data-bs-target="#addTournament">
-                    <img src="../assets/images/bebidas.png" alt="Crear torneo" class="img-fluid"> Agregar nuevo bebida.
+                    <img src="../assets/images/bebidas.png" alt="Crear torneo" class="img-fluid">Nueva bebida.
                     </a>
                 </h5>';
             }
@@ -112,7 +112,7 @@ $bebidas = json_decode(getAllBebidas(), true);
             </div>
         </div>
 
-        <!-- modal agregar producto -->
+        <!-- modal agregar bebida -->
         <div class="modal fade" id="addTournament" tabindex="-1" aria-labelledby="addTournamentLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg modal-dialog-centered">
                 <div class="modal-content">
@@ -253,14 +253,31 @@ $bebidas = json_decode(getAllBebidas(), true);
     $(document).ready(function() {
         $('#example').DataTable({
             lengthChange: false,
-            pageLength: 10,
+            pageLength: 5,
             info: false,
             responsive: true,
             "language": {
                 "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
+            },
+            initComplete: function(settings, json) {
+                $(".dataTables_filter label").addClass("text-dark");
             }
         });
-    });  
+
+        $('#detallesHorarios').DataTable({
+            lengthChange: false,
+            pageLength: 5,
+            info: false,
+            responsive: true,
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
+            },
+            "order": [[1, 'asc']],
+            initComplete: function(settings, json) {
+                $(".dataTables_filter label").addClass("text-dark");
+            }
+        });
+    }); 
 </script>
 </body>
 </html>

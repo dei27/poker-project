@@ -28,7 +28,7 @@ if (session_status() === PHP_SESSION_NONE) {
     </nav>
     </header>
 
-<div class="container mt-5 vh-100 p-5">
+<div class="container mt-5 p-5">
     <div class="row justify-content-center">
         <div class="col-md-6">
             <div class="card border-0">

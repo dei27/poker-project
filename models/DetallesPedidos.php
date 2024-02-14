@@ -40,7 +40,7 @@ class DetallesPedidos extends BaseModel {
 
     public function getAllDetallesPedidos($id_pedido) {
         try {
-            $stmt = $this->conn->prepare("SELECT dp.id_detalle, dp.id_pedido, COALESCE(r.nombre_receta, b.nombre_bebida) AS producto, dp.cantidad FROM detalles_pedido dp LEFT JOIN recetas r ON dp.id_platillo = r.id_receta LEFT JOIN bebidas b ON dp.id_bebida = b.id_bebida WHERE id_pedido = :id_pedido ORDER BY dp.cantidad ASC;");
+            $stmt = $this->conn->prepare("SELECT dp.id_detalle, dp.id_pedido, COALESCE(r.nombre_receta, b.nombre_bebida) AS producto, dp.cantidad, COALESCE(r.precio, b.precio_bebida) AS precio FROM detalles_pedido dp LEFT JOIN recetas r ON dp.id_platillo = r.id_receta LEFT JOIN bebidas b ON dp.id_bebida = b.id_bebida WHERE id_pedido = :id_pedido ORDER BY dp.cantidad ASC;");
             $stmt->bindParam(':id_pedido', $id_pedido, PDO::PARAM_INT);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);

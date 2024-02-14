@@ -28,7 +28,7 @@ $pedidos = json_decode($pedidosData, true);
     <header>
     <?php 
         if(isset($_SESSION["user"])){
-            include('nav_admin.php');
+            include('menu.php');
         }else{
             echo 
             '<nav class="navbar sticky-top">
@@ -39,13 +39,13 @@ $pedidos = json_decode($pedidosData, true);
     </header>
 
 <?php if (isset($_SESSION["user"])) { ?>
-    <div class="container-fluid mt-5 p-5">
+    <div class="container-fluid p-5">
         <div class="card p-3">
             <h4 class="card-header mb-3 py-3">Mis órdenes</h4>
             <?php
             if(isset($_SESSION["user"])){
             echo '<h5 class="modal-title mb-3">
-                    <a href="nuevaOrden.php" class="text-decoration-none text-info">Agregar nueva orden.</a>
+                    <a href="tiposOrdenes.php" class="text-decoration-none text-info">Agregar nueva orden.</a>
                 </h5>';
             }
             ?>
@@ -53,10 +53,10 @@ $pedidos = json_decode($pedidosData, true);
             <table id="example" class="table table-dark table-striped table-hover">
                 <thead class="table-warning">
                     <tr>
-                        <th>Cliente</th>
+                        <th>Mesa</th>
                         <!-- <th>Teléfono</th>
                         <th>Dirección</th> -->
-                        <th>Fecha</th>
+                        <th>Hora</th>
                         <th>Estado</th>
                         <th>Detalles</th>
                         <th>Total</th>
@@ -80,10 +80,10 @@ $pedidos = json_decode($pedidosData, true);
                         if ($fecha_pedido === $fecha_actual):
                     ?>
                         <tr>
-                            <td><?php echo $pedido['nombre_cliente']; ?></td>
+                            <td><?php echo ($pedido['mesa'] !== null) ? $pedido['mesa'] : 'Express'; ?></td>
                             <!-- <td><?php echo $pedido['telefono_cliente']; ?></td>
                             <td><?php echo $pedido['direccion_cliente']; ?></td> -->
-                            <td><?php echo $pedido['fecha_pedido']; ?></td>
+                            <td><?php echo date('h:i:s A', strtotime($pedido['fecha_pedido'])); ?></td>
                             <td><?php echo $pedido['estado_pedido']; ?></td>
                             <td>
                                 <a href="#" data-bs-toggle="modal" data-bs-target="#modalDetalles<?php echo $pedido['id_pedido']; ?>">
@@ -94,12 +94,12 @@ $pedidos = json_decode($pedidosData, true);
                                     <div class="modal-dialog modal-lg modal-dialog-centered">
                                         <div class="modal-content">
                                             <div class="modal-header text-bg-dark">
-                                                <h5 class="modal-title" id="modalDetallesLabel">Detalles del Pedido</h5>
+                                                <h5 class="modal-title" id="modalDetallesLabel">Productos de la orden</h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
                                             <div class="modal-body">
                                                 <h5 class="modal-title mb-3">
-                                                    <a href="actualizarOrden.php?idPedido=<?php echo $pedido['id_pedido']; ?>" class="text-decoration-none text-info">Editar Productos</a>
+                                                    <a href="actualizarOrden.php?idPedido=<?php echo $pedido['id_pedido']; ?>" class="text-decoration-none text-info">Editar orden</a>
                                                 </h5>
                                                 <div class="table-responsive">
                                                     <table id="detallesProductos" class="table table-dark table-striped table-hover w-100">
@@ -109,6 +109,7 @@ $pedidos = json_decode($pedidosData, true);
                                                                 <th>ID Pedido</th>
                                                                 <th>Productos</th>
                                                                 <th>Cantidad</th>
+                                                                <th>Precio unidad</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
@@ -120,6 +121,7 @@ $pedidos = json_decode($pedidosData, true);
                                                                     <td><?php echo $detalle['id_pedido']; ?></td>
                                                                     <td><?php echo $detalle['producto']; ?></td>
                                                                     <td><?php echo $detalle['cantidad']; ?></td>
+                                                                    <td>₡<?php echo $detalle['precio']; ?></td>
                                                                 </tr>
                                                             <?php endforeach; ?>
                                                         </tbody>
@@ -145,15 +147,15 @@ $pedidos = json_decode($pedidosData, true);
                                     <a href="../controllers/controllerPedidos.php?action=delete&id=<?php echo $pedido['id_pedido']; ?>" onclick="return confirm('¿Estás seguro de que quieres eliminar este pedido?')" class="text-decoration-none text-white mx-3">
                                         <i class="bi bi-trash-fill text-white"></i>
                                     </a>
-                                    <a href="#" class="text-decoration-none text-white" data-bs-toggle="modal" data-bs-target="#editModal<?php echo $pedido['id_pedido']; ?>">
-                                        <i class="bi bi-pencil-fill text-white"></i>
-                                    </a>
                                     <a href="facturar.php?idFactura=<?php echo $pedido['id_pedido']; ?>" onclick="return confirm('¿Estás seguro de que quieres facturar este pedido?')" class="text-decoration-none text-white mx-3" target="_blank">
                                         <i class="bi bi-credit-card-2-back-fill text-white"></i>
                                     </a>
+                                    <!-- <a href="#" class="text-decoration-none text-white" data-bs-toggle="modal" data-bs-target="#editModal<?php echo $pedido['id_pedido']; ?>">
+                                        <i class="bi bi-pencil-fill text-white"></i>
+                                    </a> -->
                                 </td>
 
-                                <div class="modal fade" id="editModal<?php echo $pedido['id_pedido']; ?>" tabindex="-1" aria-labelledby="editModalLabel<?php echo $pedido['id_pedido']; ?>" aria-hidden="true">
+                                <!-- <div class="modal fade" id="editModal<?php echo $pedido['id_pedido']; ?>" tabindex="-1" aria-labelledby="editModalLabel<?php echo $pedido['id_pedido']; ?>" aria-hidden="true">
                                     <div class="modal-dialog modal-dialog-centered">
                                         <div class="modal-content">
                                             <div class="modal-header text-bg-dark">
@@ -168,6 +170,11 @@ $pedidos = json_decode($pedidosData, true);
                                                     <div class="form-group mb-3">
                                                         <label for="nombreCliente">Cliente</label>
                                                         <input class="form-control" id="nombreCliente" name="nombreCliente" placeholder="Nombre..." value="<?php echo $pedido['nombre_cliente']; ?>" required>
+                                                    </div>
+
+                                                    <div class="form-group mb-3">
+                                                        <label for="mesaCliente">Mesa</label>
+                                                        <input type="number" class="form-control" id="mesaCliente" name="mesaCliente" placeholder="Número de mesa..." value="<?php echo $pedido['mesa']; ?>" required min=1 max=10>
                                                     </div>
 
                                                     <div class="form-group mb-3">
@@ -195,7 +202,7 @@ $pedidos = json_decode($pedidosData, true);
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                </div> -->
                                 <?php endif; ?>
                         </tr>
                     <?php
@@ -350,21 +357,36 @@ $pedidos = json_decode($pedidosData, true);
 
 <script>
     $(document).ready(function() {
-        $('#example, #detallesProductos').DataTable({
+        $('#example').DataTable({
             lengthChange: false,
-            pageLength: 10,
+            pageLength: 5,
             info: false,
             responsive: true,
             "language": {
                 "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
             },
+            "order": [[1, 'asc']],
+            initComplete: function(settings, json) {
+                $(".dataTables_filter label").addClass("text-dark");
+            }
+        });
+
+        $('#detallesHorarios').DataTable({
+            lengthChange: false,
+            pageLength: 5,
+            info: false,
+            responsive: true,
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
+            },
+            "order": [[1, 'asc']],
             initComplete: function(settings, json) {
                 $(".dataTables_filter label").addClass("text-dark");
             }
         });
 
         $('#detallesProductos th:nth-child(1), #detallesProductos td:nth-child(1), #detallesProductos th:nth-child(2), #detallesProductos td:nth-child(2)').css('display', 'none'); 
-    });  
+    }); 
 </script>
 </body>
 </html>

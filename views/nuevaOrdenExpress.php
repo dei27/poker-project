@@ -81,10 +81,10 @@ $bebidasPlatillos = json_decode(getAllBebidasAndPlatillos(),true);
             </div>
             <div class="col-sm-12 col-md-6 mb-3">
                 <div class="card p-3">
-                    <h4 class="card-header mb-3 py-3">Orden nueva</h4>
+                    <h4 class="card-header mb-3 py-3">Orden Nueva Express</h4>
                     <div class="card-body">
                         <form action="../controllers/controllerPedidos.php" method="post">
-                            <input type="hidden" name="action" value="addOrden">
+                            <input type="hidden" name="action" value="addOrdenExpress">
                             <div class="row mb-3">
                                 <div class="col">
                                     <label for="nombreClienteOrden" class="form-label">Nombre del Cliente</label>
@@ -97,28 +97,8 @@ $bebidasPlatillos = json_decode(getAllBebidasAndPlatillos(),true);
                             </div>
                             <div class="row mb-3">
                                 <div class="col">
-                                    <label for="mesaOrden" class="form-label">Mesa</label>
-                                    <input type="number" class="form-control" id="mesaOrden" name="mesaOrden" required placeholder="Número de mesa..." min=1 max=10>
-                                </div>
-                                <div class="col">
-                                    <label for="servicioOrden" class="form-label">Servicio</label>
-                                    <select class="form-select" id="servicioOrden" name="servicioOrden">
-                                        <option value="0">0%</option>
-                                        <option value="10" selected>10%</option>
-                                    </select>
-                                </div>
-                                <!-- <div class="col">
-                                    <label for="ivaOrden" class="form-label">IVA</label>
-                                    <select class="form-select" id="ivaOrden" name="ivaOrden">
-                                        <option value="0">0%</option>
-                                        <option value="13" selected>13%</option>
-                                    </select>
-                                </div> -->
-                            </div>
-                            <div class="row mb-3">
-                                <div class="col">
                                     <label for="direccionClienteOrden" class="form-label">Dirección del Cliente</label>
-                                    <textarea class="form-control" id="direccionClienteOrden" name="direccionClienteOrden" rows="3" placeholder="Dirección..."></textarea>
+                                    <textarea class="form-control" id="direccionClienteOrden" name="direccionClienteOrden" rows="3" placeholder="Dirección..." required></textarea>
                                 </div>
                             </div>
                             <div class="row mb-3">
@@ -285,9 +265,7 @@ $bebidasPlatillos = json_decode(getAllBebidasAndPlatillos(),true);
             $(this).closest("tr").remove();
         });
 
-    }); 
-    
-    
+    });  
 </script>
 </body>
 </html>

@@ -29,7 +29,7 @@ $recetasPrincipales = json_decode(getAllRecetas(),true);
 <header>
     <?php 
         if(isset($_SESSION["user"])){
-            include('nav_admin.php');
+            include('menu.php');
         }else{
             echo 
             '<nav class="navbar sticky-top">
@@ -42,9 +42,9 @@ $recetasPrincipales = json_decode(getAllRecetas(),true);
 <?php
 if (isset($_SESSION["user"])) {
 ?>
-    <div class="container-fluid mt-5 vh-100 p-5">
+    <div class="container-fluid p-5">
         <div class="card p-3">
-            <div class="card-header mb-3 py-3">Mis Recetas</div>
+            <h4 class="card-header mb-3 py-3">Mis Recetas</h4>
             <h6 class="modal-title mb-3">
                 <a href="#" class="text-decoration-none text-info" data-bs-toggle="modal" data-bs-target="#addTournament">
                     Agregar una nueva receta.
@@ -160,7 +160,7 @@ if (isset($_SESSION["user"])) {
                                                                     echo '<td><input type="checkbox" name="ingredientes_nuevos[]" value="' . $producto['id_producto'] . '"></td>';
                                                                     echo '<td>' . $producto['nombre'] . '</td>';
                                                                     echo '<td>' . $producto['nombre_categoria'] . '</td>';
-                                                                    echo '<td><input class="form-input" type="number" step="any" name="cantidades[' . $producto['id_producto'] . ']" placeholder="Ingrese cantidad" min="0" value="0"></td>';
+                                                                    echo '<td><input class="form-input" type="number" step="any" name="cantidades[' . $producto['id_producto'] . ']" placeholder="Ingrese cantidad" min="0" value="0" required></td>';
                                                                     echo '<td>' . $producto['nombre_unidad'] . '</td>';
                                                                     echo '<input type="hidden" name="unidades[' . $producto['id_producto'] . ']" value="' . $producto['id_unidad'] . '">';
                                                                     echo '</tr>';
@@ -228,7 +228,7 @@ if (isset($_SESSION["user"])) {
                                             </div>
                                             <div class="form-group mb-3 text-start">
                                             <div class="form-group mb-3 text-start">
-                                                <label for="tipoReceta" class="form-label">Tipo de Receta</label>
+                                                <h6>Tipo de Receta</h6>
                                                 <div class="form-check">
                                                     <input class="form-check-input" type="checkbox" id="isPrincipal" name="isPrincipal" value="1" <?php echo ($receta['principal'] == 1) ? 'checked' : ''; ?>>
                                                     <label class="form-check-label" for="isPrincipal">
@@ -296,7 +296,7 @@ if (isset($_SESSION["user"])) {
                         <input type="number" class="form-control" id="tiempoRecetaI" name="tiempoRecetaI" placeholder="Tiempo receta..." required min="1">
                     </div>
                     <div class="form-group mb-3 text-start">
-                        <label for="tipoReceta" class="form-label">Tipo de Receta</label>
+                        <h6>Tipo de Receta</h6>
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="isPrincipalI" name="isPrincipalI" value="1">
                             <label class="form-check-label" for="isPrincipalI">
@@ -510,22 +510,26 @@ if (isset($_GET['deletedIngredientes'])) {
     $(document).ready(function() {
         $('#recetas, #example').DataTable({
             lengthChange: false,
-            pageLength: 10,
+            pageLength: 5,
             info: false,
             responsive: true,
             language: {
                 url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
             },
-            colReorder: true, // Habilita ColReorder
-            dom: 'lBfrtip',
-            buttons: [
-                'excel',
-                {
-                    extend: 'colvis',
-                    text: 'Filtrar',
-                    className: 'btn btn-secondary'
-                }
-            ],
+            initComplete: function(settings, json) {
+                $(".dataTables_filter label").addClass("text-dark");
+            }
+        });
+
+        $('#detallesHorarios').DataTable({
+            lengthChange: false,
+            pageLength: 5,
+            info: false,
+            responsive: true,
+            language: {
+                url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
+            },
+            "order": [[1, 'asc']],
             initComplete: function(settings, json) {
                 $(".dataTables_filter label").addClass("text-dark");
             }
@@ -534,20 +538,12 @@ if (isset($_GET['deletedIngredientes'])) {
         $('#tablaIngredientes').DataTable({
             lengthChange: false,
             autoWidth: false,
-            pageLength: 10,
+            pageLength: 5,
             info: false,
             responsive: true,
             language: {
                 url: "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
             },
-            dom: 'lBfrtip',
-            buttons: [
-                {
-                    extend: 'colvis',
-                    text: 'Filtrar',
-                    className: 'btn btn-secondary'
-                }
-            ],
             initComplete: function(settings, json) {
                 $(".dataTables_filter label").addClass("text-dark");
             }

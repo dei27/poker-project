@@ -27,7 +27,7 @@ $categories = json_decode($categoriesData, true);
 <header>
     <?php 
         if(isset($_SESSION["user"])){
-            include('nav_admin.php');
+            include('menu.php');
         }else{
             echo 
             '<nav class="navbar sticky-top">
@@ -40,12 +40,12 @@ $categories = json_decode($categoriesData, true);
 <?php
 if (isset($_SESSION["user"])) {
 ?>
-    <div class="container-fluid mt-5 vh-100 p-5">
+    <div class="container-fluid p-5">
         <div class="table-responsive card p-3">
             <div class="card-header mb-3 py-3">Categorías registradas</div>
             <h5 class="card-text">
                 <a href="#" class="text-decoration-none text-info" data-bs-toggle="modal" data-bs-target="#addTournament">
-                <img src="../assets/images/addProduct.png" alt="Crear torneo" class="img-fluid"> Agregar nuevo categoría de producto.
+                <img src="../assets/images/addProduct.png" alt="Crear torneo" class="img-fluid">Nueva categoría.
                 </a>
             </h5>
             <table id="example" class="table table-dark table-striped table-hover">
@@ -241,13 +241,35 @@ if (isset($_GET['insertedCategory'])) {
     $(document).ready(function() {
         $('#example').DataTable({
             lengthChange: false,
-            pageLength: 10,
+            pageLength: 5,
             info: false,
+            responsive: true,
             "language": {
                 "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
+            },
+            initComplete: function(settings, json) {
+                $(".dataTables_filter label").addClass("text-dark");
             }
         });
+
+        $('#detallesHorarios').DataTable({
+            lengthChange: false,
+            pageLength: 5,
+            info: false,
+            responsive: true,
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
+            },
+            "order": [[1, 'asc']],
+            initComplete: function(settings, json) {
+                $(".dataTables_filter label").addClass("text-dark");
+            }
+        });
+
+
     });
+
+    
 </script>
 </body>
 </html>

@@ -64,5 +64,27 @@ class Registros extends BaseModel {
             die("Error: " . $e->getMessage());
         }
     }
+
+    public function getTimesByUserId() {
+        try {
+            $hora_actual = gmdate("Y-m-d", time() - 6 * 3600);
+            
+            $query = "SELECT rh.hora, trp.nombre_tipo
+                        FROM registros_horarios rh
+                        INNER JOIN tipos_registro_horarios trp
+                        ON rh.tipo = trp.id_tipo_registro
+                        WHERE id_usuario = :id_usuario
+                        AND DATE(hora) = :hora_actual;";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id_usuario', $this->id_usuario, PDO::PARAM_INT);
+            $stmt->bindParam(':hora_actual', $hora_actual, PDO::PARAM_STR);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            die("Error: " . $e->getMessage());
+        }
+    }
+    
+    
     
 }

@@ -43,4 +43,12 @@ function getAllTimesByUserId($idUsuario) {
 }
 
 
+function getTimesByUserId($idUsuario) {
+    $recordModel = new Registros();
+    $recordModel->setIdUsuario($idUsuario);
+    $record = $recordModel->getTimesByUserId();
+    return json_encode($record);
+}
+
+
 
