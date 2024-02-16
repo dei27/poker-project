@@ -62,9 +62,7 @@ if (isset($_SESSION["user"])) {
                         <th>Nombre</th>
                         <th>Precio</th>
                         <th>Tiempo</th>
-                        <th>Combinada</th>
-                        <th>Complementaria</th>
-                        <th>Especial</th>
+                        <th>Tipo</th>
                         <th class="text-center">Acciones</th>
                     </tr>
                 </thead>
@@ -184,15 +182,7 @@ if (isset($_SESSION["user"])) {
                             </td>
                             <td><?php echo $receta['precio']; ?></td>
                             <td><?php echo $receta['tiempo_preparacion']; ?></td>
-                            <td>
-                                <?php echo ($receta['principal'] == 1) ? 'Sí' : 'No';?>
-                            </td>
-                            <td>
-                                <?php echo ($receta['complementaria'] == 1) ? 'Sí' : 'No';?>
-                            </td>
-                            <td>
-                                <?php echo ($receta['especial'] == 1) ? 'Sí' : 'No';?>
-                            </td>
+                            <td><?php echo $receta['nombre_tipo']; ?></td>
                             <td class="text-center">
                                 <a href="../controllers/controllerRecetas.php?action=delete&id=<?php echo $receta['id_receta']; ?>" onclick="return confirm('¿Estás seguro de que quieres eliminar esta receta?')" class="text-decoration-none">
                                     <i class="bi bi-trash-fill text-white mx-3"></i>

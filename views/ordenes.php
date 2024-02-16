@@ -87,7 +87,7 @@ $pedidos = json_decode($pedidosData, true);
                             <td><?php echo $pedido['estado_pedido']; ?></td>
                             <td>
                                 <a href="#" data-bs-toggle="modal" data-bs-target="#modalDetalles<?php echo $pedido['id_pedido']; ?>">
-                                    <i class="bi bi-cart-fill text-white"></i>
+                                    <i class="bi bi-cart-fill text-white" data-bs-toggle='tooltip' data-bs-placement='top' data-bs-custom-class='custom-tooltip' data-bs-title='Ver Productos'></i>
                                 </a>
                                 <!-- Modal -->
                                 <div class="modal fade" id="modalDetalles<?php echo $pedido['id_pedido']; ?>" tabindex="-1" aria-labelledby="modalDetallesLabel" aria-hidden="true">
@@ -144,12 +144,80 @@ $pedidos = json_decode($pedidosData, true);
                                 if (isset($_SESSION["user"])) :
                                 ?>
                                 <td>
-                                    <a href="../controllers/controllerPedidos.php?action=delete&id=<?php echo $pedido['id_pedido']; ?>" onclick="return confirm('¿Estás seguro de que quieres eliminar este pedido?')" class="text-decoration-none text-white mx-3">
-                                        <i class="bi bi-trash-fill text-white"></i>
+                                    <a href="#" class="text-decoration-none text-white mx-3" data-bs-toggle="modal" data-bs-target="#comandasModal<?php echo $pedido['id_pedido']; ?>">
+                                        <i class="bi bi-ticket-perforated-fill text-white" data-bs-toggle='tooltip' data-bs-placement='top' data-bs-custom-class='custom-tooltip' data-bs-title='Crear Comanda'></i>
                                     </a>
-                                    <a href="facturar.php?idFactura=<?php echo $pedido['id_pedido']; ?>" onclick="return confirm('¿Estás seguro de que quieres facturar este pedido?')" class="text-decoration-none text-white mx-3" target="_blank">
-                                        <i class="bi bi-credit-card-2-back-fill text-white"></i>
+
+                                    <a href="#" class="text-decoration-none text-white mx-3" data-bs-toggle="modal" data-bs-target="#eliminarModal<?php echo $pedido['id_pedido']; ?>">
+                                        <i class="bi bi-trash-fill text-white" data-bs-toggle='tooltip' data-bs-placement='top' data-bs-custom-class='custom-tooltip' data-bs-title='Eliminar Orden'></i>
                                     </a>
+
+                                    <a href="#" class="text-decoration-none text-white mx-3" data-bs-toggle="modal" data-bs-target="#confirmModal<?php echo $pedido['id_pedido']; ?>">
+                                        <i class="bi bi-piggy-bank-fill text-white" data-bs-toggle='tooltip' data-bs-placement='top' data-bs-custom-class='custom-tooltip' data-bs-title='Cancelar Orden'></i>
+                                    </a>
+
+                                    <!-- Modal comanda-->
+                                    <div class="modal fade" id="comandasModal<?php echo $pedido['id_pedido']; ?>" tabindex="-1" aria-labelledby="comandasModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content">
+                                                <div class="modal-header text-bg-dark">
+                                                    <h5 class="modal-title" id="eliminarModalLabel">Confirmar Acción</h5>
+                                                    <button type="button" class="btn-close bg-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                    <div class="modal-body text-dark">
+                                                        <p>¿Estás seguro de que quieres crear la comanda de la orden?</p>
+                                                    </div>
+                                                    <div class="modal-footer justify-content-center">
+                                                        <a href="crearComanda.php?id=<?php echo $pedido['id_pedido']; ?>" class="btn btn-primary cerrarModal">Sí, crear comanda.</a>
+                                                    </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Modal eliminar-->
+                                    <div class="modal fade" id="eliminarModal<?php echo $pedido['id_pedido']; ?>" tabindex="-1" aria-labelledby="eliminarModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content">
+                                                <div class="modal-header text-bg-dark">
+                                                    <h5 class="modal-title" id="eliminarModalLabel">Confirmar Acción</h5>
+                                                    <button type="button" class="btn-close bg-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                    <div class="modal-body text-dark">
+                                                        <p>¿Estás seguro de que quieres eliminar este pedido?</p>
+                                                    </div>
+                                                    <div class="modal-footer justify-content-center">
+                                                        <a href="../controllers/controllerPedidos.php?action=delete&id=<?php echo $pedido['id_pedido']; ?>" class="btn btn-primary">Sí, eliminar.</a>
+                                                    </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Modal facturar-->
+                                    <div class="modal fade" id="confirmModal<?php echo $pedido['id_pedido']; ?>" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content">
+                                                <div class="modal-header text-bg-dark">
+                                                    <h5 class="modal-title" id="confirmModalLabel">Confirmar Acción</h5>
+                                                    <button type="button" class="btn-close bg-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <form action="facturar.php" method="POST">
+                                                    <div class="modal-body text-dark">
+                                                        <h6 class="mb-4 mt-1">
+                                                            <a href="facturarSeparado.php?idPedido=<?php echo $pedido['id_pedido']; ?>" class="text-decoration-none"><i class="bi bi-coin me-3"></i>Cancelar por separado<i class="bi bi-coin ms-3"></i></a>
+                                                        </h6>      
+                                                        <p>Si desea dividir la cuenta en partes iguales, indique la cantidad de personas por favor:</p>
+                                                        <input type="number" name="cantidadPersonas" id="cantidadPersonas" class="form-control" placeholder="Cantidad personas..." min="1" value="1" required>
+                                                        <input type="hidden" name="idFactura" value="<?php echo $pedido['id_pedido']; ?>">
+                                                    </div>
+                                                    <div class="modal-footer justify-content-center">
+                                                        <input type="submit" class="btn btn-primary cerrarModal" value="Cancelar cuenta">
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
                                     <!-- <a href="#" class="text-decoration-none text-white" data-bs-toggle="modal" data-bs-target="#editModal<?php echo $pedido['id_pedido']; ?>">
                                         <i class="bi bi-pencil-fill text-white"></i>
                                     </a> -->
@@ -357,6 +425,11 @@ $pedidos = json_decode($pedidosData, true);
 
 <script>
     $(document).ready(function() {
+
+        $(function () {
+            $('[data-bs-toggle="tooltip"]').tooltip();
+        });
+        
         $('#example').DataTable({
             lengthChange: false,
             pageLength: 5,
@@ -383,6 +456,10 @@ $pedidos = json_decode($pedidosData, true);
             initComplete: function(settings, json) {
                 $(".dataTables_filter label").addClass("text-dark");
             }
+        });
+
+        $('.cerrarModal').on('click', function() {
+            $('.modal').modal('hide');
         });
 
         $('#detallesProductos th:nth-child(1), #detallesProductos td:nth-child(1), #detallesProductos th:nth-child(2), #detallesProductos td:nth-child(2)').css('display', 'none'); 

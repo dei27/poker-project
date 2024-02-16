@@ -33,25 +33,25 @@ $currentPage = basename($_SERVER['PHP_SELF']);
         <div class="navbar-brand">
             <a class="" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight"><i class="bi bi-list text-dark fs-2 px-3"></i></a>
             <div class="w-50 offcanvas offcanvas-end" data-bs-scroll="true" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
-                <div class="offcanvas-header">
+                <div class="offcanvas-header text-bg-dark">
                     <h5 class="offcanvas-title" id="offcanvasRightLabel">Menú</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                    <a type="button" class="btn-close bg-white" data-bs-dismiss="offcanvas" aria-label="Close"></a>
                 </div>
                 <div class="offcanvas-body">
                 <form action="../controllers/controller.php" method="post">
                     <input type="hidden" name="action" value="logout">
-                    <div class="row">
-                    <div class="btn-group mb-3">
-                            <a href="dashboard.php" class="btn btn-secondary p-3">Inicio</a>        
+                    <div class="row justify-content-center">
+                        <div class="col-12">
+                            <a href="dashboard.php" class="text-dark text-decoration-none text-center btn btn-light w-100 p-3 mb-3"><i class="bi bi-house-heart-fill mx-1"></i>Inicio</a> 
                         </div>
-                        <div class="btn-group mb-3">
-                            <a href="#" class="btn btn-success p-3" data-bs-toggle="modal" data-bs-target="#registroHorarioModal">Crear Registro</a>        
+                        <div class="col-12">
+                            <a href="#" class="text-dark text-decoration-none text-center btn btn-light w-100 p-3 mb-3" data-bs-toggle="modal" data-bs-target="#registroHorarioModal"><i class="bi bi-stopwatch-fill mx-1"></i>Crear Registro</a>        
                         </div>
-                        <div class="btn-group mb-3">
-                            <a class="btn btn-info text-white p-3" href="#" data-bs-toggle="modal" data-bs-target="#verRegistroModal">Mis registros</a>      
+                        <div class="col-12">
+                            <a class="text-dark text-decoration-none text-center btn btn-light w-100 p-3 mb-3" href="#" data-bs-toggle="modal" data-bs-target="#verRegistroModal"><i class="bi bi-calendar2-week-fill mx-1"></i>Mis registros</a>      
                         </div>
-                        <div class="btn-group mb-3">
-                            <button type="submit navbar-brand" class="btn btn-danger p-3">Cerrar sesión</button>
+                        <div class="col-12">
+                            <a type="submit navbar-brand" class="text-dark text-decoration-none text-center btn btn-light w-100 p-3 mb-3"><i class="bi bi-door-closed-fill mx-1"></i>Cerrar sesión</a>
                         </div>
                     </div>
                 </form>

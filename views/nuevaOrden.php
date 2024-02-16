@@ -51,6 +51,7 @@ $bebidasPlatillos = json_decode(getAllBebidasAndPlatillos(),true);
                                         <th>Id</th>  
                                         <th>Precio</th>  
                                         <th>Nombre</th> 
+                                        <th>Tipo</th> 
                                         <?php 
                                             if(isset($_SESSION["user"])){
                                                 echo '<th class="text-center">Acciones</th>';
@@ -64,6 +65,30 @@ $bebidasPlatillos = json_decode(getAllBebidasAndPlatillos(),true);
                                             <td><?php echo $product['id']; ?></td>
                                             <td><?php echo $product['precio']; ?></td>
                                             <td><?php echo $product['producto']; ?></td>
+                                            <td>
+                                                <?php
+                                                switch ($product['tipo']) {
+                                                    case null:
+                                                        echo "Bebida";
+                                                        break;
+                                                    case 1:
+                                                        echo "Entradas";
+                                                        break;
+                                                    case 2:
+                                                        echo "Platillos Fuertes";
+                                                        break;
+                                                    case 3:
+                                                        echo "Postres";
+                                                        break;
+                                                    case 4:
+                                                        echo "Extras";
+                                                        break;
+                                                    default:
+                                                        echo "Desconocido";
+                                                        break;
+                                                }
+                                                ?>
+                                            </td>
                                             <td class="text-center">
                                                 <?php if(isset($_SESSION["user"])): ?>
                                                     <span id="cart_<?php echo $product['id']; ?>" class="btn cart-button text-white">
@@ -247,9 +272,10 @@ $bebidasPlatillos = json_decode(getAllBebidasAndPlatillos(),true);
     $(document).ready(function() {
         $('#productosOrden').DataTable({
             lengthChange: false,
-            pageLength: 5,
+            pageLength: 10,
             info: false,
             responsive: true,
+            "order": [[2, 'asc']],
             "language": {
                 "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
             }

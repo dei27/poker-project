@@ -36,7 +36,7 @@ if (session_status() === PHP_SESSION_NONE) {
     <?php
     if (isset($_SESSION['user'])) {
         
-        echo "<div class='container-fluid px-5'>
+        echo "<div class='container-fluid mt-5 px-5'>
                 <div class='card p-3 border-0 bg-transparent'>
                     <div class='row'>
                         <div class='col-6'>

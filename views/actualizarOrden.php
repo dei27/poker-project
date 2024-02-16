@@ -14,9 +14,6 @@ if (isset($_GET['idPedido'])) {
     $detallesPedidos =  json_decode(getAllDetallesMontos($id_pedido),true);
     $bebidasPlatillos = json_decode(getAllBebidasAndPlatillos(),true);
 }
-
-
-
 ?>
 
 <!DOCTYPE html>
@@ -62,6 +59,7 @@ if (isset($_GET['idPedido'])) {
                                         <th>Id</th>  
                                         <th>Precio</th>  
                                         <th>Nombre</th> 
+                                        <th>Tipo</th> 
                                         <?php 
                                             if(isset($_SESSION["user"])){
                                                 echo '<th class="text-center">Acciones</th>';
@@ -75,10 +73,34 @@ if (isset($_GET['idPedido'])) {
                                             <td><?php echo $product['id']; ?></td>
                                             <td><?php echo $product['precio']; ?></td>
                                             <td><?php echo $product['producto']; ?></td>
+                                            <td>
+                                                <?php
+                                                switch ($product['tipo']) {
+                                                    case null:
+                                                        echo "Bebida";
+                                                        break;
+                                                    case 1:
+                                                        echo "Entradas";
+                                                        break;
+                                                    case 2:
+                                                        echo "Platillos Fuertes";
+                                                        break;
+                                                    case 3:
+                                                        echo "Postres";
+                                                        break;
+                                                    case 4:
+                                                        echo "Extras";
+                                                        break;
+                                                    default:
+                                                        echo "Desconocido";
+                                                        break;
+                                                }
+                                                ?>
+                                            </td>
                                             <td class="text-center">
                                                 <?php if(isset($_SESSION["user"])): ?>
                                                     <span id="cart_<?php echo $product['id']; ?>" class="btn cart-button text-white">
-                                                        <i class="bi bi-cart-plus-fill"></i>
+                                                        <i class="bi bi-cart-plus-fill" data-bs-toggle='tooltip' data-bs-placement='top' data-bs-custom-class='custom-tooltip' data-bs-title='Agregar'></i>
                                                     </span>
                                                 <?php endif; ?>
                                             </td>
@@ -127,7 +149,7 @@ if (isset($_GET['idPedido'])) {
                             <div class="row mb-3">
                                 <div class="col">
                                     <label for="direccionClienteUpdate" class="form-label">Dirección del Cliente</label>
-                                    <textarea class="form-control" id="direccionClienteUpdate" name="direccionClienteUpdate" rows="3"><?php echo isset($pedido['direccion_cliente']) ? $pedido['direccion_cliente'] : ''; ?></textarea>
+                                    <textarea class="form-control" id="direccionClienteUpdate" name="direccionClienteUpdate" rows="3" placeholder="Requisito para envíos..."<?php if ($pedido['mesa'] == null) echo ' required'; ?>><?php echo isset($pedido['direccion_cliente']) ? htmlspecialchars($pedido['direccion_cliente'], ENT_QUOTES, 'UTF-8') : ''; ?></textarea>
                                 </div>
                             </div>
                             <div class="row mb-3">
@@ -150,7 +172,7 @@ if (isset($_GET['idPedido'])) {
                                                             <td><?php echo $detalle['producto']; ?></td>
                                                             <td>₡<?php echo $detalle['precio']; ?></td>
                                                             <td><input type="number" class="form-control cantidad" name="cantidad[<?php echo $detalle['product_id']; ?>]" value="<?php echo $detalle['cantidad']; ?>" min=1 required></td>
-                                                            <td><span class="btn remove-button"><i class="bi bi-cart-x-fill"></i></span></td>
+                                                            <td><span class="btn remove-button"><i class="bi bi-cart-x-fill" data-bs-toggle='tooltip' data-bs-placement='top' data-bs-custom-class='custom-tooltip' data-bs-title='Remover'></i></span></td>
                                                         </tr>
                                                     <?php } ?>
                                                 <?php } ?>
@@ -265,11 +287,18 @@ if (isset($_GET['idPedido'])) {
 
 <script>
     $(document).ready(function() {
+
+        $(function () {
+            $('[data-bs-toggle="tooltip"]').tooltip();
+        });
+
+
         $('#productosOrden').DataTable({
             lengthChange: false,
-            pageLength: 5,
+            pageLength: 10,
             info: false,
             responsive: true,
+            "order": [[2, 'asc']],
             "language": {
                 "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
             }
@@ -296,7 +325,7 @@ if (isset($_GET['idPedido'])) {
             let productPrice = $(this).closest("tr").find("td:eq(1)").text();
             let productName = $(this).closest("tr").find("td:eq(2)").text();
             let cantidad = 1;
-            let tableRow = "<tr><td>" + productName + "</td><td>₡" + productPrice + "</td><td><input type='number' class='form-control cantidad' name='cantidad[" + productId + "]' value='" + cantidad + "' min=1 required></td><td><span class='btn remove-button'><i class='bi bi-cart-x-fill'></i></span></td></tr>";
+            let tableRow = "<tr><td>" + productName + "</td><td>₡" + productPrice + "</td><td><input type='number' class='form-control cantidad' name='cantidad[" + productId + "]' value='" + cantidad + "' min=1 required></td><td><span class='btn remove-button'><i class='bi bi-cart-x-fill' data-bs-toggle='tooltip' data-bs-placement='top' data-bs-custom-class='custom-tooltip' data-bs-title='Remover'></i></span></td></tr>";
 
             $("#tablaProductosTable tbody").append(tableRow);
         });

@@ -240,6 +240,46 @@ class PedidosModel extends BaseModel {
         }
     }
 
+    public function getCantidadByIdPedidoAndIdProducto($id_pedido, $id_producto, $tipo_producto) {
+        try {
+
+            $campo_producto = ($tipo_producto === 'bebida') ? 'id_bebida' : 'id_platillo';
+
+            $query = "SELECT cantidad FROM detalles_pedido WHERE id_pedido = :id_pedido AND $campo_producto = :id_producto;";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id_pedido', $id_pedido, PDO::PARAM_INT);
+            $stmt->bindParam(':id_producto', $id_producto, PDO::PARAM_INT);
+            $stmt->execute();
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($row) {
+                return $row['cantidad'];
+            } else {
+                return false;
+            }
+        } catch (PDOException $e) {
+            die("Error: " . $e->getMessage());
+        }
+    }
+
+    public function updateCantidadProductosDetallesPedidos($cantidad, $id_pedido, $id_producto, $tipo_producto) {
+        try {
+            $campo_producto = ($tipo_producto === 'bebida') ? 'id_bebida' : 'id_platillo';
+            
+            // Construir la consulta SQL
+            $query = "UPDATE detalles_pedido SET cantidad = :cantidad WHERE id_pedido = :id_pedido AND $campo_producto = :id_producto;";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':cantidad', $cantidad, PDO::PARAM_INT);
+            $stmt->bindParam(':id_pedido', $id_pedido, PDO::PARAM_INT);
+            $stmt->bindParam(':id_producto', $id_producto, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->rowCount() > 0;
+        } catch (PDOException $e) {
+            die("Error: " . $e->getMessage());
+        }
+    }
+    
+    
+
     
 
     // public function getRecetasByCondicion($campo, $valor) {
