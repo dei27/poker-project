@@ -16,6 +16,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
             $link = "ordenes.php";
             break;
         case "actualizarOrden.php":
+        case "facturarSeparado.php":
             $link = "ordenes.php";
             break;
         case "nuevaOrden.php":
@@ -24,7 +25,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
             break;
         default:
             $link = "dashboard.php";
-            break;
+            break;        
     }
 ?>
 
@@ -49,6 +50,9 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                         </div>
                         <div class="col-12">
                             <a class="text-dark text-decoration-none text-center btn btn-light w-100 p-3 mb-3" href="#" data-bs-toggle="modal" data-bs-target="#verRegistroModal"><i class="bi bi-calendar2-week-fill mx-1"></i>Mis registros</a>      
+                        </div>
+                        <div class="col-12">
+                            <a href="cerrarCaja.php" class="text-dark text-decoration-none text-center btn btn-light w-100 p-3 mb-3"><i class="bi bi-bank2 mx-1"></i>Cierre de caja</a>
                         </div>
                         <div class="col-12">
                             <a type="submit navbar-brand" class="text-dark text-decoration-none text-center btn btn-light w-100 p-3 mb-3"><i class="bi bi-door-closed-fill mx-1"></i>Cerrar sesión</a>

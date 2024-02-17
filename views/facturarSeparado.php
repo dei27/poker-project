@@ -129,10 +129,11 @@ if (isset($_GET['idPedido'])) {
                                                             }
                                                             ?>
                                                         </td>
-                                                        <td><input type="number" class="form-control cantidad" name="cantidadSeparado[<?php echo $detalle['product_id']; ?>]" value="<?php echo $detalle['cantidad']; ?>" min=1 required max=<?php echo $maxRango; ?>></td>
+                                                        <td><input type="number" class="form-control cantidad" name="cantidadSeparado[<?php echo $detalle['product_id']; ?>]" value="<?php echo $detalle['cantidad']; ?>" min=1 required max=<?php echo $maxRango; ?> readonly></td>
                                                         <td><input type="number" class="form-control cantidad" name="cantidadPagar[<?php echo $detalle['product_id']; ?>]" value="0" min=0 required max=<?php echo $maxRango; ?>></td>
                                                         <!-- Campo oculto para el precio -->
                                                         <input type="hidden" name="preciosSeparado[<?php echo $detalle['product_id']; ?>]" value="<?php echo $detalle['precio']; ?>">
+                                                        <input type="hidden" name="nombresProducto[<?php echo $detalle['product_id']; ?>]" value="<?php echo $detalle['producto']; ?>">
                                                     </tr>
                                                 <?php 
                                                     }
@@ -148,9 +149,20 @@ if (isset($_GET['idPedido'])) {
                                 <div class="col mb-3">
                                     <button type="submit" class="btn btn-primary w-100 p-3" name="action" value="procesarPago">Procesar pago</button>
                                 </div>
-                                <div class="col mb-3">
-                                    <button type="submit" class="btn btn-info w-100 p-3 text-white" name="action" value="crearFacturaIndividual">Crear factura individual</button>
-                                </div>
+                                <?php
+                                    if (isset($_GET['idPedido'], $_GET['min'], $_GET['max'])) {
+                                        $id_factura = $_GET['idPedido'];
+                                        $min = $_GET['min'];
+                                        $max = $_GET['max'];
+                                        $url = 'facturarIndividual.php?idFactura=' . $id_factura . '&min=' . $min . '&max=' . $max;
+                                    ?>
+                                        <div class="col mb-3">
+                                            <a href="<?php echo $url; ?>" class="btn btn-info w-100 p-3 text-white">Crear factura individual</a>
+                                        </div>
+                                    <?php
+                                    }
+                                    ?>
+
                             </div>
                         </form>
                     </div>
@@ -164,63 +176,46 @@ if (isset($_GET['idPedido'])) {
 
 
     <?php
-        if (isset($_GET['updatedPedido'])) {
-            $status = $_GET['updatedPedido'];
+        if (isset($_GET['updatedFactura'])) {
+            $status = $_GET['updatedFactura'];
+            $id_factura = isset($_GET['idPedido']) ? $_GET['idPedido'] : '';
+            $min = isset($_GET['min']) ? $_GET['min'] : '';
+            $max = isset($_GET['max']) ? $_GET['max'] : '';
             
             $messageConfig = ($status == 1)
                 ? [
                     'icon' => 'success',
                     'title' => 'Actualizado con éxito',
-                    'text' => 'Orden actualizada.',
+                    'text' => 'El pago individual se ha realizado con éxito.',
+                    'showButton' => true 
                 ]
                 : [
                     'icon' => 'error',
-                    'title' => 'Error al actualizar',
-                    'text' => 'No se pudo actualizar la orden.',
+                    'title' => 'Inconveniente al realizar el pago.',
+                    'text' => 'No se pudo realizar.',
+                    'showButton' => false
                 ];
-
+        
             echo '
             <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
             <script>
                 Swal.fire({
                     icon: "' . $messageConfig['icon'] . '",
                     title: "' . $messageConfig['title'] . '",
-                    timer: 2500,
                     text: "' . $messageConfig['text'] . '",
-                    showConfirmButton: false
+                    showCloseButton: true,
+                    allowOutsideClick: false,
+                    confirmButtonColor: "#0dcaf0",
+                    showConfirmButton: ' . ($messageConfig['showButton'] ? 'true' : 'false') . ',
+                    ' . ($messageConfig['showButton'] ? 'confirmButtonText: "Crear Factura Individual",' : '') . '
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "facturarIndividual.php?idFactura=' . $id_factura . '&min=' . $min . '&max=' . $max . '";
+                    }
                 });
             </script>
             ';
-        }
-
-        if (isset($_GET['deletePedido'])) {
-            $status = $_GET['deletePedido'];
-            
-            $messageConfig = ($status == 1)
-                ? [
-                    'icon' => 'success',
-                    'title' => 'Eliminado con éxito',
-                    'text' => 'Orden eliminada.',
-                ]
-                : [
-                    'icon' => 'error',
-                    'title' => 'Error al eliminar',
-                    'text' => 'No se pudo eliminar la orden.',
-                ];
-
-            echo '
-            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-            <script>
-                Swal.fire({
-                    icon: "' . $messageConfig['icon'] . '",
-                    title: "' . $messageConfig['title'] . '",
-                    timer: 2500,
-                    text: "' . $messageConfig['text'] . '",
-                    showConfirmButton: false
-                });
-            </script>
-            ';
-        }
+        }          
 
         if (isset($_GET['emptyProducts']) && $_GET['emptyProducts'] == 0) {
             echo '

@@ -334,10 +334,12 @@ if (isset($_POST['action']) && $_POST['action'] === 'updateOrden') {
 if (isset($_POST['action']) && $_POST['action'] === 'procesarPago') {
     $id_orden = filter_input(INPUT_POST, 'idOrden', FILTER_SANITIZE_NUMBER_INT);
     $nombre = isset($_POST['nombreClienteProcesarSeparado']) ? htmlspecialchars($_POST['nombreClienteProcesarSeparado'], ENT_QUOTES, 'UTF-8') : "Sin nombre"; 
-    $telefono = isset($_POST['telefonoProcesarSeparado']) ? htmlspecialchars($_POST['telefonoProcesarSeparado'], ENT_QUOTES, 'UTF-8') : "Sin teléfono";   
+    $telefono = isset($_POST['telefonoProcesarSeparado']) ? htmlspecialchars($_POST['telefonoProcesarSeparado'], ENT_QUOTES, 'UTF-8') : "Sin teléfono"; 
+    $mesa = isset($_POST['mesaOrdenProcesarSeparado']) ? htmlspecialchars($_POST['mesaOrdenProcesarSeparado'], ENT_QUOTES, 'UTF-8') : "null"; 
     $cantidades = $_POST['cantidadSeparado'];
     $bebidas = [];
     $platillos = [];
+    $idsCreados = [];
     $resultUpdatedBebidas = false;
     $resultUpdatedPlatillos = false;
     
@@ -345,19 +347,25 @@ if (isset($_POST['action']) && $_POST['action'] === 'procesarPago') {
 
         foreach ($cantidades as $clave => $valor) {
             $id_producto = substr($clave, 1);
-            $precio = $_POST['preciosSeparado'][$clave]; // Obtener el precio del campo oculto correspondiente
-            $cantidadPagar = $_POST['cantidadPagar'][$clave]; // Obtener el precio del campo oculto correspondiente
+            $precio = $_POST['preciosSeparado'][$clave];
+            $cantidadPagar = $_POST['cantidadPagar'][$clave];
+            $nombreProducto = $_POST['nombresProducto'][$clave];
+
             if (strpos($clave, 'B') === 0) {
                 $bebidas[$id_producto] = array(
                     'cantidad' => $valor,
                     'precio' => $precio,
-                    'cantidadPagar' => $cantidadPagar
+                    'cantidadPagar' => $cantidadPagar,
+                    'nombre_producto' => $nombreProducto,
+                    'id_producto' => $id_producto,
                 );
             } elseif (strpos($clave, 'R') === 0) {
                 $platillos[$id_producto] = array(
                     'cantidad' => $valor,
                     'precio' => $precio,
-                    'cantidadPagar' => $cantidadPagar
+                    'cantidadPagar' => $cantidadPagar,
+                    'nombre_producto' => $nombreProducto,
+                    'id_producto' => $id_producto,
                 );
             }
         }
@@ -375,15 +383,27 @@ if (isset($_POST['action']) && $_POST['action'] === 'procesarPago') {
                     $pagosModel->setIdFactura($id_orden);
                     $pagosModel->setNombre($nombre);
                     $pagosModel->setTelefono($telefono);
+
                     $precio = $datos_producto['precio'];
+                    $productoNombre = $datos_producto['nombre_producto'];
+                    $id__producto = $datos_producto['id_producto'];
+                    
                     $pagosModel->setTipoProducto(1);
                     $pagosModel->setPrecio($precio);
                     $pagosModel->setCantidad($cantidad); 
+                    $pagosModel->setNombreProducto($productoNombre); 
+                    $pagosModel->setIdProducto($id__producto); 
                     $insertedId = $pagosModel->nuevoPagoFactura();
 
-                    if($insertedId && $cantidadExistente > 0){
+                    if($insertedId > 0 && $cantidadExistente > 0){
                         $cantidadRestante = $cantidadExistente - $cantidad;
                         $resultUpdatedBebidas = $pedido->updateCantidadProductosDetallesPedidos($cantidadRestante, $id_orden, $id_producto, $tipo);
+
+                        if($resultUpdatedBebidas && $cantidadRestante == 0){
+                            $pedido->deleteDetallePedidoByIdCantidad($id_orden);
+                        }
+
+                        $idsCreados[] = $insertedId;
                     }
                 }
 
@@ -404,15 +424,27 @@ if (isset($_POST['action']) && $_POST['action'] === 'procesarPago') {
                     $pagosModel->setIdFactura($id_orden);
                     $pagosModel->setNombre($nombre);
                     $pagosModel->setTelefono($telefono);
+
                     $precio = $datos_producto['precio'];
-                    $pagosModel->setTipoProducto(1);
+                    $productoNombre = $datos_producto['nombre_producto'];
+                    $id__producto = $datos_producto['id_producto'];
+
+                    $pagosModel->setTipoProducto(2);
                     $pagosModel->setPrecio($precio);
                     $pagosModel->setCantidad($cantidad); 
+                    $pagosModel->setNombreProducto($productoNombre); 
+                    $pagosModel->setIdProducto($id__producto); 
                     $insertedId = $pagosModel->nuevoPagoFactura();
 
-                    if($insertedId && $cantidadExistente > 0){
+                    if($insertedId > 0 && $cantidadExistente > 0){
                         $cantidadRestante = $cantidadExistente - $cantidad;
                         $resultUpdatedPlatillos = $pedido->updateCantidadProductosDetallesPedidos($cantidadRestante, $id_orden, $id_producto, $tipo);
+
+                        if($resultUpdatedPlatillos && $cantidadRestante == 0){
+                            $pedido->deleteDetallePedidoByIdCantidad($id_orden);
+                        }
+
+                        $idsCreados[] = $insertedId;
                     }
                 }
 
@@ -420,14 +452,39 @@ if (isset($_POST['action']) && $_POST['action'] === 'procesarPago') {
             }
         }
 
-        if($resultUpdatedBebidas || $resultUpdatedPlatillos){
+        if ($resultUpdatedBebidas || $resultUpdatedPlatillos) {
             $nuevoPedido = new PedidosModel();
             $monto = $nuevoPedido->getMontoProductos($id_orden);
+            
+            // Calcula el nuevo monto con un incremento del 10%
             $nuevoMonto = ($monto * 0.10) + $monto;
+            
+            // Establece el nuevo monto en el pedido
             $nuevoPedido->setIdPedido($id_orden);
-            $nuevoPedido->setTotalPedido($nuevoMonto);
-            $nuevoPedido->updateTotalPedidoById();
-        }         
+            $nuevoPedido->setTotalRestante($nuevoMonto);
+            
+            // Actualiza el monto total del pedido
+            $updateMontos = $nuevoPedido->updateTotalRestateById();
+
+            $minimo = 0;
+            $maximo = 0;
+
+            if (!empty($idsCreados)) {
+                $minimo = min($idsCreados);
+                $maximo = max($idsCreados);
+            }
+            
+            if ($updateMontos) {
+                header("Location: ../views/facturarSeparado.php?idPedido=$id_orden&updatedFactura=1&min=$minimo&max=$maximo");
+                exit();
+            } else {
+                header("Location: ../views/facturarSeparado.php?idPedido=$id_orden&updatedFactura=0");
+                exit();
+            }
+        }else{
+            header("Location: ../views/facturarSeparado.php?idPedido=$id_orden&updatedFactura=0");
+            exit();
+        }                
 
             // if(!empty($platillos)){
 

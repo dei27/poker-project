@@ -11,6 +11,7 @@ class PedidosModel extends BaseModel {
     private $fecha_pedido;
     private $estado_pedido;
     private $total_pedido;
+    private $total_restante;
 
     public function getIdPedido() {
         return $this->id_pedido;
@@ -68,11 +69,15 @@ class PedidosModel extends BaseModel {
         $this->total_pedido = $total_pedido;
     }
 
+    public function setTotalRestante($total_restante) {
+        $this->total_restante = $total_restante;
+    }
+
     public function setMesa($mesa) {
         $this->mesa = $mesa;
     }
 
-    public function __construct($nombre_cliente = null,$mesa = null, $telefono_cliente = null,$direccion_cliente = null,$fecha_pedido = null,$estado_pedido = null,$total_pedido = null) {
+    public function __construct($nombre_cliente = null,$mesa = null, $telefono_cliente = null,$direccion_cliente = null,$fecha_pedido = null,$estado_pedido = null,$total_pedido = null, $total_restante = null) {
         parent::__construct();
         $this->nombre_cliente = $nombre_cliente;
         $this->mesa = $mesa;
@@ -81,6 +86,7 @@ class PedidosModel extends BaseModel {
         $this->fecha_pedido = $fecha_pedido;
         $this->estado_pedido = $estado_pedido;
         $this->total_pedido = $total_pedido;
+        $this->total_restante = $total_restante;
     }
 
     public function getAllPedidos() {
@@ -106,10 +112,23 @@ class PedidosModel extends BaseModel {
 
     public function updateTotalPedidoById() {
         try {
-            $query = "UPDATE pedidos SET total_pedido = :total_pedido WHERE id_pedido = :id_pedido";
+            $query = "UPDATE pedidos SET total_pedido = :total_pedido, total_restante = :total_pedido WHERE id_pedido = :id_pedido";
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':id_pedido', $this->id_pedido, PDO::PARAM_INT);
             $stmt->bindParam(':total_pedido', $this->total_pedido, PDO::PARAM_STR);
+            $stmt->execute();
+            return true;
+        } catch (PDOException $e) {
+            die("Error: " . $e->getMessage());
+        }
+    }
+
+    public function updateTotalRestateById() {
+        try {
+            $query = "UPDATE pedidos SET total_restante = :total_restante WHERE id_pedido = :id_pedido";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id_pedido', $this->id_pedido, PDO::PARAM_INT);
+            $stmt->bindParam(':total_restante', $this->total_restante, PDO::PARAM_STR);
             $stmt->execute();
             return true;
         } catch (PDOException $e) {
@@ -228,6 +247,22 @@ class PedidosModel extends BaseModel {
         }
     }
 
+    public function getPagosPorPersona($id_menor, $id_mayor) {
+        try {
+            $query = "SELECT pp.*, p.mesa
+            FROM pagos_por_persona pp
+            INNER JOIN pedidos p ON p.id_pedido = pp.id_factura
+            WHERE pp.id_pago BETWEEN :id_menor AND :id_mayor;";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id_menor', $id_menor, PDO::PARAM_INT);
+            $stmt->bindParam(':id_mayor', $id_mayor, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            die("Error: " . $e->getMessage());
+        }
+    }    
+
      public function deleteAllDetallesByIdPedido() {
         try {
             $query = "DELETE FROM detalles_pedido WHERE id_pedido = :id_pedido";
@@ -273,6 +308,18 @@ class PedidosModel extends BaseModel {
             $stmt->bindParam(':id_producto', $id_producto, PDO::PARAM_INT);
             $stmt->execute();
             return $stmt->rowCount() > 0;
+        } catch (PDOException $e) {
+            die("Error: " . $e->getMessage());
+        }
+    }
+
+    public function deleteDetallePedidoByIdCantidad($id_pedido) {
+        try {  
+            $query = "DELETE FROM detalles_pedido WHERE id_pedido = :id_pedido AND cantidad = 0;";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id_pedido', $id_pedido, PDO::PARAM_INT);
+            $stmt->execute();
+            return true;
         } catch (PDOException $e) {
             die("Error: " . $e->getMessage());
         }

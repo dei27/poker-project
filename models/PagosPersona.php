@@ -11,6 +11,10 @@ class PagosPersona extends BaseModel {
     private $precio;
     private $cantidad;
     private $fecha_pago;
+    private $nombre_producto;
+    private $id_producto;
+
+
 
     public function setIdPago($id_pago) {
         $this->id_pago = $id_pago;
@@ -50,8 +54,15 @@ class PagosPersona extends BaseModel {
     public function setFechaPago($fecha_pago) {
         $this->fecha_pago = $fecha_pago;
     }
+    public function setNombreProducto($nombre_producto) {
+        $this->nombre_producto = $nombre_producto;
+    }
 
-    public function __construct($id_pago = null, $id_factura = null, $nombre = null, $telefono = null, $tipo_producto = null, $precio = null, $cantidad = null, $fecha_pago = null) {
+    public function setIdProducto($id_producto) {
+        $this->id_producto = $id_producto;
+    }
+
+    public function __construct($id_pago = null, $id_factura = null, $nombre = null, $telefono = null, $tipo_producto = null, $precio = null, $cantidad = null, $fecha_pago = null, $nombre_producto = null, $id_producto = null) {
         parent::__construct();
         $this->id_pago = $id_pago;
         $this->id_factura = $id_factura;
@@ -61,6 +72,8 @@ class PagosPersona extends BaseModel {
         $this->precio = $precio;
         $this->cantidad = $cantidad;
         $this->fecha_pago = $fecha_pago;
+        $this->nombre_producto = $nombre_producto;
+        $this->id_producto = $id_producto;
     }
 
     public function getAllPagosPersona() {
@@ -86,30 +99,11 @@ class PagosPersona extends BaseModel {
         }
     }
 
-    // public function updateProductById() {
-    //     try {
-    //         $query = "UPDATE productos SET nombre = :nombre, cantidad = :cantidad, precio = :precio, id_categoria = :categoria, id_unidad = :id_unidad WHERE id_producto = :id";
-    //         $stmt = $this->conn->prepare($query);
-            
-    //         $stmt->bindParam(':id', $this->id, PDO::PARAM_INT);
-    //         $stmt->bindParam(':nombre', $this->nombre, PDO::PARAM_STR);
-    //         $stmt->bindParam(':cantidad', $this->cantidad, PDO::PARAM_STR);
-    //         $stmt->bindParam(':precio', $this->precio, PDO::PARAM_STR);
-    //         $stmt->bindParam(':categoria', $this->categoria, PDO::PARAM_INT);
-    //         $stmt->bindParam(':id_unidad', $this->id_unidad, PDO::PARAM_INT);
-    //         $stmt->execute();
-            
-    //         return true;
-    //     } catch (PDOException $e) {
-    //         die("Error: " . $e->getMessage());
-    //     }
-    // }
-
     public function nuevoPagoFactura() {
         try {
             $hora_actual = gmdate("Y-m-d H:i:s", time() - 6 * 3600);
 
-            $query = "INSERT INTO pagos_por_persona (id_factura, nombre, telefono, tipo_producto, precio, cantidad, fecha_pago) VALUES (:id_factura, :nombre, :telefono, :tipo_producto, :precio, :cantidad, :fecha_pago)";
+            $query = "INSERT INTO pagos_por_persona (id_factura, nombre, telefono, tipo_producto, precio, cantidad, fecha_pago, nombre_producto, id_producto) VALUES (:id_factura, :nombre, :telefono, :tipo_producto, :precio, :cantidad, :fecha_pago, :nombre_producto, :id_producto)";
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':id_factura', $this->id_factura, PDO::PARAM_INT);
             $stmt->bindParam(':nombre', $this->nombre, PDO::PARAM_STR);
@@ -118,8 +112,13 @@ class PagosPersona extends BaseModel {
             $stmt->bindParam(':precio', $this->precio, PDO::PARAM_STR);
             $stmt->bindParam(':cantidad', $this->cantidad, PDO::PARAM_STR);
             $stmt->bindParam(':fecha_pago', $hora_actual, PDO::PARAM_STR);
+            $stmt->bindParam(':nombre_producto', $this->nombre_producto, PDO::PARAM_STR);
+            $stmt->bindParam(':id_producto', $this->id_producto, PDO::PARAM_INT);
             $stmt->execute();
-            return true; 
+
+            $id_insertado = $this->conn->lastInsertId();
+            
+            return $id_insertado;
 
         } catch (PDOException $e) {
             die("Error: " . $e->getMessage());
