@@ -40,7 +40,7 @@ $products = json_decode($prodcutsData, true);
     ?>
     </header>
 
-<?php if (isset($_SESSION["user"])) { ?>
+<?php if (isset($_SESSION["user"]) && (isset($_SESSION['role']) && $_SESSION['role'] === 1)) { ?>
     <div class="container-fluid p-5">
         <div class="card p-3">
             <h4 class="card-header mb-3 py-3">Inventario</h4>

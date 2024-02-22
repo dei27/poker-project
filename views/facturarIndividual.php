@@ -14,6 +14,8 @@ if(isset($_GET["idFactura"]) && isset($_GET["min"]) && isset($_GET["max"])) {
     $fecha = "";
     $cliente = "";
     $telefono = "";
+    $metodo_pago = 0;
+
 
     $pedido = new PedidosModel();
     $productos = new DetallesPedidos();
@@ -37,6 +39,7 @@ if(isset($_GET["idFactura"]) && isset($_GET["min"]) && isset($_GET["max"])) {
             $fecha = date("g:i:s A d-m-Y", strtotime($producto['fecha_pago']));
             $cliente = $producto['nombre'];
             $telefono = $producto['telefono'];
+            $metodo_pago = intval($producto['metodo_pago']);
 
         }elseif ($producto['tipo_producto'] == 2) {
 
@@ -54,6 +57,7 @@ if(isset($_GET["idFactura"]) && isset($_GET["min"]) && isset($_GET["max"])) {
             $fecha = date("g:i:s A d-m-Y", strtotime($producto['fecha_pago']));
             $cliente = $producto['nombre'];
             $telefono = $producto['telefono'];
+            $metodo_pago = intval($producto['metodo_pago']);
         }
     }
 
@@ -116,6 +120,25 @@ if(isset($_GET["idFactura"]) && isset($_GET["min"]) && isset($_GET["max"])) {
     $contenido .= "Total por pagar: ₡" . number_format($totalOrden, 2) . PHP_EOL;
     
     $contenido .= "_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _" . PHP_EOL;
+    $contenido .= " " . PHP_EOL;
+
+    switch ($metodo_pago)
+    {
+        case 1:
+            $metodo_pago = "Efectivo";
+            break;
+        case 2:
+            $metodo_pago = "Tarjeta";
+            break;
+        case 3:
+            $metodo_pago = "Sinpe";
+            break;
+        default:
+            $metodo_pago = "Sin método de pago";
+            break;
+    }
+
+    $contenido .= "Método de pago: " . $metodo_pago . PHP_EOL;
     $contenido .= " " . PHP_EOL;
     $contenido .= "Cancelado por: " . $nombreCajero . PHP_EOL;
 

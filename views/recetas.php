@@ -40,7 +40,7 @@ $recetasPrincipales = json_decode(getAllRecetas(),true);
 </header>
 
 <?php
-if (isset($_SESSION["user"])) {
+if (isset($_SESSION["user"]) && (isset($_SESSION['role']) && $_SESSION['role'] === 1)) {
 ?>
     <div class="container-fluid p-5">
         <div class="card p-3">
@@ -50,13 +50,8 @@ if (isset($_SESSION["user"])) {
                     Agregar una nueva receta.
                 </a>
             </h6>
-            <h6 class="modal-title mb-3">
-                <a href="#" class="text-decoration-none text-info" data-bs-toggle="modal" data-bs-target="#addTournament">
-                    Agregar recetas combinadas.
-                </a>
-            </h6>
             <div class="table-responsive">
-            <table id="example" class="table table-dark table-striped table-hover">
+            <table id="recetas" class="table table-dark table-striped table-hover">
                 <thead class="table-warning">
                     <tr>
                         <th>Nombre</th>
@@ -91,7 +86,7 @@ if (isset($_SESSION["user"])) {
                                                     <input type="hidden" name="action" value="delete">
                                                     <input type="hidden" name="idRecetaDelete" value="<?php echo $receta['id_receta'];?>">
                                                     <div class="table-responsive">
-                                                        <table id="recetas" class="table table-dark table-striped table-hover">
+                                                        <table id="recetasDetalles" class="table table-dark table-striped table-hover">
                                                             <thead class="table-warning">
                                                                 <tr>
                                                                     <th>Check</th>
@@ -217,30 +212,38 @@ if (isset($_SESSION["user"])) {
                                                 <input type="number" class="form-control" id="tiempoReceta" name="tiempoReceta" placeholder="Tiempo receta..." value="<?php echo $receta['tiempo_preparacion']?>" required min="0">
                                             </div>
                                             <div class="form-group mb-3 text-start">
+                                                <label for="tipoReceta">Tipo de Receta</label>
+                                                <select class="form-select" id="tipoReceta" name="tipoReceta" required>
+                                                    <option value="">Selecciona un tipo de receta...</option>
+                                                    <option value="1" <?php echo ($receta['tipo'] == 1) ? 'selected' : ''; ?>>Entradas</option>
+                                                    <option value="2" <?php echo ($receta['tipo'] == 2) ? 'selected' : ''; ?>>Platillos Fuertes</option>
+                                                    <option value="3" <?php echo ($receta['tipo'] == 3) ? 'selected' : ''; ?>>Postres</option>
+                                                    <option value="4" <?php echo ($receta['tipo'] == 4) ? 'selected' : ''; ?>>Extras</option>
+                                                </select>
+                                            </div>
+
                                             <div class="form-group mb-3 text-start">
-                                                <h6>Tipo de Receta</h6>
-                                                <div class="form-check">
+                                                <h6>Modalidad de Receta</h6>
+                                                <div class="form-check-inline">
                                                     <input class="form-check-input" type="checkbox" id="isPrincipal" name="isPrincipal" value="1" <?php echo ($receta['principal'] == 1) ? 'checked' : ''; ?>>
                                                     <label class="form-check-label" for="isPrincipal">
                                                         Combinada
                                                     </label>
                                                 </div>
 
-                                                <div class="form-check">
+                                                <div class="form-check-inline">
                                                     <input class="form-check-input" type="checkbox" id="isComplementaria" name="isComplementaria" value="1" <?php echo ($receta['complementaria'] == 1) ? 'checked' : ''; ?>>
                                                     <label class="form-check-label" for="isComplementaria">
                                                         Complementaria
                                                     </label>
                                                 </div>
 
-                                                <div class="form-check">
+                                                <div class="form-check-inline">
                                                     <input class="form-check-input" type="checkbox" id="isEspecial" name="isEspecial" value="1" <?php echo ($receta['especial'] == 1) ? 'checked' : ''; ?>>
                                                     <label class="form-check-label" for="isEspecial">
                                                         Especial
                                                     </label>
                                                 </div>
-                                            </div>
-
                                             </div>
 
                                             <div class="form-group mt-3 text-center">
@@ -285,27 +288,31 @@ if (isset($_SESSION["user"])) {
                         <label for="tiempoRecetaI" class="form-label">Tiempo preparación</label>
                         <input type="number" class="form-control" id="tiempoRecetaI" name="tiempoRecetaI" placeholder="Tiempo receta..." required min="1">
                     </div>
+                    <div class="form-group mb-3">
+                        <label for="tipoRecetaI">Tipo de Receta</label>
+                        <select class="form-select" id="tipoRecetaI" name="tipoRecetaI" required>
+                            <option value="">Selecciona un tipo de receta...</option>
+                            <option value="1">Entradas</option>
+                            <option value="2">Platillos Fuertes</option>
+                            <option value="3">Postres</option>
+                            <option value="4">Extras</option>
+                        </select>
+                    </div>
                     <div class="form-group mb-3 text-start">
-                        <h6>Tipo de Receta</h6>
-                        <div class="form-check">
+                        <h6>Modalidad de Receta</h6>
+                        <div class="form-check-inline">
                             <input class="form-check-input" type="checkbox" id="isPrincipalI" name="isPrincipalI" value="1">
-                            <label class="form-check-label" for="isPrincipalI">
-                                Combinada
-                            </label>
+                            <label class="form-check-label" for="isPrincipalI">Combinada</label>
                         </div>
 
-                        <div class="form-check">
+                        <div class="form-check-inline">
                             <input class="form-check-input" type="checkbox" id="isComplementariaI" name="isComplementariaI">
-                            <label class="form-check-label" for="isComplementariaI">
-                                Complementaria
-                            </label>
+                            <label class="form-check-label" for="isComplementariaI">Complementaria</label>
                         </div>
 
-                        <div class="form-check">
+                        <div class="form-check-inline">
                             <input class="form-check-input" type="checkbox" id="isEspecialI" name="isEspecialI" value="1">
-                            <label class="form-check-label" for="isEspecialI">
-                                Especial
-                            </label>
+                            <label class="form-check-label" for="isEspecialI">Especial</label>
                         </div>
                     </div>
                     <div class="form-group mt-3 text-center">
@@ -498,7 +505,7 @@ if (isset($_GET['deletedIngredientes'])) {
 
 <script>
     $(document).ready(function() {
-        $('#recetas, #example').DataTable({
+        $('#recetas, #recetasDetalles').DataTable({
             lengthChange: false,
             pageLength: 5,
             info: false,

@@ -146,15 +146,17 @@ if (isset($_GET['idPedido'])) {
                                 </div>
                             <?php endif; ?>
 
-                            <div class="row mb-3">
-                                <div class="col">
-                                    <label for="direccionClienteUpdate" class="form-label">Dirección del Cliente</label>
-                                    <textarea class="form-control" id="direccionClienteUpdate" name="direccionClienteUpdate" rows="3" placeholder="Requisito para envíos..."<?php if ($pedido['mesa'] == null) echo ' required'; ?>><?php echo isset($pedido['direccion_cliente']) ? htmlspecialchars($pedido['direccion_cliente'], ENT_QUOTES, 'UTF-8') : ''; ?></textarea>
+                            <?php if ($pedido['mesa'] === null): ?>
+                                <div class="row mb-3">
+                                    <div class="col">
+                                        <label for="direccionClienteUpdate" class="form-label">Dirección del Cliente</label>
+                                        <textarea class="form-control" id="direccionClienteUpdate" name="direccionClienteUpdate" rows="3" placeholder="Requisito para envíos..." required><?php echo isset($pedido['direccion_cliente']) ? htmlspecialchars($pedido['direccion_cliente'], ENT_QUOTES, 'UTF-8') : ''; ?></textarea>
+                                    </div>
                                 </div>
-                            </div>
+                            <?php endif; ?>
                             <div class="row mb-3">
                                 <div class="col">
-                                    <h6>Productos de la orden:</h6>
+                                    <h5 class="card-header mb-3 py-3">Productos de la orden</h5>
                                     <div id="tablaProductos" class="table-responsive">
                                         <table id="tablaProductosTable" class="table table-light table-striped">
                                             <thead>

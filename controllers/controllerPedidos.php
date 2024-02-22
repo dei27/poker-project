@@ -6,10 +6,28 @@ if (session_status() === PHP_SESSION_NONE) {
 include(__DIR__ . '/../models/PedidosModel.php');
 include(__DIR__ . '/../models/PagosPersona.php');
 
+
 function getAllPedidos() {
     $pedidosModel = new PedidosModel();
     $pedidos = $pedidosModel->getAllPedidos();
     return json_encode($pedidos);
+}
+
+function pagarFactura($id_orden, $nombre, $telefono, $tipoProducto, $precio, $cantidad, $fecha_pago, $productoNombre, $id__producto, $metodo_pago, $mesaPedido) {
+    $pagosModel = new PagosPersona();
+    $pagosModel->setIdFactura($id_orden);
+    $pagosModel->setNombre($nombre);
+    $pagosModel->setTelefono($telefono);
+    $pagosModel->setTipoProducto($tipoProducto);
+    $pagosModel->setPrecio($precio);
+    $pagosModel->setCantidad($cantidad); 
+    $pagosModel->setFechaPago($fecha_pago); 
+    $pagosModel->setNombreProducto($productoNombre); 
+    $pagosModel->setIdProducto($id__producto); 
+    $pagosModel->setMetodoPago($metodo_pago); 
+    $pagosModel->setMesa($mesaPedido); 
+    $insertedId = $pagosModel->nuevoPagoFactura();
+    return $insertedId;
 }
 
 function getPedidoById($id_pedido){
@@ -18,10 +36,20 @@ function getPedidoById($id_pedido){
     return $pedido; 
 }
 
+function getEstadoPedido($id_pedido){
+    $pedidosModel = new PedidosModel();
+    $pedido = $pedidosModel->getEstadoPedidoById($id_pedido);
+    return $pedido; 
+}
+
 function facturarPedidoById($id_pedido){
     $pedidosModel = new PedidosModel();
     $pedido = $pedidosModel->facturarById($id_pedido);
     return $pedido; 
+}
+
+function redirgir(){
+
 }
 
 
@@ -75,11 +103,9 @@ if (isset($_POST['id'], $_POST['action']) && $_POST['action'] === 'edit') {
 
 if (isset($_POST['action']) && $_POST['action'] === 'addOrden') {
     $nombre = isset($_POST['nombreClienteOrden']) ? htmlspecialchars($_POST['nombreClienteOrden'], ENT_QUOTES, 'UTF-8') : "Sin nombre"; 
-    $mesa = isset($_POST['mesaOrden']) ? htmlspecialchars($_POST['mesaOrden'], ENT_QUOTES, 'UTF-8') : "1"; 
+    $mesa = isset($_POST['mesaOrden']) ? htmlspecialchars($_POST['mesaOrden'], ENT_QUOTES, 'UTF-8') : null; 
     $telefono = isset($_POST['telefonoClienteOrden']) ? htmlspecialchars($_POST['telefonoClienteOrden'], ENT_QUOTES, 'UTF-8') : "Sin teléfono";   
-    $servicio = isset($_POST['servicioOrden']) ? htmlspecialchars($_POST['servicioOrden'], ENT_QUOTES, 'UTF-8') : "10";
-    // $iva = isset($_POST['ivaOrden']) ? htmlspecialchars($_POST['ivaOrden'], ENT_QUOTES, 'UTF-8') : "13"; 
-    $direccion = isset($_POST['direccionClienteOrden']) ? htmlspecialchars($_POST['direccionClienteOrden'], ENT_QUOTES, 'UTF-8') : "Sin dirección"; 
+    $servicio = 10;
     $inputs = $_POST['cantidad'];
     $bebidas = [];
     $platillos = [];
@@ -89,7 +115,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'addOrden') {
         $pedidosModel->setNombreCliente($nombre);
         $pedidosModel->setMesa($mesa);
         $pedidosModel->setTelefonoCliente($telefono);
-        $pedidosModel->setDireccionCliente($direccion);
+        $pedidosModel->setDireccionCliente(null);
         $insertedId = $pedidosModel->newPedido();
         $insertedBebidas = false;
         $insertedPlatillos = false;
@@ -161,10 +187,15 @@ if (isset($_POST['action']) && $_POST['action'] === 'addOrden') {
 if (isset($_POST['action']) && $_POST['action'] === 'addOrdenExpress') {
     $nombre = isset($_POST['nombreClienteOrden']) ? htmlspecialchars($_POST['nombreClienteOrden'], ENT_QUOTES, 'UTF-8') : "Sin nombre"; 
     $telefono = isset($_POST['telefonoClienteOrden']) ? htmlspecialchars($_POST['telefonoClienteOrden'], ENT_QUOTES, 'UTF-8') : "Sin teléfono";   
-    $direccion = isset($_POST['direccionClienteOrden']) ? htmlspecialchars($_POST['direccionClienteOrden'], ENT_QUOTES, 'UTF-8') : "Sin dirección"; 
+    $direccion = isset($_POST['direccionClienteOrden']) ? htmlspecialchars($_POST['direccionClienteOrden'], ENT_QUOTES, 'UTF-8') : null; 
     $inputs = $_POST['cantidad'];
     $bebidas = [];
     $platillos = [];
+
+    if($direccion === null){
+        header("Location: ../views/ordenes.php?orderAdd=0");
+        exit(); 
+    }
     
     if(!empty($inputs)){
         $pedidosModel = new PedidosModel();
@@ -243,7 +274,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'updateOrden') {
     $telefono = isset($_POST['telefonoClienteUpdate']) ? htmlspecialchars($_POST['telefonoClienteUpdate'], ENT_QUOTES, 'UTF-8') : "Sin teléfono";   
     $servicio = isset($_POST['servicioOrdenUpdate']) ? htmlspecialchars($_POST['servicioOrdenUpdate'], ENT_QUOTES, 'UTF-8') : "0";
     // $iva = isset($_POST['ivaOrdenUpdate']) ? htmlspecialchars($_POST['ivaOrdenUpdate'], ENT_QUOTES, 'UTF-8') : "13"; 
-    $direccion = isset($_POST['direccionClienteUpdate']) ? (trim($_POST['direccionClienteUpdate']) !== '' ? htmlspecialchars($_POST['direccionClienteUpdate'], ENT_QUOTES, 'UTF-8') : "Sin dirección") : "Sin dirección";
+    $direccion = isset($_POST['direccionClienteUpdate']) ? (trim($_POST['direccionClienteUpdate']) !== '' ? htmlspecialchars($_POST['direccionClienteUpdate'], ENT_QUOTES, 'UTF-8') : "Sin dirección") : null;
     $inputs = $_POST['cantidad'];
     $bebidas = [];
     $platillos = [];
@@ -297,7 +328,12 @@ if (isset($_POST['action']) && $_POST['action'] === 'updateOrden') {
 
                 $montoTotal = $pedidosModel->getMontoProductos($id_orden);
 
-                $montoTotalConServicio = $montoTotal + ($montoTotal * $servicio / 100);
+                if($mesaOrdenUpdate !== null){
+                    $montoTotalConServicio = $montoTotal + ($montoTotal * $servicio / 100);
+                }else{
+                    $montoTotalConServicio = $montoTotal;
+                }
+
 
                 $pedidosUpdate = new PedidosModel();
                 $pedidosUpdate->setIdPedido($id_orden);
@@ -327,7 +363,6 @@ if (isset($_POST['action']) && $_POST['action'] === 'updateOrden') {
         header("Location: ../views/actualizarOrden.php?idPedido=$id_orden&emptyProducts=0");
         exit();
     }
-    
 }
 
 
@@ -335,7 +370,8 @@ if (isset($_POST['action']) && $_POST['action'] === 'procesarPago') {
     $id_orden = filter_input(INPUT_POST, 'idOrden', FILTER_SANITIZE_NUMBER_INT);
     $nombre = isset($_POST['nombreClienteProcesarSeparado']) ? htmlspecialchars($_POST['nombreClienteProcesarSeparado'], ENT_QUOTES, 'UTF-8') : "Sin nombre"; 
     $telefono = isset($_POST['telefonoProcesarSeparado']) ? htmlspecialchars($_POST['telefonoProcesarSeparado'], ENT_QUOTES, 'UTF-8') : "Sin teléfono"; 
-    $mesa = isset($_POST['mesaOrdenProcesarSeparado']) ? htmlspecialchars($_POST['mesaOrdenProcesarSeparado'], ENT_QUOTES, 'UTF-8') : "null"; 
+    $mesa = isset($_POST['mesaOrdenProcesarSeparado']) ? htmlspecialchars($_POST['mesaOrdenProcesarSeparado'], ENT_QUOTES, 'UTF-8') : null; 
+    $metodo_pago = isset($_POST['metodoPago']) ? htmlspecialchars($_POST['metodoPago'], ENT_QUOTES, 'UTF-8') : 1; 
     $cantidades = $_POST['cantidadSeparado'];
     $bebidas = [];
     $platillos = [];
@@ -393,6 +429,8 @@ if (isset($_POST['action']) && $_POST['action'] === 'procesarPago') {
                     $pagosModel->setCantidad($cantidad); 
                     $pagosModel->setNombreProducto($productoNombre); 
                     $pagosModel->setIdProducto($id__producto); 
+                    $pagosModel->setMetodoPago($metodo_pago); 
+                    $pagosModel->setMesa($mesa); 
                     $insertedId = $pagosModel->nuevoPagoFactura();
 
                     if($insertedId > 0 && $cantidadExistente > 0){
@@ -434,6 +472,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'procesarPago') {
                     $pagosModel->setCantidad($cantidad); 
                     $pagosModel->setNombreProducto($productoNombre); 
                     $pagosModel->setIdProducto($id__producto); 
+                    $pagosModel->setMetodoPago($metodo_pago); 
                     $insertedId = $pagosModel->nuevoPagoFactura();
 
                     if($insertedId > 0 && $cantidadExistente > 0){
@@ -485,44 +524,163 @@ if (isset($_POST['action']) && $_POST['action'] === 'procesarPago') {
             header("Location: ../views/facturarSeparado.php?idPedido=$id_orden&updatedFactura=0");
             exit();
         }                
-
-            // if(!empty($platillos)){
-
-            //     foreach ($platillos as $id_platillo  => $cantidad) {
-            //         if (!empty($cantidad)) {
-            //             $insertedPlatillos = $pedidosModel->newDetallePedidoPlatillo($insertedId, $id_platillo, $cantidad);
-            //         }
-            //     }
-            // }
-
-            // if($insertedPlatillos || $insertedBebidas){
-
-            //     $montoTotal = $pedidosModel->getMontoProductos($insertedId);
-            //     $pedidosUpdate = new PedidosModel();
-            //     $pedidosUpdate->setIdPedido($insertedId);
-            //     $pedidosUpdate->setTotalPedido($montoTotal);
-            //     $updateMonto = $pedidosUpdate->updateTotalPedidoById();
-
-            //     if($updateMonto){
-            //         header("Location: ../views/ordenes.php?orderAdd=1");
-            //         exit();
-            //     }else{
-            //         header("Location: ../views/ordenes.php?orderAdd=0");
-            //         exit();
-            //     }
-
-                
-                
-            // }else{
-            //     header("Location: ../views/ordenes.php?orderAdd=0");
-            //     exit();
-            // }
         
     }else{
-        header("Location: ../views/nuevaOrdenExpress.php?emptyProducts=0");
+        header("Location: ../views/facturarSeparado.php?idPedido=$id_orden&emptyProducts=0");
         exit();
     }  
 }
+
+if (isset($_POST['action']) && $_POST['action'] == "facturarPago") {
+    $id_factura = filter_input(INPUT_POST, 'idFactura', FILTER_SANITIZE_NUMBER_INT) ?: false;
+    $cantidadPersonas = filter_input(INPUT_POST, 'cantidadPersonas', FILTER_SANITIZE_NUMBER_INT) ?: false;
+    $mesaPedido = filter_input(INPUT_POST, 'mesaPedido', FILTER_SANITIZE_NUMBER_INT) ?: null;
+    $metodo_pago = isset($_POST['metodoPago']) ? htmlspecialchars($_POST['metodoPago'], ENT_QUOTES, 'UTF-8') : 1; 
+
+    if($id_factura && $cantidadPersonas){
+
+    $estado_pedido = getEstadoPedido($id_factura);
+
+    $pedido = new PedidosModel();
+    $productos = new PedidosModel();
+
+    $datosPedido  = $pedido->getPedidosById($id_factura);
+    $dataProductos = $productos->getAllDetallesPedidosAndPreciosPedidos($id_factura);
+
+    $bebidas = array();
+    $platillos = array();
+    $preciosPlatillos = 0;
+    $preciosBebidas = 0;
+    $insertados = array();
+
+    foreach ($dataProductos as $producto) {
+
+        $product_id = substr($producto['product_id'], 1);
+
+        if (substr($producto['product_id'], 0, 1) === 'R') {
+
+            $platillos[] = array(
+                'producto' => $producto['producto'],
+                'precio' => $producto['precio'],
+                'cantidad' => $producto['cantidad'],
+                'product_id' => $product_id
+            );
+        } else {
+            $bebidas[] = array(
+                'producto' => $producto['producto'],
+                'precio' => $producto['precio'],
+                'cantidad' => $producto['cantidad'],
+                'product_id' => $product_id
+            );
+        }
+    }
+
+    date_default_timezone_set('America/Costa_Rica');
+    $fecha_actual = date(time());
+
+    echo $fecha_actual ;
+
+    if (!empty($platillos)) {
+        foreach ($platillos as $platillo) {
+            $preciosPlatillos += $platillo['precio'] * $platillo['cantidad'];
+
+            if($estado_pedido != "Cancelado"){
+                $insertedIdPago = pagarFactura($id_factura, $datosPedido['nombre_cliente'], $datosPedido['telefono_cliente'], 2, $platillo['precio'], $platillo['cantidad'], $fecha_actual, $platillo['producto'], $platillo['product_id'], $metodo_pago, $mesaPedido);
+
+                $cantidadBebida = intval($platillo['cantidad']);
+                $pedidoBebida = new PedidosModel();
+                $tipoBebida = 'platillo';
+                $cantidadExistenteBebida = intval($pedidoBebida->getCantidadByIdPedidoAndIdProducto($id_factura, $platillo['product_id'], $tipoBebida));
+
+                if($cantidadBebida !== 0 && $cantidadBebida <= $cantidadExistenteBebida){
+
+                    if($insertedIdPago > 0 && $cantidadExistenteBebida > 0){
+                        $cantidadRestante = $cantidadExistenteBebida - $cantidadBebida;
+                        $resultUpdatedBebidas = $pedidoBebida->updateCantidadProductosDetallesPedidos($cantidadRestante, $id_factura, $platillo['product_id'], $tipoBebida);
+
+                        if($resultUpdatedBebidas && $cantidadRestante == 0){
+                            $insertedResult = $pedidoBebida->deleteDetallePedidoByIdCantidad($id_factura);
+                        }
+                    }
+                    $insertados[] = $insertedIdPago;
+                }
+
+                
+            }
+        }
+    }
+    
+    if (!empty($bebidas)) {
+
+        foreach ($bebidas as $bebida) {
+
+            if($estado_pedido != "Cancelado"){
+                $insertedIdPago = pagarFactura($id_factura, $datosPedido['nombre_cliente'], $datosPedido['telefono_cliente'], 1, $bebida['precio'], $bebida['cantidad'], $fecha_actual, $bebida['producto'], $bebida['product_id'], $metodo_pago, $mesaPedido);
+
+                $cantidadBebida = intval($bebida['cantidad']);
+                $pedidoBebida = new PedidosModel();
+                $tipoBebida = 'bebida';
+                $cantidadExistenteBebida = intval($pedidoBebida->getCantidadByIdPedidoAndIdProducto($id_factura, $bebida['product_id'], $tipoBebida));
+
+                if($cantidadBebida !== 0 && $cantidadBebida <= $cantidadExistenteBebida){
+
+                    if($insertedIdPago > 0 && $cantidadExistenteBebida > 0){
+                        $cantidadRestante = $cantidadExistenteBebida - $cantidadBebida;
+                        $resultUpdatedBebidas = $pedidoBebida->updateCantidadProductosDetallesPedidos($cantidadRestante, $id_factura, $bebida['product_id'], $tipoBebida);
+
+                        if($resultUpdatedBebidas && $cantidadRestante == 0){
+                            $insertedResult = $pedidoBebida->deleteDetallePedidoByIdCantidad($id_factura);
+                        }
+                    }
+
+                    $insertados[] = $insertedIdPago;
+                }
+                
+            }
+        }
+    }
+
+        if($estado_pedido != "Cancelado"){
+            $facturarPedido = facturarPedidoById($id_factura);
+        }
+
+        if(!empty($insertados)){
+
+            $minimo = min($insertados);
+            $maximo = max($insertados);
+            $url = "";
+
+            if($mesaPedido !== null){
+                $url = "facturada=1&i=$id_factura&c=$cantidadPersonas&min=$minimo&max=$maximo";
+            }else{
+                $url = "facturada=1&min=$minimo&max=$maximo";
+            }
+
+            header("Location: ../views/ordenes.php?$url ");
+            exit();
+        }else{
+            header("Location: ../views/ordenes.php?facturada=0");
+            exit();
+        } 
+    }else{
+        header("Location: ../views/ordenes.php?facturada=0");
+        exit();
+    }
+}
+
+
+if (isset($_POST['action']) && $_POST['action'] == "calcularClientes" && $_POST['idOrden'] && $_POST['cantidadClientes']) {
+    $id_factura = filter_input(INPUT_POST, 'idOrden', FILTER_SANITIZE_NUMBER_INT) ?: false;
+    $cantidadPersonas = filter_input(INPUT_POST, 'cantidadClientes', FILTER_SANITIZE_NUMBER_INT) ?: false;
+
+    if($id_factura && $cantidadPersonas){
+        header("Location: ../views/facturarClientes.php?idPedido=$id_factura&c=$cantidadPersonas");
+        exit();
+    }
+
+
+}
+
 
 
 

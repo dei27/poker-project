@@ -25,6 +25,8 @@ if (isset($_POST['action']) && $_POST['action'] === 'add') {
     $principal = isset($_POST['isPrincipalI']) ? filter_input(INPUT_POST, 'isPrincipalI', FILTER_SANITIZE_NUMBER_INT) : 0;
     $complementaria = isset($_POST['isComplementariaI']) ? filter_input(INPUT_POST, 'isComplementariaI', FILTER_SANITIZE_NUMBER_INT) : 0;
     $especial = isset($_POST['isEspecialI']) ? filter_input(INPUT_POST, 'isEspecialI', FILTER_SANITIZE_NUMBER_INT) : 0;
+    $tipo = isset($_POST['tipoRecetaI']) ? htmlspecialchars($_POST['tipoRecetaI'], ENT_QUOTES, 'UTF-8') : 1;
+
 
     if ($nombre !== null && !empty($nombre)) {
         $recetaModel = new RecetaModel();
@@ -34,6 +36,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'add') {
         $recetaModel->setPrincipal($principal);
         $recetaModel->setComplementaria($complementaria);
         $recetaModel->setEspecial($especial);
+        $recetaModel->setTipo($tipo);
         $resultQuery = $recetaModel->newReceta();
 
         if($resultQuery){
@@ -58,6 +61,8 @@ if (isset($_POST['action']) && $_POST['action'] === 'edit') {
     $principal = isset($_POST['isPrincipal']) ? filter_input(INPUT_POST, 'isPrincipal', FILTER_SANITIZE_NUMBER_INT) : 0;
     $complementaria = isset($_POST['isComplementaria']) ? filter_input(INPUT_POST, 'isComplementaria', FILTER_SANITIZE_NUMBER_INT) : 0;
     $especial = isset($_POST['isEspecial']) ? filter_input(INPUT_POST, 'isEspecial', FILTER_SANITIZE_NUMBER_INT) : 0;
+    $tipo = isset($_POST['tipoReceta']) ? htmlspecialchars($_POST['tipoReceta'], ENT_QUOTES, 'UTF-8') : 1;
+
 
     if ($id !== null && !empty($id)) {
         $recetaModel = new RecetaModel();
@@ -68,6 +73,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'edit') {
         $recetaModel->setPrincipal($principal);
         $recetaModel->setComplementaria($complementaria);
         $recetaModel->setEspecial($especial);
+        $recetaModel->setTipo($tipo);
 
         $resultQuery = $recetaModel->updateRecipeById();
 

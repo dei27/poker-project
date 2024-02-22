@@ -5,6 +5,26 @@ if (isset($_SESSION["userId"])) {
     $recordsData = getAllTimesByUserId($_SESSION["userId"]);
     $times = json_decode($recordsData, true);
     $myTimes = json_decode(getTimesByUserId($_SESSION["userId"]), true);
+    $myTimeTotal = json_decode(getTimesByDay($_SESSION["userId"]), true);
+    $dataWeek = json_decode(getTimeByWeek($_SESSION["userId"]), true);
+    $myWeek = json_decode(getAllTimeWeeks($_SESSION["userId"]), true);
+
+    if(!empty($myTimeTotal)){
+
+        foreach ($myTimeTotal as $time){
+            $tiempoAlmuerzo =  $time["tiempo_almuerzo"];
+            $horasTrabajadas = $time["total_horas_trabajadas"];
+        }
+    }
+
+    if(!empty($dataWeek)){
+
+        foreach ($dataWeek as $week){
+            $tiempoAlmuerzoWeek =  $week["total_tiempo_almuerzo"];
+            $horasTrabajadasWeek = $week["total_horas_trabajadas"];
+        }
+    }
+
 }
 
 $currentPage = basename($_SERVER['PHP_SELF']);
@@ -51,11 +71,14 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                         <div class="col-12">
                             <a class="text-dark text-decoration-none text-center btn btn-light w-100 p-3 mb-3" href="#" data-bs-toggle="modal" data-bs-target="#verRegistroModal"><i class="bi bi-calendar2-week-fill mx-1"></i>Mis registros</a>      
                         </div>
+
+                        <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 1): ?>
                         <div class="col-12">
                             <a href="cerrarCaja.php" class="text-dark text-decoration-none text-center btn btn-light w-100 p-3 mb-3"><i class="bi bi-bank2 mx-1"></i>Cierre de caja</a>
                         </div>
+                        <?php endif; ?>
                         <div class="col-12">
-                            <a type="submit navbar-brand" class="text-dark text-decoration-none text-center btn btn-light w-100 p-3 mb-3"><i class="bi bi-door-closed-fill mx-1"></i>Cerrar sesión</a>
+                            <button type="submit" class="text-dark text-decoration-none text-center btn btn-light w-100 p-3 mb-3"><i class="bi bi-door-closed-fill mx-1"></i>Cerrar sesión</button>
                         </div>
                     </div>
                 </form>
@@ -112,7 +135,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
             <div class="modal-body">
             <div class="table-responsive">
                 <table id="detallesHorarios" class="table table-dark table-striped table-hover w-100">
-                    <thead>
+                    <thead class="table-warning">
                         <tr>
                             <th>Tipo</th>
                             <th>Fecha</th>
@@ -123,7 +146,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                         foreach ($myTimes as $time): ?>
                             <tr>
                                 <td><?php echo $time['nombre_tipo']; ?></td>
-                                <td><?php echo date('d-m-Y h:i:s A', strtotime($time['hora'])); ?></td>
+                                <td><?php echo date('d-m-Y H:i:s', strtotime($time['hora'])); ?></td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>

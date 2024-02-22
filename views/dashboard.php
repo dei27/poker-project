@@ -34,7 +34,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 <main>
     <?php
-    if (isset($_SESSION['user'])) {
+    if (isset($_SESSION['role']) && $_SESSION['role'] === 1) {
         
         echo "<div class='container-fluid mt-5 px-5'>
                 <div class='card p-3 border-0 bg-transparent'>
@@ -61,12 +61,26 @@ if (session_status() === PHP_SESSION_NONE) {
                             <a href='bebidas.php' class='col-6 text-center w-100 my-5 p-1 rounded-pill border-0 btn btn-light py-3' data-bs-toggle='tooltip' data-bs-placement='top' data-bs-custom-class='custom-tooltip' data-bs-title='Ver bebidas'><img src='../assets/images/bebidas.png' alt='imagen de te' class='img-fluid'></a>
                         </div>
                         <div class='col-6'>
-                            <a href='categorias.php' class='col-6 text-center w-100 my-5 p-1 rounded-pill border-0 btn btn-light py-3' data-bs-toggle='tooltip' data-bs-placement='top' data-bs-custom-class='custom-tooltip' data-bs-title='Ver categorías'><img src='../assets/images/categorias.png' alt='libro de recetas' class='img-fluid'></a> 
+                        <a href='horarios.php' class='col-6 text-center w-100 my-5 p-1 rounded-pill border-0 btn btn-light py-3' data-bs-toggle='tooltip' data-bs-placement='top' data-bs-custom-class='custom-tooltip' data-bs-title='Ver horarios'><img src='../assets/images/calendario.png' alt='calendario' class='img-fluid'></a>
                         </div>
                     </div>
                 </div>
             </div>";
-    } else { 
+    }else if(isset($_SESSION['role']) && $_SESSION['role'] === 2){
+        echo "<div class='container-fluid mt-5 px-5'>
+                <div class='card border-0 bg-transparent'>
+                    <div class='row'>
+                        <div class='col-12 text-center'>
+                            <a href='ordenes.php' class='col-6 text-center w-50 mb-5 p-1 rounded-pill border-0 btn btn-light py-3' data-bs-toggle='tooltip' data-bs-placement='top' data-bs-custom-class='custom-tooltip' data-bs-title='Ver órdenes'><img src='../assets/images/pedidos.png' alt='libro de recetas' class='img-fluid'></a>
+                        </div>
+                        <div class='col-12 text-center'>
+                            <a href='horarios.php' class='col-6 text-center w-50 mb-5 p-1 rounded-pill border-0 btn btn-light py-3' data-bs-toggle='tooltip' data-bs-placement='top' data-bs-custom-class='custom-tooltip' data-bs-title='Ver mis horarios'><img src='../assets/images/calendario.png' alt='calendario' class='img-fluid'></a>              
+                        </div>
+                    </div>
+                </div>
+            </div>";
+    } 
+    else { 
         echo '<div class="container-fluid mt-5 vh-100 p-5">
             <div class="card p-3">
                 <p class="card-text py-5">No tienes el poder suficiente para poder ver esto. <a href="login.php">Inicia sesión</a>.</p>

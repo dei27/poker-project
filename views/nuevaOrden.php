@@ -120,7 +120,7 @@ $bebidasPlatillos = json_decode(getAllBebidasAndPlatillos(),true);
                                     <input type="tel" class="form-control" id="telefonoClienteOrden" name="telefonoClienteOrden" required placeholder="Teléfono...">
                                 </div>
                             </div>
-                            <div class="row mb-3">
+                            <div class="row mb-5">
                                 <div class="col">
                                     <label for="mesaOrden" class="form-label">Mesa</label>
                                     <input type="number" class="form-control" id="mesaOrden" name="mesaOrden" required placeholder="Número de mesa..." min=1 max=10>
@@ -128,40 +128,26 @@ $bebidasPlatillos = json_decode(getAllBebidasAndPlatillos(),true);
                                 <div class="col">
                                     <label for="servicioOrden" class="form-label">Servicio</label>
                                     <select class="form-select" id="servicioOrden" name="servicioOrden">
-                                        <option value="0">0%</option>
                                         <option value="10" selected>10%</option>
                                     </select>
                                 </div>
-                                <!-- <div class="col">
-                                    <label for="ivaOrden" class="form-label">IVA</label>
-                                    <select class="form-select" id="ivaOrden" name="ivaOrden">
-                                        <option value="0">0%</option>
-                                        <option value="13" selected>13%</option>
-                                    </select>
-                                </div> -->
                             </div>
                             <div class="row mb-3">
                                 <div class="col">
-                                    <label for="direccionClienteOrden" class="form-label">Dirección del Cliente</label>
-                                    <textarea class="form-control" id="direccionClienteOrden" name="direccionClienteOrden" rows="3" placeholder="Dirección..."></textarea>
-                                </div>
-                            </div>
-                            <div class="row mb-3">
-                                <div class="col">
-                                <h6>Productos de la orden:</h6>
-                                <div id="tablaProductos" class="table-responsive">
-                                    <table id="tablaProductosTable" class="table table-light table-striped">
-                                        <thead>
-                                            <tr>
-                                                <th>Nombre</th>
-                                                <th>Precio</th>
-                                                <th>Cantidad</th>
-                                                <th>Acción</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody></tbody>
-                                    </table>
-                                </div>
+                                    <h6>Productos de la orden:</h6>
+                                    <div id="tablaProductos" class="table-responsive">
+                                        <table id="tablaProductosTable" class="table table-light table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>Nombre</th>
+                                                    <th>Precio</th>
+                                                    <th>Cantidad</th>
+                                                    <th>Acción</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody></tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
                             <button type="submit" class="btn btn-primary w-100 p-3">Procesar Orden</button>

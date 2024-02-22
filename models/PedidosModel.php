@@ -237,7 +237,7 @@ class PedidosModel extends BaseModel {
 
     public function facturarById($id_pedido) {
         try {
-            $query = "UPDATE pedidos SET estado_pedido = 'Cancelado' WHERE id_pedido = :id_pedido";
+            $query = "UPDATE pedidos SET estado_pedido = 'Cancelado', total_restante = 0 WHERE id_pedido = :id_pedido";
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':id_pedido', $id_pedido, PDO::PARAM_INT);
             $stmt->execute();
@@ -246,6 +246,24 @@ class PedidosModel extends BaseModel {
             die("Error: " . $e->getMessage());
         }
     }
+
+    public function getEstadoPedidoById($id_pedido) {
+        try {
+            $query = "SELECT estado_pedido FROM pedidos where id_pedido = :id_pedido;";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id_pedido', $id_pedido, PDO::PARAM_INT);
+            $stmt->execute();
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($row) {
+                return $row['estado_pedido'];
+            } else {
+                return false;
+            }
+        } catch (PDOException $e) {
+            die("Error: " . $e->getMessage());
+        }
+    }
+    
 
     public function getPagosPorPersona($id_menor, $id_mayor) {
         try {
@@ -324,52 +342,17 @@ class PedidosModel extends BaseModel {
             die("Error: " . $e->getMessage());
         }
     }
-    
-    
 
-    
 
-    // public function getRecetasByCondicion($campo, $valor) {
-    //     try {
-    //         $query = "SELECT * FROM recetas WHERE $campo = :valor";
-    //         $stmt = $this->conn->prepare($query);
-    //         $stmt->bindParam(':valor', $valor, PDO::PARAM_INT);  // Enlazar el valor
-    //         $stmt->execute();
-    //         return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    //     } catch (PDOException $e) {
-    //         die("Error: " . $e->getMessage());
-    //     }
-    // }
-    
-    
-
-    // public function newReceta() {
-    //     try {
-    //         $query = "INSERT INTO recetas (nombre_receta, tiempo_preparacion, principal, complementaria, especial ) VALUES (:nombre_receta,:tiempo_preparacion,:principal,:complementaria,:especial)";
-    //         $stmt = $this->conn->prepare($query);
-    //         $stmt->bindParam(':nombre_receta', $this->nombre_receta, PDO::PARAM_STR);
-    //         $stmt->bindParam(':tiempo_preparacion', $this->tiempo_preparacion, PDO::PARAM_INT);
-    //         $stmt->bindParam(':principal', $this->principal, PDO::PARAM_INT);
-    //         $stmt->bindParam(':complementaria', $this->complementaria, PDO::PARAM_INT);
-    //         $stmt->bindParam(':especial', $this->especial, PDO::PARAM_INT);
-    //         $stmt->execute();
-    //         return true; 
-
-    //     } catch (PDOException $e) {
-    //         die("Error: " . $e->getMessage());
-    //         return false;
-    //     }
-    // }
-
-    // public function deleteRecipeById() {
-    //     try {
-    //         $query = "DELETE FROM recetas WHERE id_receta = :id_receta";
-    //         $stmt = $this->conn->prepare($query);
-    //         $stmt->bindParam(':id_receta', $this->id_receta, PDO::PARAM_INT);
-    //         $stmt->execute();
-    //         return true; 
-    //     } catch (PDOException $e) {
-    //         die("Error: " . $e->getMessage());
-    //     }
-    // }
+    public function getAllDetallesPedidosAndPreciosPedidos($id_pedido) {
+        try {
+            $stmt = $this->conn->prepare("SELECT dp.id_detalle, dp.id_pedido, CONCAT(CASE WHEN r.id_receta IS NOT NULL THEN 'R' ELSE 'B' END, COALESCE(r.id_receta, b.id_bebida)) AS product_id, COALESCE(r.nombre_receta, b.nombre_bebida) AS producto, COALESCE(r.precio, b.precio_bebida) AS precio, dp.cantidad, r.tipo FROM detalles_pedido dp LEFT JOIN recetas r ON dp.id_platillo = r.id_receta LEFT JOIN bebidas b ON dp.id_bebida = b.id_bebida WHERE id_pedido = :id_pedido ORDER BY dp.cantidad ASC;");
+            $stmt->bindParam(':id_pedido', $id_pedido, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            die("Error: " . $e->getMessage());
+        }
+    }
 }
+

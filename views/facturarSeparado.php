@@ -68,17 +68,27 @@ if (isset($_GET['idPedido'])) {
                                     <input type="tel" class="form-control" id="telefonoProcesarSeparado" name="telefonoProcesarSeparado" required value="<?php echo isset($pedido['telefono_cliente']) && !empty($pedido['telefono_cliente']) ? $pedido['telefono_cliente'] : ''; ?>">
                                 </div>
 
-                                <div class="col-sm-6 col-md-6 col-lg-3 mb-1">
+                                <div class="col-sm-6 col-md-6 col-lg-2 mb-1">
                                     <label for="mesaOrdenProcesarSeparado" class="form-label">Mesa</label>
                                     <input type="number" class="form-control" id="mesaOrdenProcesarSeparado" name="mesaOrdenProcesarSeparado" placeholder="Número de mesa..." min="1" max="10" value="<?php echo $pedido['mesa']; ?>" readonly>
                                 </div>
-                                <div class="col-sm-6 col-md-6 col-lg-3 mb-1">
+                                <div class="col-sm-6 col-md-6 col-lg-2 mb-1">
                                     <label for="servicioOrdenProcesarSeparado" class="form-label">Servicio</label>
                                     <select class="form-select" id="servicioOrdenProcesarSeparado" name="servicioOrdenProcesarSeparado" disabled>
                                         <option value="0">0%</option>
                                         <option value="10" selected>10%</option>
                                     </select>
                                 </div>
+                                <div class="col-sm-6 col-md-6 col-lg-2 mb-1">
+                                    <label for="metodoPago" class="form-label">Método de Pago</label>
+                                    <select class="form-select" id="metodoPago" name="metodoPago" required>
+                                        <option value="">Seleccionar</option>
+                                        <option value="1">Efectivo</option>
+                                        <option value="2">Tarjeta</option>
+                                        <option value="3">Sinpe</option>
+                                    </select>
+                                </div>
+
                                 
                             </div>
 
@@ -161,7 +171,7 @@ if (isset($_GET['idPedido'])) {
                                         </div>
                                     <?php
                                     }
-                                    ?>
+                                ?>
 
                             </div>
                         </form>
@@ -224,8 +234,8 @@ if (isset($_GET['idPedido'])) {
                 Swal.fire({
                     icon: "error",
                     title: "No se puedo procesar",
-                    timer: 2500,
-                    text: "No se agregaron productos a la orden.",
+                    timer: 3000,
+                    text: "No hay productos por cancelar.",
                     showConfirmButton: false
                 });
             </script>

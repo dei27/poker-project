@@ -13,6 +13,8 @@ class PagosPersona extends BaseModel {
     private $fecha_pago;
     private $nombre_producto;
     private $id_producto;
+    private $metodo_pago;
+    private $mesa;
 
 
 
@@ -62,7 +64,15 @@ class PagosPersona extends BaseModel {
         $this->id_producto = $id_producto;
     }
 
-    public function __construct($id_pago = null, $id_factura = null, $nombre = null, $telefono = null, $tipo_producto = null, $precio = null, $cantidad = null, $fecha_pago = null, $nombre_producto = null, $id_producto = null) {
+    public function setMetodoPago($metodo_pago) {
+        $this->metodo_pago = $metodo_pago;
+    }
+
+    public function setMesa($mesa) {
+        $this->mesa = $mesa;
+    }
+
+    public function __construct($id_pago = null, $id_factura = null, $nombre = null, $telefono = null, $tipo_producto = null, $precio = null, $cantidad = null, $fecha_pago = null, $nombre_producto = null, $id_producto = null, $metodo_pago = null, $mesa = null) {
         parent::__construct();
         $this->id_pago = $id_pago;
         $this->id_factura = $id_factura;
@@ -74,18 +84,37 @@ class PagosPersona extends BaseModel {
         $this->fecha_pago = $fecha_pago;
         $this->nombre_producto = $nombre_producto;
         $this->id_producto = $id_producto;
+        $this->metodo_pago = $metodo_pago;
+        $this->mesa = $mesa;
     }
 
     public function getAllPagosPersona() {
         try {
-            $query = "SELECT * FROM pagos_por_persona";
+            date_default_timezone_set('America/Costa_Rica');
+            $dia = date('Y-m-d');
+    
+            $query = "SELECT 
+                        id_factura, 
+                        CASE 
+                            WHEN mesa IS NOT NULL THEN SUM(precio * cantidad) * 1.10 
+                            ELSE SUM(precio * cantidad) 
+                        END AS monto
+                    FROM 
+                        pagos_por_persona 
+                    WHERE 
+                        DATE(fecha_pago) = :dia
+                        AND metodo_pago = :metodo_pago
+                    GROUP BY 
+                        id_factura;";
             $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':metodo_pago', $this->metodo_pago, PDO::PARAM_INT);
+            $stmt->bindParam(':dia', $dia, PDO::PARAM_STR);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             die("Error: " . $e->getMessage());
         }
-    }
+    }    
 
     public function deleteProductById($id) {
         try {
@@ -103,7 +132,7 @@ class PagosPersona extends BaseModel {
         try {
             $hora_actual = gmdate("Y-m-d H:i:s", time() - 6 * 3600);
 
-            $query = "INSERT INTO pagos_por_persona (id_factura, nombre, telefono, tipo_producto, precio, cantidad, fecha_pago, nombre_producto, id_producto) VALUES (:id_factura, :nombre, :telefono, :tipo_producto, :precio, :cantidad, :fecha_pago, :nombre_producto, :id_producto)";
+            $query = "INSERT INTO pagos_por_persona (id_factura, nombre, telefono, tipo_producto, precio, cantidad, fecha_pago, nombre_producto, id_producto, metodo_pago, mesa) VALUES (:id_factura, :nombre, :telefono, :tipo_producto, :precio, :cantidad, :fecha_pago, :nombre_producto, :id_producto, :metodo_pago, :mesa)";
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':id_factura', $this->id_factura, PDO::PARAM_INT);
             $stmt->bindParam(':nombre', $this->nombre, PDO::PARAM_STR);
@@ -114,6 +143,8 @@ class PagosPersona extends BaseModel {
             $stmt->bindParam(':fecha_pago', $hora_actual, PDO::PARAM_STR);
             $stmt->bindParam(':nombre_producto', $this->nombre_producto, PDO::PARAM_STR);
             $stmt->bindParam(':id_producto', $this->id_producto, PDO::PARAM_INT);
+            $stmt->bindParam(':metodo_pago', $this->metodo_pago, PDO::PARAM_INT);
+            $stmt->bindParam(':mesa', $this->mesa, PDO::PARAM_INT);
             $stmt->execute();
 
             $id_insertado = $this->conn->lastInsertId();

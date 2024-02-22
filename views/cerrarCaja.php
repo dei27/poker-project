@@ -3,10 +3,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-include('../controllers/controllerCategories.php');
-
-$categoriesData = getAllCategories();
-$categories = json_decode($categoriesData, true);
+include('../controllers/controllerPagosPersonas.php');
 ?>
 
 <!DOCTYPE html>
@@ -21,7 +18,7 @@ $categories = json_decode($categoriesData, true);
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="../assets/css/style.css">
-    <title>Categorías</title>
+    <title>Cerrar Caja</title>
 </head>
 <body>
 <header>
@@ -39,92 +36,126 @@ $categories = json_decode($categoriesData, true);
 
 <?php
 if (isset($_SESSION["user"]) && (isset($_SESSION['role']) && $_SESSION['role'] === 1)) {
+    $facturasEfectivo = json_decode(getAllPagosByPersonas(1), true);
+    $facturasTarjeta = json_decode(getAllPagosByPersonas(2), true);
+    $facturasSinpe = json_decode(getAllPagosByPersonas(3), true);
+    
+    $granTotal = 0;
+
+    foreach ($facturasEfectivo as $item) {
+        $granTotal += $item['monto'];
+    } 
+    
+    foreach ($facturasTarjeta as $item) {
+        $granTotal += $item['monto'];
+    } 
+    
+    foreach ($facturasSinpe as $item) {
+        $granTotal += $item['monto'];
+    }
+
+    date_default_timezone_set('America/Costa_Rica');
+    $dia = date('d-m-Y');
+    
+    $total = 0;
+    $total01 = 0;
+    $total02 = 0;
+    
 ?>
     <div class="container-fluid p-5">
         <div class="table-responsive card p-3">
-            <div class="card-header mb-3 py-3">Categorías registradas</div>
-            <h5 class="card-text">
-                <a href="#" class="text-decoration-none text-info" data-bs-toggle="modal" data-bs-target="#addTournament">
-                <img src="../assets/images/addProduct.png" alt="Crear torneo" class="img-fluid">Nueva categoría.
-                </a>
-            </h5>
-            <table id="example" class="table table-dark table-striped table-hover">
-                <thead class="table-warning">
-                    <tr>
-                        <th>Nombre</th>
-                        <th class="text-center">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($categories as $category):?>
-                        <tr>
-                            <td><?php echo $category['nombre_categoria']; ?></td>
-                            <td class="text-center">
-                                <a href="../controllers/controllerCategories.php?action=delete&id=<?php echo $category['id_categoria']; ?>" onclick="return confirm('¿Estás seguro de que quieres eliminar esta categoría?')" class="text-decoration-none">
-                                    <i class="bi bi-trash-fill text-white mx-3"></i>
-                                </a>
-                                <a href="#" data-bs-toggle="modal" data-bs-target="#editModal<?php echo $category['id_categoria']?>" class="text-decoration-none">
-                                    <i class="bi bi-pencil-square text-white"></i>
-                                </a>
+            <div class="card-header mb-5 py-3"><h4>Cierre de Caja <?php echo $dia; ?></h4></div>
+            <div class="row">
+                <?php if ($granTotal > 0): ?>
+                    <h5>El día de hoy se ha facturado un total de: ₡<?php echo number_format($granTotal, 2, '.', ',');?></h5>
+                <?php else: ?>
+                    <h5>El día de hoy aún no se ha facturado.</h5>
+                <?php endif; ?>
+                <div class="col-sm-12 col-md-12 col-lg-4 mb-3">
+                    <table id="table-Efectivo" class="table table-dark table-striped table-hover caption-top">
+                        <caption>Efectivo</caption>
+                        <thead class="table-warning">
+                            <tr>
+                                <th>Factura</th>
+                                <th class="text-center">Monto</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php 
+                                foreach ($facturasEfectivo as $item):
+                                $total += $item['monto'];
+                            ?>
+                                <tr>
+                                    <td><?php echo $item['id_factura']; ?></td>
+                                    <td><?php echo number_format($item['monto'], 2, '.', ','); ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                            <tr>
+                                <td><strong>Total</strong></td>
+                                <td><strong><?php echo number_format($total, 2, '.', ','); ?></strong></td>
 
-                                <!-- Editar categoria -->
-                                <div class="modal fade" id="editModal<?php echo $category['id_categoria']?>" tabindex="-1" aria-labelledby="editModalLabel<?php echo $category['id_categoria']?>" aria-hidden="true">
-                                <div class="modal-dialog modal-dialog-centered">
-                                    <div class="modal-content">
-                                    <div class="modal-header bg-dark">
-                                        <h5 class="modal-title" id="editModalLabel<?php echo $category['id_categoria']?>">Editar Categoría</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body text-dark">
-                                        <!-- Edit Form -->
-                                        <form action="../controllers/controllerCategories.php" method="post">
-                                            <input type="hidden" name="action" value="editCategory">
-                                            <input type="hidden" name="id_categoria" value="<?php echo $category['id_categoria']?>">
-                                            <div class="form-group mb-3">
-                                                <label for="nombreCategoria" class="form-label">Nombre</label>
-                                                <input type="text" class="form-control" id="nombreCategoria" name="nombreCategoria" placeholder="Nombre Categoria..." value="<?php echo $category['nombre_categoria']?>" required>
-                                            </div>
-                                            <div class="form-group mb-3 text-end">
-                                                <input type="submit" class="btn btn-primary" value="Guardar">
-                                            </div>
-                                        </form>
-                                    </div>
-                                    </div>
-                                </div>
-                                </div>
+                            </tr>
+                        </tbody>
+                    </table>
 
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+
+                </div>
+                <div class="col-sm-12 col-md-12 col-lg-4 mb-3">
+                    <table id="table-Tarjeta" class="table table-dark table-striped table-hover caption-top">
+                        <caption>Tarjeta</caption>
+                        <thead class="table-warning">
+                            <tr>
+                                <th>Factura</th>
+                                <th class="text-center">Monto</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php 
+                                foreach ($facturasTarjeta as $item):
+                                $total01 += $item['monto'];
+                            ?>
+                                <tr>
+                                    <td><?php echo $item['id_factura']; ?></td>
+                                    <td><?php echo number_format($item['monto'], 2, '.', ','); ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                            <tr>
+                                <td><strong>Total</strong></td>
+                                <td><strong><?php echo number_format($total01, 2, '.', ','); ?></strong></td> 
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-sm-12 col-md-12 col-lg-4 mb-3">
+                    <table id="table-Sinpe" class="table table-dark table-striped table-hover caption-top">
+                        <caption>Sinpe</caption>
+                        <thead class="table-warning">
+                            <tr>
+                                <th>Factura</th>
+                                <th class="text-center">Monto</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php 
+                                foreach ($facturasSinpe as $item):
+                                $total02 += $item['monto'];
+                            ?>
+                                <tr>
+                                    <td><?php echo $item['id_factura']; ?></td>
+                                    <td><?php echo number_format($item['monto'], 2, '.', ','); ?></td> 
+                                </tr>
+                            <?php endforeach; ?>
+                            <tr>
+                                <td><strong>Total</strong></td>
+                                <td><strong><?php echo number_format($total02, 2, '.', ','); ?></strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>  
         </div>
+
     </div>
-<!-- modal agregar categoria -->
-<div class="modal fade" id="addTournament" tabindex="-1" aria-labelledby="addTournamentLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                <div class="modal-header text-bg-dark">
-                    <h5 class="modal-title" id="addTournament">Agregar Nueva Categoría</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                    <div class="modal-body">
-                        <form action="../controllers/controllerCategories.php" method="post" class="form-floating">
-                            <input type="hidden" name="action" value="add">
-                            <div class="form-group mb-3">
-                                <label for="nombreCategoriaI">Nombre</label>
-                                <input class="form-control" id="nombreCategoriaI" name="nombreCategoriaI" placeholder="Nombre categoría..." value="" required>
-                            </div>
-                            <div class="form-group mt-3 text-end">
-                                <div class="col-md-12">
-                                    <input type="submit" class="btn btn-info text-white w-50 p-3" value="Guardar">
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
 <?php
 }else{
     echo '<div class="container-fluid mt-5 vh-100 p-5">
@@ -239,9 +270,9 @@ if (isset($_GET['insertedCategory'])) {
 
 <script>
     $(document).ready(function() {
-        $('#example').DataTable({
-            lengthChange: false,
-            pageLength: 5,
+        $('#table-Efectivo, #table-Tarjeta, #table-Sinpe').DataTable({
+            paging: false,
+            searching: false,
             info: false,
             responsive: true,
             "language": {
@@ -251,6 +282,7 @@ if (isset($_GET['insertedCategory'])) {
                 $(".dataTables_filter label").addClass("text-dark");
             }
         });
+
 
         $('#detallesHorarios').DataTable({
             lengthChange: false,

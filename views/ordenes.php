@@ -60,6 +60,7 @@ $pedidos = json_decode($pedidosData, true);
                         <th>Estado</th>
                         <th>Detalles</th>
                         <th>Total</th>
+                        <th>Restante</th>
 
                         <?php 
                             if(isset($_SESSION["user"])){
@@ -98,9 +99,11 @@ $pedidos = json_decode($pedidosData, true);
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
                                             <div class="modal-body">
-                                                <h5 class="modal-title mb-3">
-                                                    <a href="actualizarOrden.php?idPedido=<?php echo $pedido['id_pedido']; ?>" class="text-decoration-none text-info">Editar orden</a>
-                                                </h5>
+                                                <?php if ($pedido["estado_pedido"] == "Pendiente"): ?>
+                                                    <h5 class="modal-title mb-3">
+                                                        <a href="actualizarOrden.php?idPedido=<?php echo $pedido['id_pedido']; ?>" class="text-decoration-none text-info">Editar orden</a>
+                                                    </h5>
+                                                <?php endif; ?>
                                                 <div class="table-responsive">
                                                     <table id="detallesProductos" class="table table-dark table-striped table-hover w-100">
                                                         <thead>
@@ -128,9 +131,6 @@ $pedidos = json_decode($pedidosData, true);
                                                     </table>
                                                 </div>
                                             </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -138,6 +138,7 @@ $pedidos = json_decode($pedidosData, true);
 
 
                             <td><?php echo $pedido['total_pedido']; ?></td>
+                            <td><?php echo $pedido['total_restante']; ?></td>
 
                                 <?php
 
@@ -148,9 +149,11 @@ $pedidos = json_decode($pedidosData, true);
                                         <i class="bi bi-ticket-perforated-fill text-white" data-bs-toggle='tooltip' data-bs-placement='top' data-bs-custom-class='custom-tooltip' data-bs-title='Crear Comanda'></i>
                                     </a>
 
-                                    <a href="#" class="text-decoration-none text-white mx-3" data-bs-toggle="modal" data-bs-target="#eliminarModal<?php echo $pedido['id_pedido']; ?>">
+                                    <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 1): ?>
+                                        <a href="#" class="text-decoration-none text-white mx-3" data-bs-toggle="modal" data-bs-target="#eliminarModal<?php echo $pedido['id_pedido']; ?>">
                                         <i class="bi bi-trash-fill text-white" data-bs-toggle='tooltip' data-bs-placement='top' data-bs-custom-class='custom-tooltip' data-bs-title='Eliminar Orden'></i>
-                                    </a>
+                                        </a>
+                                    <?php endif; ?>
 
                                     <a href="#" class="text-decoration-none text-white mx-3" data-bs-toggle="modal" data-bs-target="#confirmModal<?php echo $pedido['id_pedido']; ?>">
                                         <i class="bi bi-piggy-bank-fill text-white" data-bs-toggle='tooltip' data-bs-placement='top' data-bs-custom-class='custom-tooltip' data-bs-title='Cancelar Orden'></i>
@@ -164,15 +167,24 @@ $pedidos = json_decode($pedidosData, true);
                                                     <h5 class="modal-title" id="eliminarModalLabel">Confirmar Acción</h5>
                                                     <button type="button" class="btn-close bg-white" data-bs-dismiss="modal" aria-label="Close"></button>
                                                 </div>
-                                                    <div class="modal-body text-dark">
+                                                <div class="modal-body text-dark">
+                                                    <?php if ($pedido["estado_pedido"] == "Pendiente"): ?>
                                                         <p>¿Estás seguro de que quieres crear la comanda de la orden?</p>
-                                                    </div>
-                                                    <div class="modal-footer justify-content-center">
-                                                        <a href="crearComanda.php?id=<?php echo $pedido['id_pedido']; ?>" class="btn btn-primary cerrarModal">Sí, crear comanda.</a>
-                                                    </div>
+                                                    <?php else: ?>
+                                                        <!-- Aquí puedes colocar el HTML alternativo si el pedido no está pendiente -->
+                                                        <p>Este pedido ya fue cancelado, no se puede crear la comanda.</p>
+                                                    <?php endif; ?>
+                                                </div>
+                                                <?php if ($pedido["estado_pedido"] == "Pendiente"): ?>
+                                                <div class="modal-footer justify-content-center">
+                                                    <a href="crearComanda.php?id=<?php echo $pedido['id_pedido']; ?>" class="btn btn-primary cerrarModal">Sí, crear comanda.</a>
+                                                </div>
+                                                <?php endif; ?>
                                             </div>
                                         </div>
                                     </div>
+
+
 
                                     <!-- Modal eliminar-->
                                     <div class="modal fade" id="eliminarModal<?php echo $pedido['id_pedido']; ?>" tabindex="-1" aria-labelledby="eliminarModalLabel" aria-hidden="true">
@@ -182,15 +194,23 @@ $pedidos = json_decode($pedidosData, true);
                                                     <h5 class="modal-title" id="eliminarModalLabel">Confirmar Acción</h5>
                                                     <button type="button" class="btn-close bg-white" data-bs-dismiss="modal" aria-label="Close"></button>
                                                 </div>
-                                                    <div class="modal-body text-dark">
+                                                <div class="modal-body text-dark">
+                                                    <?php if ($pedido["estado_pedido"] == "Pendiente"): ?>
                                                         <p>¿Estás seguro de que quieres eliminar este pedido?</p>
-                                                    </div>
+                                                    <?php else: ?>
+                                                        <p>Este pedido ya fue cancelado, no se puede eliminar.</p>
+                                                    <?php endif; ?>
+                                                </div>
+                                                <?php if ($pedido["estado_pedido"] == "Pendiente"): ?>
                                                     <div class="modal-footer justify-content-center">
-                                                        <a href="../controllers/controllerPedidos.php?action=delete&id=<?php echo $pedido['id_pedido']; ?>" class="btn btn-primary">Sí, eliminar.</a>
+                                                            <a href="../controllers/controllerPedidos.php?action=delete&id=<?php echo $pedido['id_pedido']; ?>" class="btn btn-primary">Sí, eliminar.</a>
                                                     </div>
+                                                <?php endif; ?>
+
                                             </div>
                                         </div>
                                     </div>
+
 
                                     <!-- Modal facturar-->
                                     <div class="modal fade" id="confirmModal<?php echo $pedido['id_pedido']; ?>" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
@@ -200,17 +220,65 @@ $pedidos = json_decode($pedidosData, true);
                                                     <h5 class="modal-title" id="confirmModalLabel">Confirmar Acción</h5>
                                                     <button type="button" class="btn-close bg-white" data-bs-dismiss="modal" aria-label="Close"></button>
                                                 </div>
-                                                <form action="facturar.php" method="POST">
+                                                <form action="../controllers/controllerPedidos.php" method="POST">
+                                                    <input type="hidden" name="action" value="facturarPago">
                                                     <div class="modal-body text-dark">
-                                                        <h6 class="mb-4 mt-1">
-                                                            <a href="facturarSeparado.php?idPedido=<?php echo $pedido['id_pedido']; ?>" class="text-decoration-none"><i class="bi bi-coin me-3"></i>Cancelar por separado<i class="bi bi-coin ms-3"></i></a>
-                                                        </h6>      
-                                                        <p>Si desea dividir la cuenta en partes iguales, indique la cantidad de personas por favor:</p>
-                                                        <input type="number" name="cantidadPersonas" id="cantidadPersonas" class="form-control" placeholder="Cantidad personas..." min="1" value="1" required>
-                                                        <input type="hidden" name="idFactura" value="<?php echo $pedido['id_pedido']; ?>">
-                                                    </div>
-                                                    <div class="modal-footer justify-content-center">
-                                                        <input type="submit" class="btn btn-primary cerrarModal" value="Cancelar cuenta">
+                                                        <?php if ($pedido["estado_pedido"] == "Pendiente" && $pedido["mesa"] !== null): ?>
+                                                            <input type="hidden" name="mesaPedido" value="<?php echo $pedido['mesa']; ?>">
+                                                            <h6 class="mb-4 mt-1">
+                                                                <a href="facturarSeparado.php?idPedido=<?php echo $pedido['id_pedido']; ?>" class="text-decoration-none">
+                                                                    <i class="bi bi-coin me-3"></i>Cancelar por separado<i class="bi bi-coin ms-3"></i>
+                                                                </a>
+                                                            </h6>      
+                                                            <p>Si desea dividir la cuenta en partes iguales, indique la cantidad de personas por favor:</p>
+                                                            <div class="row my-1">
+                                                                <div class="col my-1">
+                                                                    <label for="cantidadPersonas" class="form-label">Cantidad</label>
+                                                                    <input type="number" name="cantidadPersonas" id="cantidadPersonas" class="form-control" placeholder="Cantidad personas..." min="1" value="1" required>
+                                                                    <input type="hidden" name="idFactura" value="<?php echo $pedido['id_pedido']; ?>">
+                                                                </div>
+                                                                <div class="col my-1">
+                                                                    <label for="metodoPago" class="form-label">Método de Pago</label>
+                                                                    <select class="form-select" id="metodoPago" name="metodoPago" required>
+                                                                        <option value="">Seleccionar</option>
+                                                                        <option value="1">Efectivo</option>
+                                                                        <option value="2">Tarjeta</option>
+                                                                        <option value="3">Sinpe</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            
+                                                            <div class="modal-footer justify-content-center">
+                                                                <div class="row">
+                                                                    <div class="col">
+                                                                        <input type="submit" class="btn btn-primary" value="Facturar Pago">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        <?php elseif ($pedido["estado_pedido"] == "Pendiente" && $pedido["mesa"] == null): ?>
+                                                            <input type="hidden" name="mesaPedido" value="<?php echo empty($pedido['mesa']) ? null : $pedido['mesa']; ?>">
+                                                            <input type="hidden" name="cantidadPersonas" id="cantidadPersonas" class="form-control" placeholder="Cantidad personas..." min="1" value="1" required>
+                                                            <input type="hidden" name="idFactura" value="<?php echo $pedido['id_pedido']; ?>">
+                                                            <div class="col-sm-12 col-md-12 col-lg-12 mb-3">
+                                                                <label for="metodoPago" class="form-label">Método de Pago</label>
+                                                                <select class="form-select" id="metodoPago" name="metodoPago" required>
+                                                                    <option value="">Seleccionar</option>
+                                                                    <option value="1">Efectivo</option>
+                                                                    <option value="2">Tarjeta</option>
+                                                                    <option value="3">Sinpe</option>
+                                                                </select>
+                                                            </div>
+                                                            <div class="modal-footer justify-content-center">
+                                                                <div class="row">
+                                                                    <div class="col">
+                                                                        <input type="submit" class="btn btn-primary" value="Facturar Pago">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        <?php else: ?>
+                                                            <!-- Aquí puedes colocar el HTML alternativo si el pedido no está pendiente -->
+                                                            <p>Este pedido ya fue cancelado.</p>
+                                                        <?php endif; ?>
                                                     </div>
                                                 </form>
                                             </div>
@@ -404,6 +472,55 @@ $pedidos = json_decode($pedidosData, true);
             </script>
             ';
         }
+
+        if (isset($_GET['facturada'])) {
+            $status = $_GET['facturada'];
+            $id_factura = isset($_GET['i']) ? $_GET['i'] : null;
+            $cantidadPersonas = isset($_GET['c']) ? $_GET['c'] : null;
+            $min = isset($_GET['min']) ? $_GET['min'] : 0;
+            $max = isset($_GET['max']) ? $_GET['max'] : 0;
+            $url = null;
+
+            if($id_factura !== null && $cantidadPersonas !== null && $min !== 0 && $max !== 0){
+                $url = "facturar.php?idFactura=" . $id_factura . "&cantidadPersonas=" . $cantidadPersonas . "&min=" . $min. "&max=" . $max;
+            }elseif($min !== 0 && $max !== 0 && $id_factura === null && $cantidadPersonas === null){
+                $url = "facturar.php?min=" . $min  . "&max=" . $max;
+            }           
+            
+            $messageConfig = ($status == 1)
+                ? [
+                    'icon' => 'success',
+                    'title' => 'Actualizado con éxito',
+                    'text' => 'El pago individual se ha realizado con éxito.',
+                    'showButton' => true 
+                ]
+                : [
+                    'icon' => 'error',
+                    'title' => 'Inconveniente al realizar el pago.',
+                    'text' => 'No se pudo realizar.',
+                    'showButton' => false
+                ];
+        
+            echo '
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            <script>
+                Swal.fire({
+                    icon: "' . $messageConfig['icon'] . '",
+                    title: "' . $messageConfig['title'] . '",
+                    text: "' . $messageConfig['text'] . '",
+                    showCloseButton: true,
+                    allowOutsideClick: false,
+                    confirmButtonColor: "#0dcaf0",
+                    showConfirmButton: ' . ($messageConfig['showButton'] ? 'true' : 'false') . ',
+                    ' . ($messageConfig['showButton'] ? 'confirmButtonText: "Crear Factura Individual",' : '') . '
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "'. $url .'";
+                    }
+                });
+            </script>
+            ';
+        }
     ?>
 
 </div>
@@ -444,7 +561,7 @@ $pedidos = json_decode($pedidosData, true);
             }
         });
 
-        $('#detallesHorarios').DataTable({
+        $('#detallesHorarios, #detallesProductos').DataTable({
             lengthChange: false,
             pageLength: 5,
             info: false,
