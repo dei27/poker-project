@@ -31,7 +31,7 @@ if (isset($_GET['idPedido'])) {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="../assets/css/style.css">
-    <title>Ordenes</title>
+    <title>Facturar</title>
 </head>
 <body>
     <header>
@@ -56,7 +56,6 @@ if (isset($_GET['idPedido'])) {
                     <h4 class="card-header mb-3 py-3">Orden #<?php echo $id_pedido; ?></h4>
                     <div class="card-body">
                         <form action="../controllers/controllerPedidos.php" method="post">
-                            <input type="hidden" name="action" value="facturarSeparado">
                             <input type="hidden" name="idOrden" value="<?php echo $id_pedido; ?>">
                             <div class="row mb-3">
                                 <div class="col-sm-6 col-md-6 col-lg-3 mb-1">

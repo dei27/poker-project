@@ -247,6 +247,21 @@ class PedidosModel extends BaseModel {
         }
     }
 
+    public function updateEstadoPedidoById() {
+        try {
+            $query = "UPDATE pedidos SET estado_pedido = 'Cancelado' WHERE id_pedido = :id_pedido";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id_pedido', $this->id_pedido, PDO::PARAM_INT);
+            $stmt->execute();
+            return true;
+        } catch (PDOException $e) {
+            die("Error: " . $e->getMessage());
+        }
+    }
+
+
+    
+
     public function getEstadoPedidoById($id_pedido) {
         try {
             $query = "SELECT estado_pedido FROM pedidos where id_pedido = :id_pedido;";
@@ -263,6 +278,7 @@ class PedidosModel extends BaseModel {
             die("Error: " . $e->getMessage());
         }
     }
+
     
 
     public function getPagosPorPersona($id_menor, $id_mayor) {
@@ -288,6 +304,18 @@ class PedidosModel extends BaseModel {
             $stmt->bindParam(':id_pedido', $this->id_pedido, PDO::PARAM_INT);
             $stmt->execute();
             return true; 
+        } catch (PDOException $e) {
+            die("Error: " . $e->getMessage());
+        }
+    }
+
+    public function getAllDetallesPedidoByIdPedido() {
+        try {
+            $query = "SELECT * FROM detalles_pedido WHERE id_pedido = :id_pedido";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id_pedido', $this->id_pedido, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             die("Error: " . $e->getMessage());
         }
@@ -336,8 +364,14 @@ class PedidosModel extends BaseModel {
             $query = "DELETE FROM detalles_pedido WHERE id_pedido = :id_pedido AND cantidad = 0;";
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':id_pedido', $id_pedido, PDO::PARAM_INT);
-            $stmt->execute();
-            return true;
+            $result = $stmt->execute();
+        
+            if ($result && $stmt->rowCount() > 0) {
+                return true;
+            } else {
+                return false;
+            }
+
         } catch (PDOException $e) {
             die("Error: " . $e->getMessage());
         }

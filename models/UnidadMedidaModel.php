@@ -23,7 +23,7 @@ class UnidadMedida extends BaseModel {
 
     public function getAllUnidadesMedidas() {
         try {
-            $query = "SELECT * FROM unidades_medidas";
+            $query = "SELECT * FROM unidades_medidas ORDER BY nombre_unidad DESC";
             $stmt = $this->conn->prepare($query);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);

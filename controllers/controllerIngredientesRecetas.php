@@ -53,26 +53,29 @@ if (isset($_POST['action']) && $_POST['action'] === 'delete') {
     $ingredientes_nuevos = isset($_POST['ingredientes_seleccionados']) ? $_POST['ingredientes_seleccionados'] : [];
     $resultQuery = false;
 
-    print_r($ingredientes_nuevos);
+    if(!empty($ingredientes_nuevos)){
 
-    if ($id_receta !== null && !empty($id_receta) && !empty($ingredientes_nuevos)) {
-        $recetaIngredienteModel = new RecetaIngredienteModel();
-        $recetaIngredienteModel->setIdReceta($id_receta);
+        if ($id_receta !== null && !empty($id_receta) && !empty($ingredientes_nuevos)) {
+            $recetaIngredienteModel = new RecetaIngredienteModel();
+            $recetaIngredienteModel->setIdReceta($id_receta);
 
-        // Iterar sobre los ingredientes seleccionados y realizar la inserción
-        foreach ($ingredientes_nuevos as $id_ingrediente) {
-            $recetaIngredienteModel->setIdIngrediente($id_ingrediente);
-            $resultQuery = $recetaIngredienteModel->deleteIngredientesByIdReceta();
+            // Iterar sobre los ingredientes seleccionados y realizar la inserción
+            foreach ($ingredientes_nuevos as $id_ingrediente) {
+                $recetaIngredienteModel->setIdIngrediente($id_ingrediente);
+                $resultQuery = $recetaIngredienteModel->deleteIngredientesByIdReceta();
+            }
+
+            if($resultQuery){
+                header("Location: ../views/recetas.php?deletedIngredientes=1");
+                exit();
+            }else {
+                header("Location: ../views/recetas.php?deletedIngredientes=0");
+                exit();
+            }
         }
-
-        if($resultQuery){
-            header("Location: ../views/recetas.php?deletedIngredientes=1");
-            exit();
-        }else {
-            header("Location: ../views/recetas.php?deletedIngredientes=0");
-            exit();
-        }
-       
+    }else {
+        header("Location: ../views/recetas.php?deletedIngredientes=0");
+        exit();
     }
 }
 

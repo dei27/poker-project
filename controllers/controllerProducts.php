@@ -30,11 +30,13 @@ if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])
 if (isset($_POST['id'], $_POST['action']) && $_POST['action'] === 'edit') {
     $id = filter_input(INPUT_POST, 'id', FILTER_SANITIZE_NUMBER_INT);
     $nombre = isset($_POST['nombreProducto']) ? htmlspecialchars($_POST['nombreProducto'], ENT_QUOTES, 'UTF-8') : "Sin nombre";
-    $cantidad = isset($_POST['cantidadProducto']) ? htmlspecialchars($_POST['cantidadProducto'], ENT_QUOTES, 'UTF-8') : "Sin cantidad";
+    $cantidad = isset($_POST['cantidadProducto']) ? floatval($_POST['cantidadProducto']) : 0.0;
+    $cantidadOriginal = isset($_POST['cantidadProductoOriginal']) ? floatval($_POST['cantidadProductoOriginal']) : 0.0;
     $precio = isset($_POST['precioProducto']) ? $_POST['precioProducto'] : 0.0;
     $precio = filter_var($precio, FILTER_VALIDATE_FLOAT);
     $categoria = isset($_POST['categoriaProducto']) ? filter_input(INPUT_POST, 'categoriaProducto', FILTER_SANITIZE_NUMBER_INT) : 0;
     $unidad = isset($_POST['unidadProducto']) ? filter_input(INPUT_POST, 'unidadProducto', FILTER_SANITIZE_NUMBER_INT) : 0;
+    $result = false;
 
     if ($id !== null && !empty($id)) {
         $productModel = new Producto();
@@ -45,11 +47,24 @@ if (isset($_POST['id'], $_POST['action']) && $_POST['action'] === 'edit') {
         $productModel->setCategoria($categoria);
         $productModel->setUnidad($unidad);
 
-        $productModel->updateProductById();
+        if ($cantidad != $cantidadOriginal) {
+            date_default_timezone_set('America/Costa_Rica');
+            $fechaIngreso = date('Y-m-d H:i:s');
+            $productModel->setFechaIngreso($fechaIngreso);
+            $result = $productModel->updateProductByIdAndFechaIngreso();  
+        } else {
+            $result = $productModel->updateProductById();
+        }
 
-        header("Location: ../views/productos.php?updatedProduct=1");
-        exit();
-    } else {        header("Location: ../views/productos.php?updatedProduct=0");
+        if($result){
+            header("Location: ../views/productos.php?updatedProduct=1");
+            exit();
+        }else{
+            header("Location: ../views/productos.php?updatedProduct=0");
+            exit();
+        }
+    } else {        
+        header("Location: ../views/productos.php?updatedProduct=0");
         exit();
     }
 }

@@ -69,6 +69,33 @@ class Registros extends BaseModel {
         }
     }
 
+    public function getAllHorariosUsuarios(){
+        try {
+            date_default_timezone_set('America/Costa_Rica');
+            $hora_actual = gmdate("Y-m-d", time() - 6 * 3600);
+
+            $query = "SELECT * FROM registros_horarios rh INNER JOIN usuarios u ON u.id = rh.id_usuario INNER JOIN tipos_registro_horarios trp ON rh.tipo = trp.id_tipo_registro WHERE WEEK(rh.hora) = WEEK(:hora_actual);";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':hora_actual', $hora_actual, PDO::PARAM_STR);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            die("Error: " . $e->getMessage());
+        }
+    }
+
+    public function getMotivoCambio($id_registro){
+        try {
+            $query = "SELECT ch.*, u.nickname as usuario FROM cambios_horarios ch INNER JOIN usuarios u ON ch.id_usuario = u.id WHERE id_registro = :id_registro ORDER BY id_cambio DESC LIMIT 1;";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id_registro', $id_registro, PDO::PARAM_STR);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            die("Error: " . $e->getMessage());
+        }
+    }
+
     public function getTimesByUserId() {
         try {
             date_default_timezone_set('America/Costa_Rica');
@@ -158,5 +185,35 @@ class Registros extends BaseModel {
             die("Error: " . $e->getMessage());
         }
     }
+
+
+    public function uptadeRegistroByIdRegistro(){
+        try {
+            $query = "UPDATE registros_horarios SET hora = :hora WHERE id_registro = :id_registro";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id_registro', $this->id_registro, PDO::PARAM_INT);
+            $stmt->bindParam(':hora', $this->hora, PDO::PARAM_STR);
+            $success = $stmt->execute();
+            return $success ? true : false;
+        } catch (PDOException $e) {
+            die("Error: " . $e->getMessage());
+        }
+    }
+
+    public function newCambioHorario($motivo_cambio, $id_usuario){
+        try {
+            $query = "INSERT INTO cambios_horarios (id_registro, motivo_cambio, id_usuario) VALUES (:id_registro, :motivo_cambio, :id_usuario)";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id_registro', $this->id_registro, PDO::PARAM_INT);
+            $stmt->bindParam(':motivo_cambio', $motivo_cambio, PDO::PARAM_STR);
+            $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $success = $stmt->execute();
+            return $success ? true : false; 
+        } catch (PDOException $e) {
+            die("Error: " . $e->getMessage());
+            return false;
+        }
+    }
+    
         
 }

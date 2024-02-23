@@ -9,6 +9,8 @@ class Producto extends BaseModel {
     private $precio;
     private $categoria;
     private $id_unidad;
+    private $fecha_ingreso;
+    private $fecha_fin;
 
 
     public function setId($id) {
@@ -33,6 +35,14 @@ class Producto extends BaseModel {
 
     public function setUnidad($id_unidad) {
         $this->id_unidad = $id_unidad;
+    }
+
+    public function setFechaIngreso($fecha_ingreso) {
+        $this->fecha_ingreso = $fecha_ingreso;
+    }
+
+    public function setFechaFin($fecha_fin) {
+        $this->fecha_fin = $fecha_fin;
     }
 
 
@@ -100,6 +110,26 @@ class Producto extends BaseModel {
             $stmt->bindParam(':precio', $this->precio, PDO::PARAM_STR);
             $stmt->bindParam(':categoria', $this->categoria, PDO::PARAM_INT);
             $stmt->bindParam(':id_unidad', $this->id_unidad, PDO::PARAM_INT);
+            $stmt->execute();
+            
+            return true;
+        } catch (PDOException $e) {
+            die("Error: " . $e->getMessage());
+        }
+    }
+
+    public function updateProductByIdAndFechaIngreso() {
+        try {
+            $query = "UPDATE productos SET nombre = :nombre, cantidad = :cantidad, precio = :precio, id_categoria = :categoria, id_unidad = :id_unidad, fecha_ingreso = :fecha_ingreso WHERE id_producto = :id";
+            $stmt = $this->conn->prepare($query);
+            
+            $stmt->bindParam(':id', $this->id, PDO::PARAM_INT);
+            $stmt->bindParam(':nombre', $this->nombre, PDO::PARAM_STR);
+            $stmt->bindParam(':cantidad', $this->cantidad, PDO::PARAM_STR);
+            $stmt->bindParam(':precio', $this->precio, PDO::PARAM_STR);
+            $stmt->bindParam(':categoria', $this->categoria, PDO::PARAM_INT);
+            $stmt->bindParam(':id_unidad', $this->id_unidad, PDO::PARAM_INT);
+            $stmt->bindParam(':fecha_ingreso', $this->fecha_ingreso, PDO::PARAM_STR);
             $stmt->execute();
             
             return true;

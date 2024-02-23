@@ -108,13 +108,13 @@ if(isset($_GET["idFactura"]) && isset($_GET["min"]) && isset($_GET["max"])) {
     $contenido .= "_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _" . PHP_EOL;
     $contenido .= " " . PHP_EOL;
     $subtotal = $preciosPlatillos + $preciosBebidas;
-    $servicio10 = number_format(($preciosPlatillos + $preciosBebidas)*0.10, 2);
+    $servicio10 = ($preciosPlatillos + $preciosBebidas)*0.10;
     $totalOrden = $subtotal + $servicio10;
     $contenido .= "Subtotal de la Orden: ₡" . number_format($subtotal, 2) . PHP_EOL;
     $contenido .= " " . PHP_EOL;
 
     if($mesa !== null){
-        $contenido .= "Servicio 10%: ₡" . $servicio10 . PHP_EOL;
+        $contenido .= "Servicio 10%: ₡" . number_format($servicio10, 2) . PHP_EOL;
         $contenido .= " " . PHP_EOL;
     }
     $contenido .= "Total por pagar: ₡" . number_format($totalOrden, 2) . PHP_EOL;

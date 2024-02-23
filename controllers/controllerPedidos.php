@@ -370,7 +370,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'procesarPago') {
     $id_orden = filter_input(INPUT_POST, 'idOrden', FILTER_SANITIZE_NUMBER_INT);
     $nombre = isset($_POST['nombreClienteProcesarSeparado']) ? htmlspecialchars($_POST['nombreClienteProcesarSeparado'], ENT_QUOTES, 'UTF-8') : "Sin nombre"; 
     $telefono = isset($_POST['telefonoProcesarSeparado']) ? htmlspecialchars($_POST['telefonoProcesarSeparado'], ENT_QUOTES, 'UTF-8') : "Sin teléfono"; 
-    $mesa = isset($_POST['mesaOrdenProcesarSeparado']) ? htmlspecialchars($_POST['mesaOrdenProcesarSeparado'], ENT_QUOTES, 'UTF-8') : null; 
+    $mesa = isset($_POST['mesaOrdenProcesarSeparado']) ? filter_input(INPUT_POST, 'mesaOrdenProcesarSeparado', FILTER_SANITIZE_NUMBER_INT) : null;
     $metodo_pago = isset($_POST['metodoPago']) ? htmlspecialchars($_POST['metodoPago'], ENT_QUOTES, 'UTF-8') : 1; 
     $cantidades = $_POST['cantidadSeparado'];
     $bebidas = [];
@@ -438,7 +438,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'procesarPago') {
                         $resultUpdatedBebidas = $pedido->updateCantidadProductosDetallesPedidos($cantidadRestante, $id_orden, $id_producto, $tipo);
 
                         if($resultUpdatedBebidas && $cantidadRestante == 0){
-                            $pedido->deleteDetallePedidoByIdCantidad($id_orden);
+                            $sinEliminarBebidas = $pedido->deleteDetallePedidoByIdCantidad($id_orden);
                         }
 
                         $idsCreados[] = $insertedId;
@@ -473,6 +473,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'procesarPago') {
                     $pagosModel->setNombreProducto($productoNombre); 
                     $pagosModel->setIdProducto($id__producto); 
                     $pagosModel->setMetodoPago($metodo_pago); 
+                    $pagosModel->setMesa($mesa); 
                     $insertedId = $pagosModel->nuevoPagoFactura();
 
                     if($insertedId > 0 && $cantidadExistente > 0){
@@ -480,7 +481,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'procesarPago') {
                         $resultUpdatedPlatillos = $pedido->updateCantidadProductosDetallesPedidos($cantidadRestante, $id_orden, $id_producto, $tipo);
 
                         if($resultUpdatedPlatillos && $cantidadRestante == 0){
-                            $pedido->deleteDetallePedidoByIdCantidad($id_orden);
+                            $sinEliminarPlatillos = $pedido->deleteDetallePedidoByIdCantidad($id_orden);
                         }
 
                         $idsCreados[] = $insertedId;
@@ -490,6 +491,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'procesarPago') {
                 
             }
         }
+
 
         if ($resultUpdatedBebidas || $resultUpdatedPlatillos) {
             $nuevoPedido = new PedidosModel();
@@ -511,6 +513,12 @@ if (isset($_POST['action']) && $_POST['action'] === 'procesarPago') {
             if (!empty($idsCreados)) {
                 $minimo = min($idsCreados);
                 $maximo = max($idsCreados);
+            }
+
+            $dataDetallesPedido = $nuevoPedido->getAllDetallesPedidoByIdPedido();
+
+            if(empty($dataDetallesPedido)){
+                $nuevoPedido->updateEstadoPedidoById();
             }
             
             if ($updateMontos) {

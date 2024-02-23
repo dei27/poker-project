@@ -38,10 +38,33 @@ if (isset($_SESSION["user"])) {
     <div class="container-fluid p-5">
         <div class="table-responsive card p-3">
             <h4 class="card-header mb-3 py-3">Mis horarios</h4>
-            <h5 class="card-text">
-                <a href="#" class="text-decoration-none text-info" data-bs-toggle="modal" data-bs-target="#registroHorarioModalNuevo">
-                <img src="../assets/images/reloj.png" alt="Crear torneo" class="img-fluid"><span class="ms-3">Nuevo Registro</span></a> 
-            </h5>
+
+            <div class="row mb-3">
+                <div class="col text-start mb-1">
+                    <h5 class="card-text">
+                        <a href="#" class="text-decoration-none text-info" data-bs-toggle="modal" data-bs-target="#registroHorarioModalNuevo">
+                        <img src="../assets/images/reloj.png" alt="Crear torneo" class="img-fluid"><span class="ms-3">Nuevo Registro</span></a> 
+                    </h5>
+                </div>
+                <div class="col text-end mb-1">
+                    <?php
+                    if(isset($_SESSION["role"]) && $_SESSION["role"] === 1) {
+                    ?>
+                        <h5 class="card-text">
+                            <a href="actualizarHorarios.php" class="text-decoration-none text-info">
+                                <img src="../assets/images/calendario.png" alt="Crear torneo" class="img-fluid">
+                                <span class="ms-3">Editar horarios</span>
+                            </a> 
+                        </h5>
+                    <?php
+                    }
+                    ?>
+                </div>
+            </div>
+            
+
+            
+
             <div class="row">
                 <div class="col-sm-12 col-md-12 col-lg-6 mb-3">
                     <ul>

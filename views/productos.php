@@ -8,7 +8,8 @@ include('../controllers/controllerUnidadMedida.php');
 
 $prodcutsData = getAll();
 $products = json_decode($prodcutsData, true);
-
+$categories = json_decode(getAllCategories(), true);
+$unidades = json_decode(getAllUnidades(), true);
 
 ?>
 
@@ -54,139 +55,156 @@ $products = json_decode($prodcutsData, true);
             }
             ?>
             <div class="table-responsive">
-            <table id="example" class="table table-dark table-striped table-hover">
-                <thead class="table-warning">
-                    <tr>
-                        <th>Nombre</th>
-                        <th>Cantidad</th>
-                        <th>Precio</th>
-                        <th>Categoría</th>
-                        <th>Medida</th>
-                        
-                        <?php 
-                            if(isset($_SESSION["user"])){
-                                echo '<th>Acciones</th>';
-                            }
-                        ?>
-                        
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($products as $product):?>
+                <table id="productosInventario" class="table table-dark table-striped table-hover">
+                    <thead class="table-warning">
                         <tr>
-                            <td><?php echo $product['nombre']; ?></td>
-                            <td><?php echo empty($product['cantidad']) ? 'Sin cantidad' : $product['cantidad']; ?></td>
-                            <td><?php echo $product['precio']; ?></td>
-                            <td>
-                            <?php
-                                $categoryInfo = getNameCategoryById($product['id_categoria']);
-                                $categoryName = json_decode($categoryInfo, true);
-
-                                if (isset($categoryName['nombre_categoria'])) {
-                                    echo $categoryName['nombre_categoria'];
-                                } else {
-                                    echo 'Categoría no encontrada';
+                            <th>Nombre</th>
+                            <th>Cantidad</th>
+                            <th>Precio</th>
+                            <th>Ingreso</th>
+                            <th>Categoría</th>
+                            <th>Medida</th>
+                            
+                            <?php 
+                                if(isset($_SESSION["user"])){
+                                    echo '<th>Acciones</th>';
                                 }
                             ?>
-                            </td>
-                            <td>
-                            <?php
-                                $unindadInfo = getNameUnidadMedida($product['id_unidad']);
-                                $unidadName = json_decode($unindadInfo, true);
-
-                                if (isset($unidadName['nombre_unidad'])) {
-                                    echo $unidadName['nombre_unidad'];
-                                } else {
-                                    echo 'Unidad de medida no encontrada';
-                                }
-                            ?>
-                            </td>
-                                <?php
-                                $categories = json_decode(getAllCategories(), true);
-                                $selectedCategoryId = $product['id_categoria'];
-
-                                $unidades = json_decode(getAllUnidades(), true);
-                                $selectedUnidadId = $product['id_unidad'];
-
-                                if (isset($_SESSION["user"])) :
-                                ?>
+                            
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($products as $product):?>
+                            <tr>
+                                <td><?php echo $product['nombre']; ?></td>
+                                <td><?php echo empty($product['cantidad']) ? 'Sin cantidad' : $product['cantidad']; ?></td>
+                                <td><?php echo $product['precio']; ?></td>
+                                <td><?php echo date('d-m-Y h:i A', strtotime($product['fecha_ingreso'])); ?></td>
                                 <td>
-                                    <a href="../controllers/controllerProducts.php?action=delete&id=<?php echo $product['id_producto']; ?>" onclick="return confirm('¿Estás seguro de que quieres eliminar este producto?')" class="text-decoration-none text-white mx-3">
-                                        <i class="bi bi-trash-fill text-white"></i>
-                                    </a>
-                                    <a href="#" class="text-decoration-none text-white" data-bs-toggle="modal" data-bs-target="#editModal<?php echo $product['id_producto']; ?>">
-                                        <i class="bi bi-pencil-fill text-white"></i>
-                                    </a>
+                                <?php
+                                    $categoryInfo = getNameCategoryById($product['id_categoria']);
+                                    $categoryName = json_decode($categoryInfo, true);
+
+                                    if (isset($categoryName['nombre_categoria'])) {
+                                        echo $categoryName['nombre_categoria'];
+                                    } else {
+                                        echo 'Categoría no encontrada';
+                                    }
+                                ?>
                                 </td>
+                                <td>
+                                <?php
+                                    $unindadInfo = getNameUnidadMedida($product['id_unidad']);
+                                    $unidadName = json_decode($unindadInfo, true);
 
-                                <div class="modal fade" id="editModal<?php echo $product['id_producto']; ?>" tabindex="-1" aria-labelledby="editModalLabel<?php echo $product['id_producto']; ?>" aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-centered">
-                                        <div class="modal-content">
-                                            <div class="modal-header text-bg-dark">
-                                                <h5 class="modal-title" id="editModalLabel<?php echo $product['id_producto']; ?>">Editar Producto</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <form action="../controllers/controllerProducts.php" method="post" class="form-floating">
-                                                    <input type="hidden" name="id" value="<?php echo $product['id_producto']; ?>">
-                                                    <input type="hidden" name="action" value="edit">
+                                    if (isset($unidadName['nombre_unidad'])) {
+                                        echo $unidadName['nombre_unidad'];
+                                    } else {
+                                        echo 'Unidad de medida no encontrada';
+                                    }
+                                ?>
+                                </td>
+                                    <?php
+                                    $selectedCategoryId = $product['id_categoria'];
+                                    $selectedUnidadId = $product['id_unidad'];
 
-                                                    <div class="form-group mb-3">
-                                                        <label for="nombreProducto">Nombre</label>
-                                                        <input class="form-control" id="nombreProducto" name="nombreProducto" placeholder="Nombre..." value="<?php echo $product['nombre']; ?>" required>
-                                                    </div>
+                                    if (isset($_SESSION["user"])) :
+                                    ?>
+                                    <td>
+                                        <a href="#" class="text-decoration-none text-white mx-3" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal<?php echo $product['id_producto']; ?>">
+                                            <i class="bi bi-trash-fill text-white"></i>
+                                        </a>
+                                        <a href="#" class="text-decoration-none text-white" data-bs-toggle="modal" data-bs-target="#editModal<?php echo $product['id_producto']; ?>">
+                                            <i class="bi bi-pencil-fill text-white"></i>
+                                        </a>
+                                    </td>
 
-                                                    <div class="form-group mb-3">
-                                                        <label for="cantidadProducto" class="form-label">Cantidad</label>
-                                                        <input type="number" class="form-control" id="cantidadProducto" name="cantidadProducto" placeholder="Cantidad..." step="any" value="<?php echo htmlspecialchars($product['cantidad']); ?>" min=1 required>
-                                                    </div>
-
-                                                    <div class="form-group mb-3">
-                                                        <label for="precioProducto" class="form-label">Precio</label>
-                                                        <input type="number" class="form-control" id="precioProducto" name="precioProducto" placeholder="Precio..." step="any" value="<?php echo htmlspecialchars($product['precio']); ?>" min=1 required>
-                                                    </div>
-
-                                                    <div class="form-group mb-3">
-                                                        <label for="categoriaProducto" class="form-label">Categoría</label>
-                                                        <select class="form-select" id="categoriaProducto" name="categoriaProducto" placeholder="Categoría..." required>
-                                                            <?php foreach ($categories as $category) : ?>
-                                                                <?php
-                                                                $categoryId = $category['id_categoria'];
-                                                                $categoryName = $category['nombre_categoria'];
-                                                                $selected = ($categoryId == $selectedCategoryId) ? 'selected' : '';
-                                                                ?>
-                                                                <option value="<?php echo $categoryId; ?>" <?php echo $selected; ?>><?php echo $categoryName; ?></option>
-                                                            <?php endforeach; ?>
-                                                        </select>
-                                                    </div>
-
-                                                    <div class="form-group mb-3">
-                                                        <label for="unidadProducto" class="form-label">Unidad de medida</label>
-                                                        <select class="form-select" id="unidadProducto" name="unidadProducto" placeholder="Unidad..." required>
-                                                            <?php foreach ($unidades as $unidad) : ?>
-                                                                <?php
-                                                                $id_unidad = $unidad['id_unidad'];
-                                                                $unidadName = $unidad['nombre_unidad'];
-                                                                $selected = ($id_unidad == $selectedUnidadId) ? 'selected' : '';
-                                                                ?>
-                                                                <option value="<?php echo $id_unidad; ?>" <?php echo $selected; ?>><?php echo $unidadName; ?></option>
-                                                            <?php endforeach; ?>
-                                                        </select>
-                                                    </div>
-
-                                                    <div class="form-group mb-3 text-end">
-                                                        <input type="submit" class="btn btn-primary" value="Guardar">
-                                                    </div>
-                                                </form>
+                                    <div class="modal fade" id="confirmDeleteModal<?php echo $product['id_producto']; ?>" tabindex="-1" aria-labelledby="confirmDeleteModalLabel<?php echo $product['id_producto']; ?>" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content">
+                                                <div class="modal-header text-bg-dark">
+                                                    <h5 class="modal-title" id="confirmDeleteModalLabel<?php echo $product['id_producto']; ?>">Confirmar Eliminación</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    ¿Estás seguro de que quieres eliminar este producto?
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <a href="../controllers/controllerProducts.php?action=delete&id=<?php echo $product['id_producto']; ?>" class="btn btn-danger">Eliminar</a>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                <?php endif; ?>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+
+                                    <div class="modal fade" id="editModal<?php echo $product['id_producto']; ?>" tabindex="-1" aria-labelledby="editModalLabel<?php echo $product['id_producto']; ?>" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content">
+                                                <div class="modal-header text-bg-dark">
+                                                    <h5 class="modal-title" id="editModalLabel<?php echo $product['id_producto']; ?>">Editar Producto</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <form action="../controllers/controllerProducts.php" method="post" class="form-floating">
+                                                        <input type="hidden" name="id" value="<?php echo $product['id_producto']; ?>">
+                                                        <input type="hidden" name="action" value="edit">
+
+                                                        <div class="form-group mb-3">
+                                                            <label for="nombreProducto">Nombre</label>
+                                                            <input class="form-control" id="nombreProducto" name="nombreProducto" placeholder="Nombre..." value="<?php echo $product['nombre']; ?>" required>
+                                                        </div>
+
+                                                        <div class="form-group mb-3">
+                                                            <label for="cantidadProducto" class="form-label">Cantidad</label>
+                                                            <input type="number" class="form-control" id="cantidadProducto" name="cantidadProducto" placeholder="Cantidad..." step="any" value="<?php echo htmlspecialchars($product['cantidad']); ?>" min=1 required>
+                                                            <input type="hidden" class="form-control" id="cantidadProductoOriginal" name="cantidadProductoOriginal" step="any" value="<?php echo htmlspecialchars($product['cantidad']); ?>">
+                                                        </div>
+
+                                                        <div class="form-group mb-3">
+                                                            <label for="precioProducto" class="form-label">Precio</label>
+                                                            <input type="number" class="form-control" id="precioProducto" name="precioProducto" placeholder="Precio..." step="any" value="<?php echo htmlspecialchars($product['precio']); ?>" min=1 required>
+                                                        </div>
+
+                                                        <div class="form-group mb-3">
+                                                            <label for="categoriaProducto" class="form-label">Categoría</label>
+                                                            <select class="form-select" id="categoriaProducto" name="categoriaProducto" placeholder="Categoría..." required>
+                                                                <?php foreach ($categories as $category) : ?>
+                                                                    <?php
+                                                                    $categoryId = $category['id_categoria'];
+                                                                    $categoryName = $category['nombre_categoria'];
+                                                                    $selected = ($categoryId == $selectedCategoryId) ? 'selected' : '';
+                                                                    ?>
+                                                                    <option value="<?php echo $categoryId; ?>" <?php echo $selected; ?>><?php echo $categoryName; ?></option>
+                                                                <?php endforeach; ?>
+                                                            </select>
+                                                        </div>
+
+                                                        <div class="form-group mb-3">
+                                                            <label for="unidadProducto" class="form-label">Unidad de medida</label>
+                                                            <select class="form-select" id="unidadProducto" name="unidadProducto" placeholder="Unidad..." required>
+                                                                <?php foreach ($unidades as $unidad) : ?>
+                                                                    <?php
+                                                                    $id_unidad = $unidad['id_unidad'];
+                                                                    $unidadName = $unidad['nombre_unidad'];
+                                                                    $selected = ($id_unidad == $selectedUnidadId) ? 'selected' : '';
+                                                                    ?>
+                                                                    <option value="<?php echo $id_unidad; ?>" <?php echo $selected; ?>><?php echo $unidadName; ?></option>
+                                                                <?php endforeach; ?>
+                                                            </select>
+                                                        </div>
+
+                                                        <div class="form-group mb-3 text-end">
+                                                            <input type="submit" class="btn btn-primary" value="Guardar">
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <?php endif; ?>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
             </div>
         </div>
 
@@ -204,6 +222,20 @@ $products = json_decode($prodcutsData, true);
                             <div class="form-group mb-3">
                                 <label for="nombreProductoI">Nombre</label>
                                 <input class="form-control" id="nombreProductoI" name="nombreProductoI" placeholder="Nombre..." value="" required>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label for="unidadProductoI">Unidad de medida</label>
+                                <select class="form-select" id="unidadProductoI" name="unidadProductoI" placeholder="Categoría..." required>
+                                    <option value="">Seleccione la medida</option>
+                                    <?php foreach ($unidades as $unidad) : ?>
+                                        <?php
+                                        $unidadId = $unidad['id_unidad'];
+                                        $unidadName = $unidad['nombre_unidad'];
+                                        ?>
+                                        <option value="<?php echo $unidadId; ?>"><?php echo $unidadName; ?></option>
+                                    <?php endforeach; ?>
+                                </select>
                             </div>
 
                             <div class="form-group mb-3">
@@ -225,18 +257,6 @@ $products = json_decode($prodcutsData, true);
                                         $categoryName = $category['nombre_categoria'];
                                         ?>
                                         <option value="<?php echo $categoryId; ?>"><?php echo $categoryName; ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
-                            <div class="form-group mb-3">
-                                <label for="unidadProductoI">Unidad de medida</label>
-                                <select class="form-select" id="unidadProductoI" name="unidadProductoI" placeholder="Categoría...">
-                                    <?php foreach ($unidades as $unidad) : ?>
-                                        <?php
-                                        $unidadId = $unidad['id_unidad'];
-                                        $unidadName = $unidad['nombre_unidad'];
-                                        ?>
-                                        <option value="<?php echo $unidadId; ?>"><?php echo $unidadName; ?></option>
                                     <?php endforeach; ?>
                                 </select>
                             </div>
@@ -348,7 +368,7 @@ $products = json_decode($prodcutsData, true);
 
 <script>
     $(document).ready(function() {
-        $('#example').DataTable({
+        $('#productosInventario').DataTable({
             lengthChange: false,
             pageLength: 5,
             info: false,

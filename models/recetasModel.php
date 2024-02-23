@@ -70,6 +70,30 @@ class RecetaModel extends BaseModel {
         }
     }
 
+    public function getAllRecetasComplementarias() {
+        try {
+            $query = "SELECT r.*, tr.nombre_tipo
+            FROM recetas r
+            INNER JOIN tipos_recetas tr ON r.tipo = tr.id_tipo 
+            WHERE r.complementaria = 1
+            AND NOT EXISTS (
+                SELECT 1 FROM recetas_combinadas rc
+                WHERE rc.id_receta_compuesta = r.id_receta
+            )
+            AND r.id_receta != :id_receta;";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id_receta', $this->id_receta, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            die("Error: " . $e->getMessage());
+        }
+    }
+
+
+
+    
+
     public function getRecetasByCondicion($campo, $valor) {
         try {
             $query = "SELECT r.*, tr.nombre_tipo

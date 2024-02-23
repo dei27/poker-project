@@ -10,10 +10,11 @@ if (isset($_POST['action'])) {
     if ($action === 'login') {
         $nickname = isset($_POST['nickname']) ? htmlspecialchars($_POST['nickname'], ENT_QUOTES, 'UTF-8') : '';
         $password = isset($_POST['password']) ? htmlspecialchars($_POST['password'], ENT_QUOTES, 'UTF-8') : '';
+        $password_encriptada = hash('sha512', $password);
 
-        if (!empty($nickname) && !empty($password)) {
+        if (!empty($nickname) && !empty($password_encriptada)) {
 
-            $user = getUser($nickname, $password);
+            $user = getUser($nickname, $password_encriptada);
         
             if ($user) {
                 $_SESSION['user'] = $user;

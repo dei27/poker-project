@@ -82,6 +82,15 @@ if (isset($_SESSION["user"]) && (isset($_SESSION['role']) && $_SESSION['role'] =
                                                         Agregar ingredientes.
                                                     </a>
                                                 </h6>
+
+                                            <?php if ($receta['principal'] == 1): ?>
+                                                <h6 class="modal-title mb-3"> 
+                                                    <a href="#" class="text-decoration-none text-info" data-bs-toggle="modal" data-bs-target="#agregarRecetas<?php echo $receta['id_receta']; ?>">
+                                                        Agregar recetas complementarias.
+                                                    </a>
+                                                </h6>
+                                            <?php endif; ?>
+
                                                 <form action="../controllers/controllerIngredientesRecetas.php" method="post" class="form-floating">
                                                     <input type="hidden" name="action" value="delete">
                                                     <input type="hidden" name="idRecetaDelete" value="<?php echo $receta['id_receta'];?>">
@@ -121,6 +130,60 @@ if (isset($_SESSION["user"]) && (isset($_SESSION['role']) && $_SESSION['role'] =
                                     </div>
                                 </div>
 
+                                <!-- Modal agregar recetas complementarias -->
+                                <div class="modal fade" id="agregarRecetas<?php echo $receta['id_receta']; ?>" tabindex="-1" aria-labelledby="agregarRecetasLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                                        <div class="modal-content">
+                                            <div class="modal-header bg-dark">
+                                                <h6 class="modal-title" id="agregarRecetasLabel">Agregar Recetas Complementarias</h6>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body text-dark">
+                                                <div class="mb-3">
+                                                    <h6><i class="bi bi-clipboard2-plus-fill"></i> Seleccione la o las recetas que desea combinar con <?php echo $receta['nombre_receta']; ?>.</h6>
+                                                </div>
+                                                <form action="../controllers/controllerRecetasCombinadas.php" method="post" class="form-floating">
+                                                    <input type="hidden" name="action" value="add">
+                                                    <input type="hidden" name="idReceta" value="<?php echo $receta['id_receta'];?>">
+                                                    <div class="table-responsive">
+                                                        <table id="tablaRecetasComplementarias" class="table table-dark table-striped table-hover">
+                                                            <thead class="table-warning">
+                                                                <tr>
+                                                                    <th>Elegir</th>
+                                                                    <th>Receta</th>
+                                                                    <th>Tipo</th>
+                                                                    <th>Cantidad</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <?php
+                                                                $recetasComplementarias = json_decode(getAllRecetasComplementarias($receta['id_receta']), true);
+
+                                                                foreach ($recetasComplementarias as $recetaComplementaria) {
+                                                                    echo '<tr>';
+                                                                    echo '<td><input type="checkbox" name="recetas_nuevas[]" value="' . $recetaComplementaria['id_receta'] . '"></td>';
+                                                                    echo '<td>' . $recetaComplementaria['nombre_receta'] . '</td>';
+                                                                    echo '<td>' . $recetaComplementaria['nombre_tipo'] . '</td>';
+                                                                    echo '<td><input class="form-input text-end" type="number" step="any" name="cantidades[' . $recetaComplementaria['id_receta'] . ']" placeholder="Ingrese cantidad" min="0" value="0" required></td>';
+                                                                    echo '</tr>';
+                                                                }
+                                                                ?>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                    
+                                                    <div class="form-group mt-3 text-center">
+                                                        <div class="col-md-12">
+                                                            <input type="submit" class="btn btn-info text-white w-50 p-3" value="Guardar">
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
                                 <!-- Modal agregar ingredientes -->
                                 <div class="modal fade" id="agregarIngredientes<?php echo $receta['id_receta']; ?>" tabindex="-1" aria-labelledby="agregarIngredientesLabel" aria-hidden="true">
                                     <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -133,7 +196,6 @@ if (isset($_SESSION["user"]) && (isset($_SESSION['role']) && $_SESSION['role'] =
                                                 <form action="../controllers/controllerIngredientesRecetas.php" method="post" class="form-floating">
                                                     <input type="hidden" name="action" value="add">
                                                     <input type="hidden" name="idReceta" value="<?php echo $receta['id_receta'];?>">
-
                                                     <div class="table-responsive">
                                                         <table id="tablaIngredientes" class="table table-dark table-striped table-hover">
                                                             <thead class="table-warning">
@@ -153,14 +215,13 @@ if (isset($_SESSION["user"]) && (isset($_SESSION['role']) && $_SESSION['role'] =
                                                                     echo '<td><input type="checkbox" name="ingredientes_nuevos[]" value="' . $producto['id_producto'] . '"></td>';
                                                                     echo '<td>' . $producto['nombre'] . '</td>';
                                                                     echo '<td>' . $producto['nombre_categoria'] . '</td>';
-                                                                    echo '<td><input class="form-input" type="number" step="any" name="cantidades[' . $producto['id_producto'] . ']" placeholder="Ingrese cantidad" min="0" value="0" required></td>';
+                                                                    echo '<td><input class="form-input text-end" type="number" step="any" name="cantidades[' . $producto['id_producto'] . ']" placeholder="Ingrese cantidad" min="0" value="0" required></td>';
                                                                     echo '<td>' . $producto['nombre_unidad'] . '</td>';
                                                                     echo '<input type="hidden" name="unidades[' . $producto['id_producto'] . ']" value="' . $producto['id_unidad'] . '">';
                                                                     echo '</tr>';
                                                                 }
                                                                 ?>
                                                             </tbody>
-
                                                         </table>
                                                     </div>
                                                     
@@ -179,82 +240,93 @@ if (isset($_SESSION["user"]) && (isset($_SESSION['role']) && $_SESSION['role'] =
                             <td><?php echo $receta['tiempo_preparacion']; ?></td>
                             <td><?php echo $receta['nombre_tipo']; ?></td>
                             <td class="text-center">
-                                <a href="../controllers/controllerRecetas.php?action=delete&id=<?php echo $receta['id_receta']; ?>" onclick="return confirm('¿Estás seguro de que quieres eliminar esta receta?')" class="text-decoration-none">
+                                <a href="#" class="text-decoration-none" data-bs-toggle="modal" data-bs-target="#confirmDeleteRecetaModal<?php echo $receta['id_receta']?>">
                                     <i class="bi bi-trash-fill text-white mx-3"></i>
                                 </a>
                                 <a href="#" data-bs-toggle="modal" data-bs-target="#editModal<?php echo $receta['id_receta']?>" class="text-decoration-none">
                                     <i class="bi bi-pencil-square text-white"></i>
                                 </a>
 
-                                <!-- Editar receta -->
-                                <div class="modal fade" id="editModal<?php echo $receta['id_receta']?>" tabindex="-1" aria-labelledby="editModalLabel<?php echo $receta['id_receta']?>" aria-hidden="true">
-                                <div class="modal-dialog modal-dialog-centered">
-                                    <div class="modal-content">
-                                    <div class="modal-header bg-dark">
-                                        <h5 class="modal-title" id="editModalLabel<?php echo $receta['id_receta']?>">Editar receta</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body text-dark">
-                                        <!-- Edit Form -->
-                                        <form action="../controllers/controllerRecetas.php" method="post">
-                                            <input type="hidden" name="action" value="edit">
-                                            <input type="hidden" name="id_receta" value="<?php echo $receta['id_receta']?>">
-                                            <div class="form-group mb-3 text-start">
-                                                <label for="nombreReceta" class="form-label">Nombre</label>
-                                                <input type="text" class="form-control" id="nombreReceta" name="nombreReceta" placeholder="Nombre receta..." value="<?php echo $receta['nombre_receta']?>" required>
+                                <!-- Modal de confirmación de eliminación de receta -->
+                                <div class="modal fade" id="confirmDeleteRecetaModal<?php echo $receta['id_receta']?>" tabindex="-1" aria-labelledby="confirmDeleteRecetaModalLabel<?php echo $receta['id_receta']?>" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header bg-dark">
+                                                <h5 class="modal-title" id="confirmDeleteRecetaModalLabel<?php echo $receta['id_receta']?>">Confirmar Eliminación de Receta</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
-                                            <div class="form-group mb-3 text-start">
-                                                <label for="precioReceta" class="form-label">Precio</label>
-                                                <input type="number" class="form-control" id="precioReceta" name="precioReceta" placeholder="Precio..." step="any" value="<?php echo htmlspecialchars($receta['precio']); ?>" min=1 required>
+                                            <div class="modal-body text-dark">
+                                                <h6>¿Estás seguro de que quieres eliminar esta receta?</h6>
                                             </div>
-                                            <div class="form-group mb-3 text-start">
-                                                <label for="tiempoReceta" class="form-label">Tiempo preparación</label>
-                                                <input type="number" class="form-control" id="tiempoReceta" name="tiempoReceta" placeholder="Tiempo receta..." value="<?php echo $receta['tiempo_preparacion']?>" required min="0">
+                                            <div class="modal-footer">
+                                                <a href="../controllers/controllerRecetas.php?action=delete&id=<?php echo $receta['id_receta']; ?>" class="btn btn-danger">Eliminar</a>
                                             </div>
-                                            <div class="form-group mb-3 text-start">
-                                                <label for="tipoReceta">Tipo de Receta</label>
-                                                <select class="form-select" id="tipoReceta" name="tipoReceta" required>
-                                                    <option value="">Selecciona un tipo de receta...</option>
-                                                    <option value="1" <?php echo ($receta['tipo'] == 1) ? 'selected' : ''; ?>>Entradas</option>
-                                                    <option value="2" <?php echo ($receta['tipo'] == 2) ? 'selected' : ''; ?>>Platillos Fuertes</option>
-                                                    <option value="3" <?php echo ($receta['tipo'] == 3) ? 'selected' : ''; ?>>Postres</option>
-                                                    <option value="4" <?php echo ($receta['tipo'] == 4) ? 'selected' : ''; ?>>Extras</option>
-                                                </select>
-                                            </div>
-
-                                            <div class="form-group mb-3 text-start">
-                                                <h6>Modalidad de Receta</h6>
-                                                <div class="form-check-inline">
-                                                    <input class="form-check-input" type="checkbox" id="isPrincipal" name="isPrincipal" value="1" <?php echo ($receta['principal'] == 1) ? 'checked' : ''; ?>>
-                                                    <label class="form-check-label" for="isPrincipal">
-                                                        Combinada
-                                                    </label>
-                                                </div>
-
-                                                <div class="form-check-inline">
-                                                    <input class="form-check-input" type="checkbox" id="isComplementaria" name="isComplementaria" value="1" <?php echo ($receta['complementaria'] == 1) ? 'checked' : ''; ?>>
-                                                    <label class="form-check-label" for="isComplementaria">
-                                                        Complementaria
-                                                    </label>
-                                                </div>
-
-                                                <div class="form-check-inline">
-                                                    <input class="form-check-input" type="checkbox" id="isEspecial" name="isEspecial" value="1" <?php echo ($receta['especial'] == 1) ? 'checked' : ''; ?>>
-                                                    <label class="form-check-label" for="isEspecial">
-                                                        Especial
-                                                    </label>
-                                                </div>
-                                            </div>
-
-                                            <div class="form-group mt-3 text-center">
-                                                <div class="col-md-12">
-                                                    <input type="submit" class="btn btn-info text-white w-50 p-3" value="Guardar">
-                                                </div>
-                                            </div>
-                                        </form>
-                                    </div>
+                                        </div>
                                     </div>
                                 </div>
+
+                                <!-- Editar receta -->
+                                <div class="modal fade" id="editModal<?php echo $receta['id_receta']?>" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                        <div class="modal-header bg-dark">
+                                            <h5 class="modal-title" id="editModalLabel">Editar receta</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body text-dark">
+                                            <!-- Edit Form -->
+                                            <form action="../controllers/controllerRecetas.php" method="post">
+                                                <input type="hidden" name="action" value="edit">
+                                                <input type="hidden" name="id_receta" value="<?php echo $receta['id_receta']?>">
+                                                <div class="form-group mb-3 text-start">
+                                                    <label for="nombreReceta" class="form-label">Nombre</label>
+                                                    <input type="text" class="form-control" id="nombreReceta" name="nombreReceta" placeholder="Nombre receta..." value="<?php echo $receta['nombre_receta']?>" required>
+                                                </div>
+                                                <div class="form-group mb-3 text-start">
+                                                    <label for="precioReceta" class="form-label">Precio</label>
+                                                    <input type="number" class="form-control" id="precioReceta" name="precioReceta" placeholder="Precio..." step="any" value="<?php echo htmlspecialchars($receta['precio']); ?>" min=1 required>
+                                                </div>
+                                                <div class="form-group mb-3 text-start">
+                                                    <label for="tiempoReceta" class="form-label">Tiempo preparación</label>
+                                                    <input type="number" class="form-control" id="tiempoReceta" name="tiempoReceta" placeholder="Tiempo receta..." value="<?php echo $receta['tiempo_preparacion']?>" required min="0">
+                                                </div>
+                                                <div class="form-group mb-3 text-start">
+                                                    <label for="tipoReceta">Tipo de Receta</label>
+                                                    <select class="form-select" id="tipoReceta" name="tipoReceta" required>
+                                                        <option value="">Selecciona un tipo de receta...</option>
+                                                        <option value="1" <?php echo ($receta['tipo'] == 1) ? 'selected' : ''; ?>>Entradas</option>
+                                                        <option value="2" <?php echo ($receta['tipo'] == 2) ? 'selected' : ''; ?>>Platillos Fuertes</option>
+                                                        <option value="3" <?php echo ($receta['tipo'] == 3) ? 'selected' : ''; ?>>Postres</option>
+                                                        <option value="4" <?php echo ($receta['tipo'] == 4) ? 'selected' : ''; ?>>Extras</option>
+                                                    </select>
+                                                </div>
+
+                                                <div class="form-group mb-3 text-start">
+                                                    <h6>Modalidad de Receta</h6>
+                                                    <div class="form-check-inline">
+                                                        <input class="form-check-input" type="checkbox" id="isComplementaria" name="isComplementaria" value="1" <?php echo ($receta['complementaria'] == 1) ? 'checked' : ''; ?>>
+                                                        <label class="form-check-label" for="isComplementaria">
+                                                            Complementaria
+                                                        </label>
+                                                    </div>
+
+                                                    <div class="form-check-inline">
+                                                        <input class="form-check-input" type="checkbox" id="isEspecial" name="isEspecial" value="1" <?php echo ($receta['especial'] == 1) ? 'checked' : ''; ?>>
+                                                        <label class="form-check-label" for="isEspecial">
+                                                            Especial
+                                                        </label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group mt-3 text-center">
+                                                    <div class="col-md-12">
+                                                        <input type="submit" class="btn btn-info text-white w-50 p-3" value="Guardar">
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        </div>
+                                    </div>
                                 </div>
 
                             </td>
@@ -300,17 +372,11 @@ if (isset($_SESSION["user"]) && (isset($_SESSION['role']) && $_SESSION['role'] =
                     </div>
                     <div class="form-group mb-3 text-start">
                         <h6>Modalidad de Receta</h6>
-                        <div class="form-check-inline">
-                            <input class="form-check-input" type="checkbox" id="isPrincipalI" name="isPrincipalI" value="1">
-                            <label class="form-check-label" for="isPrincipalI">Combinada</label>
-                        </div>
-
-                        <div class="form-check-inline">
-                            <input class="form-check-input" type="checkbox" id="isComplementariaI" name="isComplementariaI">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="isComplementariaI" name="isComplementariaI" value="1">
                             <label class="form-check-label" for="isComplementariaI">Complementaria</label>
                         </div>
-
-                        <div class="form-check-inline">
+                        <div class="form-check form-check-inline">
                             <input class="form-check-input" type="checkbox" id="isEspecialI" name="isEspecialI" value="1">
                             <label class="form-check-label" for="isEspecialI">Especial</label>
                         </div>
@@ -505,7 +571,7 @@ if (isset($_GET['deletedIngredientes'])) {
 
 <script>
     $(document).ready(function() {
-        $('#recetas, #recetasDetalles').DataTable({
+        $('#tablaRecetasComplementarias, #recetasDetalles').DataTable({
             lengthChange: false,
             pageLength: 5,
             info: false,
@@ -517,6 +583,9 @@ if (isset($_GET['deletedIngredientes'])) {
                 $(".dataTables_filter label").addClass("text-dark");
             }
         });
+
+
+        
 
         $('#detallesHorarios').DataTable({
             lengthChange: false,

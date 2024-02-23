@@ -11,6 +11,16 @@ function getAllRecetas() {
     return json_encode($recetas);
 }
 
+function getAllRecetasComplementarias($id_receta) {
+    $recetaModel = new RecetaModel();
+    $recetaModel->setId($id_receta);
+    $recetas = $recetaModel->getAllRecetasComplementarias();
+    return json_encode($recetas);
+}
+
+
+
+
 function getRecetasByCondicion($condicion, $valor) {
     $recetaModel = new RecetaModel();
     $recetas = $recetaModel->getRecetasByCondicion($condicion, $valor);
@@ -22,10 +32,10 @@ if (isset($_POST['action']) && $_POST['action'] === 'add') {
     $precio = isset($_POST['precioRecetaI']) ? $_POST['precioRecetaI'] : 0.0;
     $precio = filter_var($precio, FILTER_VALIDATE_FLOAT);
     $tiempo = isset($_POST['tiempoRecetaI']) ? filter_input(INPUT_POST, 'tiempoRecetaI', FILTER_SANITIZE_NUMBER_INT) : 0;
-    $principal = isset($_POST['isPrincipalI']) ? filter_input(INPUT_POST, 'isPrincipalI', FILTER_SANITIZE_NUMBER_INT) : 0;
     $complementaria = isset($_POST['isComplementariaI']) ? filter_input(INPUT_POST, 'isComplementariaI', FILTER_SANITIZE_NUMBER_INT) : 0;
     $especial = isset($_POST['isEspecialI']) ? filter_input(INPUT_POST, 'isEspecialI', FILTER_SANITIZE_NUMBER_INT) : 0;
     $tipo = isset($_POST['tipoRecetaI']) ? htmlspecialchars($_POST['tipoRecetaI'], ENT_QUOTES, 'UTF-8') : 1;
+    $principal = 0;
 
 
     if ($nombre !== null && !empty($nombre)) {
@@ -33,10 +43,16 @@ if (isset($_POST['action']) && $_POST['action'] === 'add') {
         $recetaModel->setNombre($nombre);
         $recetaModel->setPrecio($precio);
         $recetaModel->setTiempo($tiempo);
+
+        if($complementaria === 0 && $especial === 0){
+            $principal = 1;
+        }
+
         $recetaModel->setPrincipal($principal);
         $recetaModel->setComplementaria($complementaria);
         $recetaModel->setEspecial($especial);
         $recetaModel->setTipo($tipo);
+
         $resultQuery = $recetaModel->newReceta();
 
         if($resultQuery){
@@ -58,10 +74,10 @@ if (isset($_POST['action']) && $_POST['action'] === 'edit') {
     $precio = isset($_POST['precioReceta']) ? $_POST['precioReceta'] : 0.0;
     $precio = filter_var($precio, FILTER_VALIDATE_FLOAT);
     $tiempo = isset($_POST['tiempoReceta']) ? filter_input(INPUT_POST, 'tiempoReceta', FILTER_SANITIZE_NUMBER_INT) : 0;
-    $principal = isset($_POST['isPrincipal']) ? filter_input(INPUT_POST, 'isPrincipal', FILTER_SANITIZE_NUMBER_INT) : 0;
     $complementaria = isset($_POST['isComplementaria']) ? filter_input(INPUT_POST, 'isComplementaria', FILTER_SANITIZE_NUMBER_INT) : 0;
     $especial = isset($_POST['isEspecial']) ? filter_input(INPUT_POST, 'isEspecial', FILTER_SANITIZE_NUMBER_INT) : 0;
     $tipo = isset($_POST['tipoReceta']) ? htmlspecialchars($_POST['tipoReceta'], ENT_QUOTES, 'UTF-8') : 1;
+    $principal = 0;
 
 
     if ($id !== null && !empty($id)) {
@@ -70,6 +86,11 @@ if (isset($_POST['action']) && $_POST['action'] === 'edit') {
         $recetaModel->setNombre($nombre);
         $recetaModel->setPrecio($precio);
         $recetaModel->setTiempo($tiempo);
+
+        if($complementaria === 0 && $especial === 0){
+            $principal = 1;
+        }
+
         $recetaModel->setPrincipal($principal);
         $recetaModel->setComplementaria($complementaria);
         $recetaModel->setEspecial($especial);

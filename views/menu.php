@@ -8,6 +8,7 @@ if (isset($_SESSION["userId"])) {
     $myTimeTotal = json_decode(getTimesByDay($_SESSION["userId"]), true);
     $dataWeek = json_decode(getTimeByWeek($_SESSION["userId"]), true);
     $myWeek = json_decode(getAllTimeWeeks($_SESSION["userId"]), true);
+    $todosHorarios = json_decode(getAllHorariosUsuarios(), true);
 
     if(!empty($myTimeTotal)){
 
@@ -31,6 +32,9 @@ $currentPage = basename($_SERVER['PHP_SELF']);
     switch ($currentPage) {
         case "dashboard.php":
             $link = "../index.php";
+            break;
+        case "actualizarHorarios.php":
+            $link = "horarios.php";
             break;
         case "tiposOrdenes.php":
             $link = "ordenes.php";
@@ -75,6 +79,9 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                         <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 1): ?>
                         <div class="col-12">
                             <a href="cerrarCaja.php" class="text-dark text-decoration-none text-center btn btn-light w-100 p-3 mb-3"><i class="bi bi-bank2 mx-1"></i>Cierre de caja</a>
+                        </div>
+                        <div class="col-12">
+                            <a href="usuarios.php" class="text-dark text-decoration-none text-center btn btn-light w-100 p-3 mb-3"><i class="bi bi-person-badge-fill mx-1"></i>Usuarios</a>
                         </div>
                         <?php endif; ?>
                         <div class="col-12">
