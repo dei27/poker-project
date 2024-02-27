@@ -42,10 +42,10 @@ if (isset($_SESSION["user"]) && (isset($_SESSION['role']) && $_SESSION['role'] =
 ?>
     <div class="container-fluid p-5">
         <div class="table-responsive card p-3">
-            <div class="card-header mb-3 py-3">Categorías registradas</div>
+            <h4 class="card-header mb-3 py-3">Categorías registradas</h4>
             <h5 class="card-text">
                 <a href="#" class="text-decoration-none text-info" data-bs-toggle="modal" data-bs-target="#addTournament">
-                <img src="../assets/images/addProduct.png" alt="Crear torneo" class="img-fluid">Nueva categoría.
+                <img src="../assets/images/addProduct.png" alt="Crear torneo" class="img-fluid me-2">Nueva categoría.
                 </a>
             </h5>
             <table id="example" class="table table-dark table-striped table-hover">
@@ -60,12 +60,32 @@ if (isset($_SESSION["user"]) && (isset($_SESSION['role']) && $_SESSION['role'] =
                         <tr>
                             <td><?php echo $category['nombre_categoria']; ?></td>
                             <td class="text-center">
-                                <a href="../controllers/controllerCategories.php?action=delete&id=<?php echo $category['id_categoria']; ?>" onclick="return confirm('¿Estás seguro de que quieres eliminar esta categoría?')" class="text-decoration-none">
-                                    <i class="bi bi-trash-fill text-white mx-3"></i>
+
+                                <a href="#" class="text-decoration-none text-white mx-3" data-bs-toggle="modal" data-bs-target="#eliminarModalCategoria<?php echo $category['id_categoria']; ?>">
+                                    <i class="bi bi-trash-fill text-white" data-bs-toggle='tooltip' data-bs-placement='top' data-bs-custom-class='custom-tooltip' data-bs-title='Eliminar categoría'></i>
                                 </a>
+
                                 <a href="#" data-bs-toggle="modal" data-bs-target="#editModal<?php echo $category['id_categoria']?>" class="text-decoration-none">
-                                    <i class="bi bi-pencil-square text-white"></i>
+                                    <i class="bi bi-pencil-square text-white" data-bs-toggle='tooltip' data-bs-placement='top' data-bs-custom-class='custom-tooltip' data-bs-title='Editar categoría'></i>
                                 </a>
+
+                                <!-- Modal eliminar-->
+                                <div class="modal fade" id="eliminarModalCategoria<?php echo $category['id_categoria']; ?>" tabindex="-1" aria-labelledby="eliminarModalCategoriaLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header text-bg-dark">
+                                                <h5 class="modal-title" id="eliminarModalCategoriaLabel">Confirmar Acción</h5>
+                                                <button type="button" class="btn-close bg-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body text-dark">
+                                                <p>¿Estás seguro de que quieres eliminar esta categoría?</p>
+                                            </div>
+                                            <div class="form-group mb-3 px-3">
+                                                <a href="../controllers/controllerCategories.php?action=delete&id=<?php echo $category['id_categoria']; ?>" class="btn btn-danger w-100 py-3"><i class="bi bi-cursor-fill text-white me-3"></i>Sí, eliminar.</a>
+                                            </div>                            
+                                        </div>
+                                    </div>
+                                </div>
 
                                 <!-- Editar categoria -->
                                 <div class="modal fade" id="editModal<?php echo $category['id_categoria']?>" tabindex="-1" aria-labelledby="editModalLabel<?php echo $category['id_categoria']?>" aria-hidden="true">
@@ -73,9 +93,9 @@ if (isset($_SESSION["user"]) && (isset($_SESSION['role']) && $_SESSION['role'] =
                                     <div class="modal-content">
                                     <div class="modal-header bg-dark">
                                         <h5 class="modal-title" id="editModalLabel<?php echo $category['id_categoria']?>">Editar Categoría</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        <button type="button" class="btn-close bg-light" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
-                                    <div class="modal-body text-dark">
+                                    <div class="modal-body text-dark text-start">
                                         <!-- Edit Form -->
                                         <form action="../controllers/controllerCategories.php" method="post">
                                             <input type="hidden" name="action" value="editCategory">
@@ -84,8 +104,11 @@ if (isset($_SESSION["user"]) && (isset($_SESSION['role']) && $_SESSION['role'] =
                                                 <label for="nombreCategoria" class="form-label">Nombre</label>
                                                 <input type="text" class="form-control" id="nombreCategoria" name="nombreCategoria" placeholder="Nombre Categoria..." value="<?php echo $category['nombre_categoria']?>" required>
                                             </div>
-                                            <div class="form-group mb-3 text-end">
-                                                <input type="submit" class="btn btn-primary" value="Guardar">
+                                            <div class="col-md-12">
+                                                <button type="submit" class="btn btn-primary w-100 p-3">
+                                                <i class="bi bi-cursor-fill text-white me-3"></i>
+                                                Guardar
+                                                </button>
                                             </div>
                                         </form>
                                     </div>
@@ -106,7 +129,7 @@ if (isset($_SESSION["user"]) && (isset($_SESSION['role']) && $_SESSION['role'] =
                 <div class="modal-content">
                 <div class="modal-header text-bg-dark">
                     <h5 class="modal-title" id="addTournament">Agregar Nueva Categoría</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close bg-light" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                     <div class="modal-body">
                         <form action="../controllers/controllerCategories.php" method="post" class="form-floating">
@@ -117,7 +140,10 @@ if (isset($_SESSION["user"]) && (isset($_SESSION['role']) && $_SESSION['role'] =
                             </div>
                             <div class="form-group mt-3 text-end">
                                 <div class="col-md-12">
-                                    <input type="submit" class="btn btn-info text-white w-50 p-3" value="Guardar">
+                                <button type="submit" class="btn btn-primary  text-white w-100 p-3">
+                                <i class="bi bi-cursor-fill text-white me-3"></i>
+                                Guardar
+                                </button>
                                 </div>
                             </div>
                         </form>
@@ -239,6 +265,11 @@ if (isset($_GET['insertedCategory'])) {
 
 <script>
     $(document).ready(function() {
+
+        $(function () {
+            $('[data-bs-toggle="tooltip"]').tooltip();
+        });
+
         $('#example').DataTable({
             lengthChange: false,
             pageLength: 5,

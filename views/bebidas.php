@@ -68,20 +68,39 @@ $bebidas = json_decode(getAllBebidas(), true);
                             <td><?php echo empty($bebida['nombre_bebida']) ? 'Sin nombre' : $bebida['nombre_bebida']; ?></td>
                             <td><?php echo empty($bebida['precio_bebida']) ? 'Sin precio' : $bebida['precio_bebida']; ?></td>
                             <td>
-                                <a href="../controllers/controllerBebidas.php?action=delete&id=<?php echo $bebida['id_bebida']; ?>" onclick="return confirm('¿Estás seguro de que quieres eliminar esta bebida?')" class="text-decoration-none text-white mx-3">
-                                    <i class="bi bi-trash-fill text-white"></i>
+                                <a href="#" class="text-decoration-none text-white mx-3" data-bs-toggle="modal" data-bs-target="#eliminarModalBebida<?php echo $bebida['id_bebida']; ?>">
+                                    <i class="bi bi-trash-fill text-white" data-bs-toggle='tooltip' data-bs-placement='top' data-bs-custom-class='custom-tooltip' data-bs-title='Eliminar bebida'></i>
                                 </a>
                                 <a href="#" class="text-decoration-none text-white" data-bs-toggle="modal" data-bs-target="#editModal<?php echo $bebida['id_bebida']; ?>">
                                     <i class="bi bi-pencil-fill text-white"></i>
                                 </a>
                             </td>
 
+                                <!-- Modal eliminar-->
+                                <div class="modal fade" id="eliminarModalBebida<?php echo $bebida['id_bebida']; ?>" tabindex="-1" aria-labelledby="eliminarModalBebidaLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header text-bg-dark">
+                                                <h5 class="modal-title" id="eliminarModalBebidaLabel">Confirmar Acción</h5>
+                                                <button type="button" class="btn-close bg-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body text-dark">
+                                                <p>¿Estás seguro de que quieres eliminar esta bebida?</p>
+                                            </div>
+                                            <div class="form-group mb-3 px-3">
+                                                <a href="../controllers/controllerRegistros.php?action=delete&id=<?php echo $bebida['id_bebida']; ?>" class="btn btn-danger w-100 py-3"><i class="bi bi-cursor-fill text-white me-3"></i>Sí, eliminar.</a>
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div class="modal fade" id="editModal<?php echo $bebida['id_bebida']; ?>" tabindex="-1" aria-labelledby="editModalLabel<?php echo $bebida['id_bebida']; ?>" aria-hidden="true">
                                     <div class="modal-dialog modal-dialog-centered">
                                         <div class="modal-content">
                                             <div class="modal-header text-bg-dark">
                                                 <h5 class="modal-title" id="editModalLabel<?php echo $bebida['id_bebida']; ?>">Editar Bebida</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                <button type="button" class="btn-close bg-light" data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
                                             <div class="modal-body">
                                                 <form action="../controllers/controllerBebidas.php" method="post" class="form-floating">
@@ -98,7 +117,10 @@ $bebidas = json_decode(getAllBebidas(), true);
                                                         <input type="number" class="form-control" id="precioBebida" name="precioBebida" placeholder="Precio..." step="any" value="<?php echo htmlspecialchars($bebida['precio_bebida']); ?>" min=1 required>
                                                     </div>
                                                     <div class="form-group mb-3 text-end">
-                                                        <input type="submit" class="btn btn-primary" value="Guardar">
+                                                    <button type="submit" class="btn btn-primary w-100 py-3">
+                                                        <i class="bi bi-cursor-fill text-white me-3"></i>
+                                                        Guardar
+                                                    </button>
                                                     </div>
                                                 </form>
                                             </div>
@@ -114,11 +136,11 @@ $bebidas = json_decode(getAllBebidas(), true);
 
         <!-- modal agregar bebida -->
         <div class="modal fade" id="addTournament" tabindex="-1" aria-labelledby="addTournamentLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                 <div class="modal-header text-bg-dark">
                     <h5 class="modal-title" id="addTournament">Agregar Nueva Bebida</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close bg-light" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                     <div class="modal-body">
                         <form action="../controllers/controllerBebidas.php" method="post" class="form-floating">
@@ -134,7 +156,10 @@ $bebidas = json_decode(getAllBebidas(), true);
                             </div>
                             <div class="form-group mt-3 text-end">
                                 <div class="col-md-12">
-                                    <input type="submit" class="btn btn-info text-white w-50 p-3" value="Guardar">
+                                <button type="submit" class="btn btn-primary w-100 py-3">
+                                    <i class="bi bi-cursor-fill text-white me-3"></i>
+                                    Guardar
+                                </button>
                                 </div>
                             </div>
                         </form>

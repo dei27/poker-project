@@ -124,13 +124,13 @@ $unidades = json_decode(getAllUnidades(), true);
                                             <div class="modal-content">
                                                 <div class="modal-header text-bg-dark">
                                                     <h5 class="modal-title" id="confirmDeleteModalLabel<?php echo $product['id_producto']; ?>">Confirmar Eliminación</h5>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    <button type="button" class="btn-close bg-light" data-bs-dismiss="modal" aria-label="Close"></button>
                                                 </div>
                                                 <div class="modal-body">
                                                     ¿Estás seguro de que quieres eliminar este producto?
                                                 </div>
-                                                <div class="modal-footer">
-                                                    <a href="../controllers/controllerProducts.php?action=delete&id=<?php echo $product['id_producto']; ?>" class="btn btn-danger">Eliminar</a>
+                                                <div class="form-group mb-3 text-start px-3">
+                                                    <a href="../controllers/controllerProducts.php?action=delete&id=<?php echo $product['id_producto']; ?>" class="btn btn-danger w-100 py-3"><i class="bi bi-cursor-fill text-white me-3"></i>Eliminar</a>
                                                 </div>
                                             </div>
                                         </div>
@@ -141,7 +141,7 @@ $unidades = json_decode(getAllUnidades(), true);
                                             <div class="modal-content">
                                                 <div class="modal-header text-bg-dark">
                                                     <h5 class="modal-title" id="editModalLabel<?php echo $product['id_producto']; ?>">Editar Producto</h5>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    <button type="button" class="btn-close bg-light" data-bs-dismiss="modal" aria-label="Close"></button>
                                                 </div>
                                                 <div class="modal-body">
                                                     <form action="../controllers/controllerProducts.php" method="post" class="form-floating">
@@ -192,9 +192,12 @@ $unidades = json_decode(getAllUnidades(), true);
                                                             </select>
                                                         </div>
 
-                                                        <div class="form-group mb-3 text-end">
-                                                            <input type="submit" class="btn btn-primary" value="Guardar">
-                                                        </div>
+                                                        <div class="col-md-12">
+                                                            <button type="submit" class="btn btn-primary w-100 p-3">
+                                                            <i class="bi bi-cursor-fill text-white me-3"></i>
+                                                            Guardar
+                                                            </button>
+                                                    </div>
                                                     </form>
                                                 </div>
                                             </div>
@@ -210,11 +213,11 @@ $unidades = json_decode(getAllUnidades(), true);
 
         <!-- modal agregar producto -->
         <div class="modal fade" id="addTournament" tabindex="-1" aria-labelledby="addTournamentLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                 <div class="modal-header text-bg-dark">
                     <h5 class="modal-title" id="addTournament">Agregar Nuevo Producto</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close bg-light" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                     <div class="modal-body">
                         <form action="../controllers/controllerProducts.php" method="post" class="form-floating">
@@ -237,16 +240,17 @@ $unidades = json_decode(getAllUnidades(), true);
                                     <?php endforeach; ?>
                                 </select>
                             </div>
+                            
+                            <div class="form-group mb-3">
+                                <label for="precioProducto">Precio por unidad de medida</label>
+                                <input type="number" class="form-control" id="precioProductoI" name="precioProductoI" placeholder="Precio ..." step="any" required min=1>
+                            </div>
 
                             <div class="form-group mb-3">
                                 <label for="cantidadProductoI">Cantidad</label>
-                                <input type="number" class="form-control" id="cantidadProductoI" name="cantidadProductoI" placeholder="Precio..." step="any" required min=1>
+                                <input type="number" class="form-control" id="cantidadProductoI" name="cantidadProductoI" placeholder="Cantidad ..." step="any" required min=0>
                             </div>
 
-                            <div class="form-group mb-3">
-                                <label for="precioProducto">Precio</label>
-                                <input type="number" class="form-control" id="precioProductoI" name="precioProductoI" placeholder="Precio..." step="any" required min=1>
-                            </div>
 
                             <div class="form-group mb-3">
                                 <label for="categoriaProductoI">Categoría</label>
@@ -260,10 +264,11 @@ $unidades = json_decode(getAllUnidades(), true);
                                     <?php endforeach; ?>
                                 </select>
                             </div>
-                            <div class="form-group mt-3 text-end">
-                                <div class="col-md-12">
-                                    <input type="submit" class="btn btn-info text-white w-50 p-3" value="Guardar">
-                                </div>
+                            <div class="col-md-12">
+                                <button type="submit" class="btn btn-primary w-100 p-3">
+                                <i class="bi bi-cursor-fill text-white me-3"></i>
+                                Guardar
+                                </button>
                             </div>
                         </form>
                     </div>

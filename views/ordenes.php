@@ -42,13 +42,12 @@ $pedidos = json_decode($pedidosData, true);
     <div class="container-fluid p-5">
         <div class="card p-3">
             <h4 class="card-header mb-3 py-3">Mis órdenes</h4>
-            <?php
-            if(isset($_SESSION["user"])){
-            echo '<h5 class="modal-title mb-3">
-                    <a href="tiposOrdenes.php" class="text-decoration-none text-info">Agregar nueva orden.</a>
-                </h5>';
-            }
-            ?>
+            <h5 class="modal-title mb-3">
+                <a href="tiposOrdenes.php" class="text-decoration-none text-info">
+                    <img src="../assets/images/pedidos.png" alt="Crear torneo" class="img-fluid me-2">Agregar nueva orden.
+                </a>
+            </h5>
+            
             <div class="table-responsive">
             <table id="example" class="table table-dark table-striped table-hover">
                 <thead class="table-warning">
@@ -81,12 +80,17 @@ $pedidos = json_decode($pedidosData, true);
                         if ($fecha_pedido === $fecha_actual):
                     ?>
                         <tr>
-                            <td><?php echo ($pedido['mesa'] !== null) ? $pedido['mesa'] : 'Express'; ?></td>
-                            <!-- <td><?php echo $pedido['telefono_cliente']; ?></td>
-                            <td><?php echo $pedido['direccion_cliente']; ?></td> -->
-                            <td><?php echo date('h:i:s A', strtotime($pedido['fecha_pedido'])); ?></td>
-                            <td><?php echo $pedido['estado_pedido']; ?></td>
-                            <td>
+                            <td <?php echo ($pedido["web"] == 1) ? 'class="table-danger"' : ''; ?>>
+                                <?php echo ($pedido['mesa'] !== null) ? $pedido['mesa'] : 'Express'; ?>
+                            </td>
+                            <td <?php echo ($pedido["web"] == 1) ? 'class="table-danger"' : ''; ?>>
+                                <?php echo date('H:i:s', strtotime($pedido['fecha_pedido'])); ?>
+                            </td>
+                            <td <?php echo ($pedido["web"] == 1) ? 'class="table-danger"' : ''; ?>>
+                                <?php echo $pedido['estado_pedido']; ?>
+                            </td>
+
+                            <td <?php echo ($pedido["web"] == 1) ? 'class="table-danger"' : ''; ?>>
                                 <a href="#" data-bs-toggle="modal" data-bs-target="#modalDetalles<?php echo $pedido['id_pedido']; ?>">
                                     <i class="bi bi-cart-fill text-white" data-bs-toggle='tooltip' data-bs-placement='top' data-bs-custom-class='custom-tooltip' data-bs-title='Ver Productos'></i>
                                 </a>
@@ -96,7 +100,7 @@ $pedidos = json_decode($pedidosData, true);
                                         <div class="modal-content">
                                             <div class="modal-header text-bg-dark">
                                                 <h5 class="modal-title" id="modalDetallesLabel">Productos de la orden</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                <button type="button" class="btn-close bg-light" data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
                                             <div class="modal-body">
                                                 <?php if ($pedido["estado_pedido"] == "Pendiente"): ?>
@@ -106,12 +110,13 @@ $pedidos = json_decode($pedidosData, true);
                                                 <?php endif; ?>
                                                 <div class="table-responsive">
                                                     <table id="detallesProductos" class="table table-dark table-striped table-hover w-100">
-                                                        <thead>
+                                                        <thead class="table-warning">
                                                             <tr>
                                                                 <th>ID Detalle</th>
                                                                 <th>ID Pedido</th>
                                                                 <th>Productos</th>
                                                                 <th>Cantidad</th>
+                                                                <th>Guía</th>
                                                                 <th>Precio unidad</th>
                                                             </tr>
                                                         </thead>
@@ -124,7 +129,16 @@ $pedidos = json_decode($pedidosData, true);
                                                                     <td><?php echo $detalle['id_pedido']; ?></td>
                                                                     <td><?php echo $detalle['producto']; ?></td>
                                                                     <td><?php echo $detalle['cantidad']; ?></td>
-                                                                    <td>₡<?php echo $detalle['precio']; ?></td>
+                                                                    <?php if($detalle['imagen'] !== null): ?>
+                                                                        <td>
+                                                                            <a href="#" data-bs-toggle="modal" data-bs-target="#fullScreenModal<?php echo $detalle['id_receta']; ?>">
+                                                                                <i class="bi bi-image-fill text-white"></i>
+                                                                            </a>
+                                                                        </td>
+                                                                    <?php else: ?>
+                                                                        <td>Sin imagen</td>
+                                                                    <?php endif; ?>
+                                                                    <td><?php echo $detalle['precio']; ?></td>
                                                                 </tr>
                                                             <?php endforeach; ?>
                                                         </tbody>
@@ -136,15 +150,36 @@ $pedidos = json_decode($pedidosData, true);
                                 </div>
                             </td>
 
+                            <!-- Modal de pantalla completa -->
+                            <div class="modal fade" id="fullScreenModal<?php echo $detalle['id_receta']; ?>" tabindex="-1" aria-labelledby="fullScreenModalLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-fullscreen">
+                                    <div class="modal-content">
+                                        <div class="modal-header bg-dark">
+                                            <button type="button" class="btn-close bg-light" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body text-center">
+                                            <?php if(isset($detalle["imagen"])): ?>
+                                                <img src="<?php echo $detalle["imagen"]; ?>" class="img-fluid" alt="Imagen de receta">
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
-                            <td><?php echo $pedido['total_pedido']; ?></td>
-                            <td><?php echo $pedido['total_restante']; ?></td>
+
+                            <td <?php echo ($pedido["web"] == 1) ? 'class="table-danger"' : ''; ?>>
+                                <?php echo $pedido['total_pedido']; ?>
+                            </td>
+                            <td <?php echo ($pedido["web"] == 1) ? 'class="table-danger"' : ''; ?>>
+                            <?php echo $pedido['total_restante']; ?>
+                            </td>
 
                                 <?php
 
                                 if (isset($_SESSION["user"])) :
                                 ?>
-                                <td>
+                                <td <?php echo ($pedido["web"] == 1) ? 'class="table-danger"' : ''; ?>>
+
                                     <a href="#" class="text-decoration-none text-white mx-3" data-bs-toggle="modal" data-bs-target="#comandasModal<?php echo $pedido['id_pedido']; ?>">
                                         <i class="bi bi-ticket-perforated-fill text-white" data-bs-toggle='tooltip' data-bs-placement='top' data-bs-custom-class='custom-tooltip' data-bs-title='Crear Comanda'></i>
                                     </a>
@@ -165,7 +200,7 @@ $pedidos = json_decode($pedidosData, true);
                                             <div class="modal-content">
                                                 <div class="modal-header text-bg-dark">
                                                     <h5 class="modal-title" id="eliminarModalLabel">Confirmar Acción</h5>
-                                                    <button type="button" class="btn-close bg-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    <button type="button" class="btn-close bg-light" data-bs-dismiss="modal" aria-label="Close"></button>
                                                 </div>
                                                 <div class="modal-body text-dark">
                                                     <?php if ($pedido["estado_pedido"] == "Pendiente"): ?>
@@ -176,23 +211,20 @@ $pedidos = json_decode($pedidosData, true);
                                                     <?php endif; ?>
                                                 </div>
                                                 <?php if ($pedido["estado_pedido"] == "Pendiente"): ?>
-                                                <div class="modal-footer justify-content-center">
-                                                    <a href="crearComanda.php?id=<?php echo $pedido['id_pedido']; ?>" class="btn btn-primary cerrarModal">Sí, crear comanda.</a>
+                                                <div class="form-group mb-3 text-start px-3">
+                                                    <a href="crearComanda.php?id=<?php echo $pedido['id_pedido']; ?>" class="btn btn-primary cerrarModal w-100 py-3"><i class="bi bi-cursor-fill text-white me-3"></i>Sí, crear comanda.</a>
                                                 </div>
                                                 <?php endif; ?>
                                             </div>
                                         </div>
                                     </div>
-
-
-
                                     <!-- Modal eliminar-->
                                     <div class="modal fade" id="eliminarModal<?php echo $pedido['id_pedido']; ?>" tabindex="-1" aria-labelledby="eliminarModalLabel" aria-hidden="true">
                                         <div class="modal-dialog modal-dialog-centered">
                                             <div class="modal-content">
                                                 <div class="modal-header text-bg-dark">
                                                     <h5 class="modal-title" id="eliminarModalLabel">Confirmar Acción</h5>
-                                                    <button type="button" class="btn-close bg-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    <button type="button" class="btn-close bg-light" data-bs-dismiss="modal" aria-label="Close"></button>
                                                 </div>
                                                 <div class="modal-body text-dark">
                                                     <?php if ($pedido["estado_pedido"] == "Pendiente"): ?>
@@ -202,8 +234,8 @@ $pedidos = json_decode($pedidosData, true);
                                                     <?php endif; ?>
                                                 </div>
                                                 <?php if ($pedido["estado_pedido"] == "Pendiente"): ?>
-                                                    <div class="modal-footer justify-content-center">
-                                                            <a href="../controllers/controllerPedidos.php?action=delete&id=<?php echo $pedido['id_pedido']; ?>" class="btn btn-primary">Sí, eliminar.</a>
+                                                    <div class="form-group mb-3 text-start px-3">
+                                                        <a href="../controllers/controllerPedidos.php?action=delete&id=<?php echo $pedido['id_pedido']; ?>" class="btn btn-danger w-100 py-3"><i class="bi bi-cursor-fill text-white me-3"></i>Sí, eliminar.</a>
                                                     </div>
                                                 <?php endif; ?>
 
@@ -218,7 +250,7 @@ $pedidos = json_decode($pedidosData, true);
                                             <div class="modal-content">
                                                 <div class="modal-header text-bg-dark">
                                                     <h5 class="modal-title" id="confirmModalLabel">Confirmar Acción</h5>
-                                                    <button type="button" class="btn-close bg-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    <button type="button" class="btn-close bg-light" data-bs-dismiss="modal" aria-label="Close"></button>
                                                 </div>
                                                 <form action="../controllers/controllerPedidos.php" method="POST">
                                                     <input type="hidden" name="action" value="facturarPago">
@@ -247,14 +279,12 @@ $pedidos = json_decode($pedidosData, true);
                                                                     </select>
                                                                 </div>
                                                             </div>
-                                                            
-                                                            <div class="modal-footer justify-content-center">
-                                                                <div class="row">
-                                                                    <div class="col">
-                                                                        <input type="submit" class="btn btn-primary" value="Facturar Pago">
-                                                                    </div>
-                                                                </div>
-                                                            </div>
+                                                            <button type="submit" class="btn btn-primary w-100 py-3 mt-3">
+                                                                <i class="bi bi-cursor-fill text-white me-3"></i>
+                                                                Facturar Pago
+                                                            </button>
+
+
                                                         <?php elseif ($pedido["estado_pedido"] == "Pendiente" && $pedido["mesa"] == null): ?>
                                                             <input type="hidden" name="mesaPedido" value="<?php echo empty($pedido['mesa']) ? null : $pedido['mesa']; ?>">
                                                             <input type="hidden" name="cantidadPersonas" id="cantidadPersonas" class="form-control" placeholder="Cantidad personas..." min="1" value="1" required>
@@ -268,13 +298,10 @@ $pedidos = json_decode($pedidosData, true);
                                                                     <option value="3">Sinpe</option>
                                                                 </select>
                                                             </div>
-                                                            <div class="modal-footer justify-content-center">
-                                                                <div class="row">
-                                                                    <div class="col">
-                                                                        <input type="submit" class="btn btn-primary" value="Facturar Pago">
-                                                                    </div>
-                                                                </div>
-                                                            </div>
+                                                            <button type="submit" class="btn btn-primary w-100 py-3 mt-3">
+                                                                <i class="bi bi-cursor-fill text-white me-3"></i>
+                                                                Facturar Pago
+                                                            </button>
                                                         <?php else: ?>
                                                             <!-- Aquí puedes colocar el HTML alternativo si el pedido no está pendiente -->
                                                             <p>Este pedido ya fue cancelado.</p>
@@ -296,7 +323,7 @@ $pedidos = json_decode($pedidosData, true);
                                         <div class="modal-content">
                                             <div class="modal-header text-bg-dark">
                                                 <h5 class="modal-title" id="editModalLabel<?php echo $pedido['id_pedido']; ?>">Editar Orden</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                <button type="button" class="btn-close bg-light" data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
                                             <div class="modal-body">
                                                 <form action="../controllers/controllerPedidos.php" method="post" class="form-floating">

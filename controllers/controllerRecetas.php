@@ -11,15 +11,19 @@ function getAllRecetas() {
     return json_encode($recetas);
 }
 
+function getCostoRecetaById($id_receta) {
+    $recetaModel = new RecetaModel();
+    $recetaModel->setId($id_receta);
+    $recetas = $recetaModel->getCostoRecetaById();
+    return json_encode($recetas);
+}
+
 function getAllRecetasComplementarias($id_receta) {
     $recetaModel = new RecetaModel();
     $recetaModel->setId($id_receta);
     $recetas = $recetaModel->getAllRecetasComplementarias();
     return json_encode($recetas);
 }
-
-
-
 
 function getRecetasByCondicion($condicion, $valor) {
     $recetaModel = new RecetaModel();
@@ -78,6 +82,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'edit') {
     $especial = isset($_POST['isEspecial']) ? filter_input(INPUT_POST, 'isEspecial', FILTER_SANITIZE_NUMBER_INT) : 0;
     $tipo = isset($_POST['tipoReceta']) ? htmlspecialchars($_POST['tipoReceta'], ENT_QUOTES, 'UTF-8') : 1;
     $principal = 0;
+    $mostrarEnWeb = isset($_POST['mostrarEnWeb']) ? htmlspecialchars($_POST['mostrarEnWeb'], ENT_QUOTES, 'UTF-8') : 0;
 
 
     if ($id !== null && !empty($id)) {
@@ -95,6 +100,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'edit') {
         $recetaModel->setComplementaria($complementaria);
         $recetaModel->setEspecial($especial);
         $recetaModel->setTipo($tipo);
+        $recetaModel->setDisponibleWeb($mostrarEnWeb);
 
         $resultQuery = $recetaModel->updateRecipeById();
 
@@ -128,6 +134,49 @@ if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])
     
     header("Location: ../views/recetas.php?deletedReceta=1");
     exit();
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['action'] == 'addImage') {
+    $id = filter_input(INPUT_POST, 'idReceta', FILTER_SANITIZE_NUMBER_INT);
+
+    if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
+        $uploadDirectory = "../assets/images/recetas/";
+        $fileName = basename($_FILES['imagen']['name']);
+        $fileExtension = pathinfo($fileName, PATHINFO_EXTENSION);
+        $uniqueFileName = $id . '.' . $fileExtension;
+        $uploadFilePath = $uploadDirectory . $uniqueFileName;
+
+        $url_image = "../assets/images/recetas/" . $uniqueFileName;
+
+        if (file_exists($uploadFilePath)) {
+            unlink($uploadFilePath);
+        }
+
+        if (move_uploaded_file($_FILES['imagen']['tmp_name'], $uploadFilePath)) {
+
+            $newReceta = new RecetaModel();
+            $newReceta->setId($id);
+            $newReceta->setImagen($url_image);
+
+            $result = $newReceta->updateImageUrlById();
+
+            if($result){
+                header("Location: ../views/recetas.php?uploadedImage=1");
+                exit();
+            }else{
+                header("Location: ../views/recetas.php?uploadedImage=0");
+                exit();
+            }
+
+            
+        } else {
+            header("Location: ../views/recetas.php?uploadedImage=0");
+            exit();
+        }
+    } else {
+        header("Location: ../views/recetas.php?uploadedImage=0");
+        exit();
+    }
 }
 
 

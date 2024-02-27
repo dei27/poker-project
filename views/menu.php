@@ -60,7 +60,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
             <div class="w-50 offcanvas offcanvas-end" data-bs-scroll="true" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
                 <div class="offcanvas-header text-bg-dark">
                     <h5 class="offcanvas-title" id="offcanvasRightLabel">Menú</h5>
-                    <a type="button" class="btn-close bg-white" data-bs-dismiss="offcanvas" aria-label="Close"></a>
+                    <a type="button" class="btn-close bg-light" data-bs-dismiss="offcanvas" aria-label="Close"></a>
                 </div>
                 <div class="offcanvas-body">
                 <form action="../controllers/controller.php" method="post">
@@ -98,9 +98,9 @@ $currentPage = basename($_SERVER['PHP_SELF']);
 <div class="modal fade" id="registroHorarioModal" tabindex="-1" aria-labelledby="registroHorarioModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header text-bg-secondary">
+            <div class="modal-header text-bg-dark">
                 <h5 class="modal-title" id="registroHorarioModalLabel">Registro de Horarios</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close bg-light" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body text-center">
                 <!-- Formulario de Registro de Horarios -->
@@ -124,7 +124,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                     </div>
                     <input type="hidden" id="horaRegistro" name="horaRegistro" value="<?php date_default_timezone_set('America/Costa_Rica'); echo date('Y-m-d H:i:s'); ?>">
                     <input type="hidden" id="id_usuario" name="id_usuario" value="<?php echo $_SESSION['userId']; ?>">
-                    <button type="submit" class="btn btn-primary">Registrar</button>
+                    <button type="submit" class="btn btn-primary w-100 py-3"><i class="bi bi-cursor-fill text-white me-3"></i>Registrar</button>
                 </form>
             </div>
         </div>
@@ -133,15 +133,15 @@ $currentPage = basename($_SERVER['PHP_SELF']);
 
 <!-- Modal para Registro de Horarios -->
 <div class="modal fade" id="verRegistroModal" tabindex="-1" aria-labelledby="registroHorarioModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
-            <div class="modal-header text-bg-secondary">
+            <div class="modal-header text-bg-dark">
                 <h5 class="modal-title" id="registroHorarioModalLabel">Registro de hoy <?php echo date('d-m-Y'); ?></h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close bg-light" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
             <div class="table-responsive">
-                <table id="detallesHorarios" class="table table-dark table-striped table-hover w-100">
+                <table id="detallesHorarios" class="table table-dark table-striped table-hover">
                     <thead class="table-warning">
                         <tr>
                             <th>Tipo</th>

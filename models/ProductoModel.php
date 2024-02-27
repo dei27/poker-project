@@ -11,6 +11,7 @@ class Producto extends BaseModel {
     private $id_unidad;
     private $fecha_ingreso;
     private $fecha_fin;
+    private $total_cantidad_producto;
 
 
     public function setId($id) {
@@ -45,14 +46,19 @@ class Producto extends BaseModel {
         $this->fecha_fin = $fecha_fin;
     }
 
+    public function setTotalCantidadProducto($total_cantidad_producto) {
+        $this->total_cantidad_producto = $total_cantidad_producto;
+    }
 
-    public function __construct($nombre = null, $cantidad = null, $precio = null, $categoria = null, $id_unidad = null) {
+
+    public function __construct($nombre = null, $cantidad = null, $precio = null, $categoria = null, $id_unidad = null, $total_cantidad_producto = null) {
         parent::__construct();
         $this->nombre = $nombre;
         $this->cantidad = $cantidad;
         $this->precio = $precio;
         $this->categoria = $categoria;
         $this->id_unidad = $id_unidad;
+        $this->total_cantidad_producto = $total_cantidad_producto;
     }
 
     public function getAllProdcuts() {
@@ -140,13 +146,14 @@ class Producto extends BaseModel {
 
     public function newProduct() {
         try {
-            $query = "INSERT INTO productos (nombre, cantidad, precio, id_categoria, id_unidad) VALUES (:nombre, :cantidad, :precio, :categoria, :id_unidad)";
+            $query = "INSERT INTO productos (nombre, cantidad, precio, id_categoria, id_unidad, total_cantidad_producto) VALUES (:nombre, :cantidad, :precio, :categoria, :id_unidad, :total_cantidad_producto)";
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':nombre', $this->nombre, PDO::PARAM_STR);
             $stmt->bindParam(':cantidad', $this->cantidad, PDO::PARAM_STR);
             $stmt->bindParam(':precio', $this->precio, PDO::PARAM_STR);
             $stmt->bindParam(':categoria', $this->categoria, PDO::PARAM_INT);
             $stmt->bindParam(':id_unidad', $this->id_unidad, PDO::PARAM_INT);
+            $stmt->bindParam(':total_cantidad_producto', $this->total_cantidad_producto, PDO::PARAM_INT);
             $stmt->execute();
             return true; 
 

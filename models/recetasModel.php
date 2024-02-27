@@ -11,6 +11,8 @@ class RecetaModel extends BaseModel {
     private $complementaria;
     private $especial;
     private $tipo;
+    private $img_url;
+    private $web;
 
 
     public function setId($id_receta) {
@@ -45,8 +47,16 @@ class RecetaModel extends BaseModel {
         $this->tipo = $tipo;
     }
 
+    public function setImagen($img_url) {
+        $this->img_url = $img_url;
+    }
 
-    public function __construct($nombre_receta = null, $precio = null, $tiempo_preparacion = null,$principal = null,$complementaria = null,$especial = null, $tipo = null) {
+    public function setDisponibleWeb($web) {
+        $this->web = $web;
+    }
+
+
+    public function __construct($nombre_receta = null, $precio = null, $tiempo_preparacion = null,$principal = null,$complementaria = null,$especial = null, $tipo = null, $img_url = null, $web = null) {
         parent::__construct();
         $this->nombre_receta = $nombre_receta;
         $this->precio = $precio;
@@ -55,6 +65,8 @@ class RecetaModel extends BaseModel {
         $this->complementaria = $complementaria;
         $this->especial = $especial;
         $this->tipo = $tipo;
+        $this->img_url = $img_url;
+        $this->web = $web;
     }
 
     public function getAllRecetas() {
@@ -90,10 +102,6 @@ class RecetaModel extends BaseModel {
         }
     }
 
-
-
-    
-
     public function getRecetasByCondicion($campo, $valor) {
         try {
             $query = "SELECT r.*, tr.nombre_tipo
@@ -108,7 +116,18 @@ class RecetaModel extends BaseModel {
             die("Error: " . $e->getMessage());
         }
     }
-    
+
+    public function getCostoRecetaById() {
+        try {
+            $query = "SELECT ri.*, CASE WHEN ri.unidad_medida <> 1 THEN (ri.cantidad / 1000) * p.precio ELSE ri.cantidad * p.precio END AS costo_total FROM recetas_ingredientes ri INNER JOIN productos p ON ri.id_ingrediente = p.id_producto WHERE ri.id_receta = :id_receta;";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id_receta', $this->id_receta, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            die("Error: " . $e->getMessage());
+        }
+    }
     
 
     public function newReceta() {
@@ -145,7 +164,7 @@ class RecetaModel extends BaseModel {
 
     public function updateRecipeById() {
         try {
-            $query = "UPDATE recetas SET nombre_receta = :nombre_receta, precio = :precio, tiempo_preparacion = :tiempo_preparacion, principal = :principal, complementaria = :complementaria, especial = :especial, tipo = :tipo WHERE id_receta = :id_receta";
+            $query = "UPDATE recetas SET nombre_receta = :nombre_receta, precio = :precio, tiempo_preparacion = :tiempo_preparacion, principal = :principal, complementaria = :complementaria, especial = :especial, tipo = :tipo, web = :web WHERE id_receta = :id_receta";
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':id_receta', $this->id_receta, PDO::PARAM_INT);
             $stmt->bindParam(':nombre_receta', $this->nombre_receta, PDO::PARAM_STR);
@@ -155,10 +174,24 @@ class RecetaModel extends BaseModel {
             $stmt->bindParam(':complementaria', $this->complementaria, PDO::PARAM_INT);
             $stmt->bindParam(':especial', $this->especial, PDO::PARAM_INT);
             $stmt->bindParam(':tipo', $this->tipo, PDO::PARAM_INT);
+            $stmt->bindParam(':web', $this->web, PDO::PARAM_INT);
             $stmt->execute();
             return true;
         } catch (PDOException $e) {
             die("Error: " . $e->getMessage());
         }
     }
+
+    public function updateImageUrlById() {
+        try {
+            $query = "UPDATE recetas SET img_url = :img_url WHERE id_receta = :id_receta";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id_receta', $this->id_receta, PDO::PARAM_INT);
+            $stmt->bindParam(':img_url', $this->img_url, PDO::PARAM_STR);
+            $success = $stmt->execute();
+            return $success ? true : false;
+        } catch (PDOException $e) {
+            die("Error: " . $e->getMessage());
+        }
+    }    
 }

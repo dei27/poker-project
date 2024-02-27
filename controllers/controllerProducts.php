@@ -71,11 +71,18 @@ if (isset($_POST['id'], $_POST['action']) && $_POST['action'] === 'edit') {
 
 if (isset($_POST['action']) && $_POST['action'] === 'add') {
     $nombre = isset($_POST['nombreProductoI']) ? htmlspecialchars($_POST['nombreProductoI'], ENT_QUOTES, 'UTF-8') : "Sin nombre";
-    $cantidad = isset($_POST['cantidadProductoI']) ? htmlspecialchars($_POST['cantidadProductoI'], ENT_QUOTES, 'UTF-8') : null;
+    $cantidad = isset($_POST['cantidadProductoI']) ? floatval($_POST['cantidadProductoI']) : 0.0;
     $precio = isset($_POST['precioProductoI']) ? $_POST['precioProductoI'] : 0.0;
     $precio = filter_var($precio, FILTER_VALIDATE_FLOAT);
     $categoria = isset($_POST['categoriaProductoI']) ? filter_input(INPUT_POST, 'categoriaProductoI', FILTER_SANITIZE_NUMBER_INT) : 0;
-    $unidad = isset($_POST['unidadProductoI']) ? filter_input(INPUT_POST, 'unidadProductoI', FILTER_SANITIZE_NUMBER_INT) : 0;
+    $unidad = isset($_POST['unidadProductoI']) ? floatval($_POST['unidadProductoI']) : 0.0;
+    $unidadMedida = $unidad;
+
+    if($unidad != 1){
+        $unidadMedida = 1000;
+    }
+
+    $total = $cantidad * $unidadMedida;
 
     if ($nombre !== null && !empty($nombre)) {
         $productModel = new Producto();
@@ -84,6 +91,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'add') {
         $productModel->setPrecio($precio);
         $productModel->setCategoria($categoria);
         $productModel->setUnidad($unidad);
+        $productModel->setTotalCantidadProducto($total);
 
         $productModel->newProduct();
 

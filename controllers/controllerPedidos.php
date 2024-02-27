@@ -682,17 +682,177 @@ if (isset($_POST['action']) && $_POST['action'] == "calcularClientes" && $_POST[
     $cantidadPersonas = filter_input(INPUT_POST, 'cantidadClientes', FILTER_SANITIZE_NUMBER_INT) ?: false;
 
     if($id_factura && $cantidadPersonas){
-        header("Location: ../views/facturarClientes.php?idPedido=$id_factura&c=$cantidadPersonas");
+        header("Location: ../views/facturarClientes.php?idFactura=$id_factura&c=$cantidadPersonas");
         exit();
     }
-
-
 }
 
+if (isset($_POST['action']) && $_POST['action'] == "facturarSeparado") {
 
+    $dataToSend = []; // Array para almacenar los datos a enviar}
 
+    foreach ($_POST as $key => $value) {
+        // Verificar si el nombre de la clave comienza con 'form_'
+        if (strpos($key, 'form_') === 0 && is_array($value)) {
+            // Obtener el número de índice del conjunto de datos
+            $index = substr($key, 5);
 
+            $nombreCliente = $value['nombreClienteProcesarSeparado'] ?? '';
+            $telefonoCliente = $value['telefonoProcesarSeparado'] ?? '';
+            $mesa = $value['mesaOrdenProcesarSeparado'] ?? '';
+            $servicio = $value['servicioOrdenProcesarSeparado'] ?? '';
+            $metodoPago = $value['metodoPago'] ?? '';
+            
+            // Agregar los datos al array de datos a enviar
+            $dataToSend[] = [
+                'nombreCliente' => $nombreCliente,
+                'telefonoCliente' => $telefonoCliente,
+                'mesa' => $mesa,
+                'servicio' => $servicio,
+                'metodoPago' => $metodoPago
+            ];
 
+            $id_factura = filter_input(INPUT_POST, 'idOrden', FILTER_SANITIZE_NUMBER_INT) ?: false;
+            $cantidadPersonas = filter_input(INPUT_POST, 'c', FILTER_SANITIZE_NUMBER_INT) ?: false;
 
+            // if($id_factura && $cantidadPersonas){
 
+            // $estado_pedido = getEstadoPedido($id_factura);
 
+            // $pedido = new PedidosModel();
+            // $productos = new PedidosModel();
+
+            // $datosPedido  = $pedido->getPedidosById($id_factura);
+            // $dataProductos = $productos->getAllDetallesPedidosAndPreciosPedidos($id_factura);
+
+            // $bebidas = array();
+            // $platillos = array();
+            // $preciosPlatillos = 0;
+            // $preciosBebidas = 0;
+            // $insertados = array();
+
+            // foreach ($dataProductos as $producto) {
+
+            //     $product_id = substr($producto['product_id'], 1);
+
+            //     if (substr($producto['product_id'], 0, 1) === 'R') {
+
+            //         $platillos[] = array(
+            //             'producto' => $producto['producto'],
+            //             'precio' => $producto['precio'],
+            //             'cantidad' => $producto['cantidad'],
+            //             'product_id' => $product_id
+            //         );
+            //     } else {
+            //         $bebidas[] = array(
+            //             'producto' => $producto['producto'],
+            //             'precio' => $producto['precio'],
+            //             'cantidad' => $producto['cantidad'],
+            //             'product_id' => $product_id
+            //         );
+            //     }
+            // }
+
+            // date_default_timezone_set('America/Costa_Rica');
+            // $fecha_actual = date(time());
+
+            // echo $fecha_actual ;
+
+            // if (!empty($platillos)) {
+            //     foreach ($platillos as $platillo) {
+            //         $preciosPlatillos += $platillo['precio'] * $platillo['cantidad'];
+
+            //         if($estado_pedido != "Cancelado"){
+            //             $insertedIdPago = pagarFactura($id_factura, $datosPedido['nombre_cliente'], $datosPedido['telefono_cliente'], 2, $platillo['precio'], $platillo['cantidad'], $fecha_actual, $platillo['producto'], $platillo['product_id'], $metodo_pago, $mesaPedido);
+
+            //             $cantidadBebida = intval($platillo['cantidad']);
+            //             $pedidoBebida = new PedidosModel();
+            //             $tipoBebida = 'platillo';
+            //             $cantidadExistenteBebida = intval($pedidoBebida->getCantidadByIdPedidoAndIdProducto($id_factura, $platillo['product_id'], $tipoBebida));
+
+            //             if($cantidadBebida !== 0 && $cantidadBebida <= $cantidadExistenteBebida){
+
+            //                 if($insertedIdPago > 0 && $cantidadExistenteBebida > 0){
+            //                     $cantidadRestante = $cantidadExistenteBebida - $cantidadBebida;
+            //                     $resultUpdatedBebidas = $pedidoBebida->updateCantidadProductosDetallesPedidos($cantidadRestante, $id_factura, $platillo['product_id'], $tipoBebida);
+
+            //                     if($resultUpdatedBebidas && $cantidadRestante == 0){
+            //                         $insertedResult = $pedidoBebida->deleteDetallePedidoByIdCantidad($id_factura);
+            //                     }
+            //                 }
+            //                 $insertados[] = $insertedIdPago;
+            //             }
+
+                        
+            //         }
+            //     }
+            // }
+            
+            // if (!empty($bebidas)) {
+
+            //     foreach ($bebidas as $bebida) {
+
+            //         if($estado_pedido != "Cancelado"){
+            //             $insertedIdPago = pagarFactura($id_factura, $datosPedido['nombre_cliente'], $datosPedido['telefono_cliente'], 1, $bebida['precio'], $bebida['cantidad'], $fecha_actual, $bebida['producto'], $bebida['product_id'], $metodo_pago, $mesaPedido);
+
+            //             $cantidadBebida = intval($bebida['cantidad']);
+            //             $pedidoBebida = new PedidosModel();
+            //             $tipoBebida = 'bebida';
+            //             $cantidadExistenteBebida = intval($pedidoBebida->getCantidadByIdPedidoAndIdProducto($id_factura, $bebida['product_id'], $tipoBebida));
+
+            //             if($cantidadBebida !== 0 && $cantidadBebida <= $cantidadExistenteBebida){
+
+            //                 if($insertedIdPago > 0 && $cantidadExistenteBebida > 0){
+            //                     $cantidadRestante = $cantidadExistenteBebida - $cantidadBebida;
+            //                     $resultUpdatedBebidas = $pedidoBebida->updateCantidadProductosDetallesPedidos($cantidadRestante, $id_factura, $bebida['product_id'], $tipoBebida);
+
+            //                     if($resultUpdatedBebidas && $cantidadRestante == 0){
+            //                         $insertedResult = $pedidoBebida->deleteDetallePedidoByIdCantidad($id_factura);
+            //                     }
+            //                 }
+
+            //                 $insertados[] = $insertedIdPago;
+            //             }
+                        
+            //         }
+            //     }
+            // }
+
+            //     if($estado_pedido != "Cancelado"){
+            //         $facturarPedido = facturarPedidoById($id_factura);
+            //     }
+
+            //     if(!empty($insertados)){
+
+            //         $minimo = min($insertados);
+            //         $maximo = max($insertados);
+            //         $url = "";
+
+            //         if($mesaPedido !== null){
+            //             $url = "facturada=1&i=$id_factura&c=$cantidadPersonas&min=$minimo&max=$maximo";
+            //         }else{
+            //             $url = "facturada=1&min=$minimo&max=$maximo";
+            //         }
+
+            //         header("Location: ../views/ordenes.php?$url ");
+            //         exit();
+            //     }else{
+            //         header("Location: ../views/ordenes.php?facturada=0");
+            //         exit();
+            //     } 
+            // }else{
+            //     header("Location: ../views/ordenes.php?facturada=0");
+            //     exit();
+            // }
+        }
+    }
+
+    // session_start();
+
+    // // Almacenar los datos en una variable de sesión
+    // $_SESSION['dataToSend'] = $dataToSend;
+
+    // // Redireccionar a la página de destino
+    // header('Location: ../views/facturar.php?facturarClientes=1');
+    // exit; // Detener la ejecución del script después de la redirección
+}

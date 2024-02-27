@@ -156,7 +156,7 @@ if (isset($_GET['idPedido'])) {
                             </div>
                             <div class="row">
                                 <div class="col mb-3">
-                                    <button type="submit" class="btn btn-primary w-100 p-3" name="action" value="procesarPago">Procesar pago</button>
+                                    <button type="submit" class="btn btn-primary w-100 p-3" name="action" value="procesarPago"><i class="bi bi-cursor-fill text-white me-3"></i>Procesar pago</button>
                                 </div>
                                 <?php
                                     if (isset($_GET['idPedido'], $_GET['min'], $_GET['max'])) {

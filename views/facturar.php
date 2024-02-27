@@ -351,7 +351,34 @@ if(isset($_GET["min"]) && isset($_GET["max"])) {
     unlink($archivoTemporal);
 
     exit; // Terminar la ejecución del script después de la descarga del archivo
-} else {
-    echo "No se proporcionaron los datos necesarios.";
+}
+
+
+if(isset($_GET["facturarClientes"]) && $_GET["facturarClientes"] === "1") {
+    $dataToSend = $_SESSION['dataToSend'];
+    
+    // Iterar sobre cada conjunto de datos
+    foreach ($dataToSend as $index => $cliente) {
+        // Crear el nombre del archivo con un formato específico
+        $filename = 'cliente_' . ($index + 1) . '.txt';
+        
+        // Abrir o crear el archivo en modo escritura
+        $file = fopen($filename, 'w');
+        
+        // Verificar si el archivo se abrió correctamente
+        if ($file) {
+            // Escribir los datos en el archivo
+            foreach ($cliente as $key => $value) {
+                fwrite($file, "$key: $value" . PHP_EOL);
+            }
+            
+            // Cerrar el archivo
+            fclose($file);
+            
+            echo "Archivo $filename creado exitosamente.<br>";
+        } else {
+            echo "Error al crear el archivo $filename.<br>";
+        }
+    }
 }
 

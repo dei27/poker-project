@@ -149,9 +149,9 @@ if (isset($_SESSION["user"])) {
 <div class="modal fade" id="registroHorarioModalNuevo" tabindex="-1" aria-labelledby="registroHorarioModalNuevoLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header text-bg-secondary">
+            <div class="modal-header text-bg-dark">
                 <h5 class="modal-title" id="registroHorarioModalNuevoLabel">Registro de Horarios</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close bg-light" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body text-center">
                 <!-- Formulario de Registro de Horarios -->
@@ -173,7 +173,7 @@ if (isset($_SESSION["user"])) {
                     </div>
                     <input type="hidden" id="horaRegistro" name="horaRegistro" value="<?php date_default_timezone_set('America/Costa_Rica'); echo date('Y-m-d H:i:s'); ?>">
                     <input type="hidden" id="id_usuario" name="id_usuario" value="<?php echo $_SESSION['userId']; ?>">
-                    <button type="submit" class="btn btn-primary">Registrar</button>
+                    <button type="submit" class="btn btn-primary w-100 py-3"><i class="bi bi-cursor-fill text-white me-3"></i>Registrar</button>
                 </form>
             </div>
         </div>

@@ -123,7 +123,7 @@ $bebidasPlatillos = json_decode(getAllBebidasAndPlatillos(),true);
                             <div class="row mb-3">
                                 <div class="col">
                                     <label for="direccionClienteOrden" class="form-label">Dirección del Cliente</label>
-                                    <textarea class="form-control" id="direccionClienteOrden" name="direccionClienteOrden" rows="3" placeholder="Dirección..." required></textarea>
+                                    <textarea class="form-control" id="direccionClienteOrden" name="direccionClienteOrden" rows="3" placeholder="Dirección requerida para envío express..." required></textarea>
                                 </div>
                             </div>
                             <div class="row mb-3">
@@ -144,7 +144,7 @@ $bebidasPlatillos = json_decode(getAllBebidasAndPlatillos(),true);
                                 </div>
                                 </div>
                             </div>
-                            <button type="submit" class="btn btn-primary w-100 p-3">Procesar Orden</button>
+                            <button type="submit" class="btn btn-primary w-100 p-3"><i class="bi bi-cursor-fill text-white me-3"></i>Procesar Orden</button>
                         </form>
                     </div>
                 </div>

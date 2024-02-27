@@ -150,7 +150,7 @@ $bebidasPlatillos = json_decode(getAllBebidasAndPlatillos(),true);
                                     </div>
                                 </div>
                             </div>
-                            <button type="submit" class="btn btn-primary w-100 p-3">Procesar Orden</button>
+                            <button type="submit" class="btn btn-primary w-100 p-3"><i class="bi bi-cursor-fill text-white me-3"></i>Procesar Orden</button>
                         </form>
                     </div>
                 </div>

@@ -11,6 +11,26 @@ function getAllIngredientesByReceta($idReceta) {
     return json_encode($recetasIngredientes);
 }
 
+function getAllIdsRecetasCompuestasByIdReceta($idReceta) {
+    $recetaIngredienteModel = new RecetaIngredienteModel();
+    $recetaIngredienteModel->setIdReceta($idReceta);
+    $recetasCombinadas = $recetaIngredienteModel->getAllIdsRecetasCompuestasByIdReceta($idReceta);
+    $misIds = array();
+
+    foreach ($recetasCombinadas as $receta) {
+        $nuevaReceta = array(
+            "id_receta_compuesta" => $receta["id_receta_compuesta"],
+            "cantidad_receta_compuesta" => $receta["cantidad_receta_compuesta"]
+        );
+        
+        $misIds[] = $nuevaReceta;
+    }
+    
+    return $misIds;
+}
+
+
+
 if (isset($_POST['action']) && $_POST['action'] === 'add') {
     $id_receta = filter_input(INPUT_POST, 'idReceta', FILTER_SANITIZE_NUMBER_INT);
     $ingredientes_nuevos = isset($_POST['ingredientes_nuevos']) ? $_POST['ingredientes_nuevos'] : [];

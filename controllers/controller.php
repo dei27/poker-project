@@ -38,12 +38,10 @@ if (isset($_POST['action'])) {
 
 function getUser($nickname, $password)
 {
-    // Realizar la conexión a la base de datos
     $conn = connectDB();
 
     try {
-        // Consultar la base de datos para obtener el usuario
-        $query = "SELECT * FROM usuarios WHERE nickname = :nickname AND password = :password";
+        $query = "SELECT * FROM usuarios WHERE nickname = :nickname AND password = :password AND habilitado = 1";
         $stmt = $conn->prepare($query);
         $stmt->bindParam(':nickname', $nickname);
         $stmt->bindParam(':password', $password);

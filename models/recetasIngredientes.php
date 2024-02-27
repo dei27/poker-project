@@ -37,12 +37,39 @@ class RecetaIngredienteModel extends BaseModel {
 
     public function getIngredientesDeReceta($idReceta) {
         try {
-            $stmt = $this->conn->prepare("SELECT ri.id_receta, ri.id_ingrediente, ri.cantidad, ri.unidad_medida, p.nombre, um.nombre_unidad
-                FROM recetas_ingredientes ri
-                INNER JOIN productos p ON p.id_producto = ri.id_ingrediente
-                INNER JOIN unidades_medidas um ON um.id_unidad = ri.unidad_medida
-                WHERE id_receta = :id_receta");
+            $stmt = $this->conn->prepare(
+            "SELECT 
+            ri.id_receta, 
+            ri.id_ingrediente, 
+            ri.cantidad, 
+            ri.unidad_medida, 
+            p.nombre, 
+            um.nombre_unidad, 
+            CASE 
+                WHEN ri.unidad_medida <> 1 THEN (ri.cantidad / 1000) * p.precio 
+                ELSE ri.cantidad * p.precio 
+            END AS costo_total
+            FROM 
+            recetas_ingredientes ri
+            INNER JOIN 
+            productos p ON p.id_producto = ri.id_ingrediente
+            INNER JOIN 
+            unidades_medidas um ON um.id_unidad = ri.unidad_medida
+            WHERE 
+            id_receta = :id_receta;");
             $stmt->bindParam(':id_receta', $idReceta, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            die("Error: " . $e->getMessage());
+        }
+    }
+
+    public function getAllIdsRecetasCompuestasByIdReceta() {
+        try {
+            $query = "SELECT * FROM recetas_combinadas WHERE id_receta_principal = :id_receta;";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id_receta', $this->id_receta, PDO::PARAM_INT);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {

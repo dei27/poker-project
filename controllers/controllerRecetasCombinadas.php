@@ -26,14 +26,14 @@ if (isset($_POST['action']) && $_POST['action'] === 'add') {
         }
 
         if ($resultQuery) {
-            header("Location: ../views/recetas.php?insertedIngredientes=1");
+            header("Location: ../views/recetas.php?insertedRecetas=1");
             exit();
         } else {
-            header("Location: ../views/recetas.php?insertedIngredientes=0");
+            header("Location: ../views/recetas.php?insertedRecetas=0");
             exit();
         }
     } else {
-        header("Location: ../views/recetas.php?insertedIngredientes=0");
+        header("Location: ../views/recetas.php?insertedRecetas=0");
         exit();
     }
 }

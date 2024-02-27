@@ -1,0 +1,369 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+include('../controllers/controllerUsuarios.php');
+
+$usuarios = json_decode(getAllUsuarios(), true);
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Explora la auténtica experiencia de sabores moncheños en nuestra microempresa familiar. Desde generaciones, hemos cultivado tradiciones ramonenses que se reflejan en cada producto que ofrecemos. Descubre la esencia de nuestras raíces a través de delicias cuidadosamente elaboradas, donde cada bocado es un viaje a la rica herencia de las tradiciones moncheñas. ¡Bienvenido a un mundo donde la vida tiene el sabor tan bueno como Monchister!">
+    <meta name="keywords" content="microempresa familiar, tradiciones ramonenses, sabores moncheños, productos artesanales, herencia culinaria, delicias familiares, monchister, autenticidad, experiencias gastronómicas">
+    <meta name="author" content="Deivi Campos">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <title>Usuarios</title>
+</head>
+<body>
+<header>
+    <?php 
+        if(isset($_SESSION["user"])){
+            include('menu.php');
+        }else{
+            echo 
+            '<nav class="navbar sticky-top">
+                <a href="../index.php" class="text-decoration-none text-dark navbar-brand"><i class="bi bi-arrow-left-circle-fill text-dark fs-3 px-3"></i></a>
+            </nav>';
+        }
+    ?>
+</header>
+
+<?php
+if (isset($_SESSION["user"]) && (isset($_SESSION['role']) && $_SESSION['role'] === 1)) {
+?>
+    <div class="container-fluid p-5">
+        <div class="table-responsive card p-3">
+            <h5 class="card-header mb-3 py-3">Usuarios registrados</h5>
+            <h5 class="card-text">
+                <a href="#" class="text-decoration-none text-info" data-bs-toggle="modal" data-bs-target="#addTournament">
+                    <img src="../assets/images/addUser.png" alt="logo usuario" class="img-fluid me-2">Nuevo usuario.
+                </a>
+            </h5>
+            <table id="example" class="table table-dark table-striped table-hover">
+                <thead class="table-warning">
+                    <tr>
+                        <th>Nickname</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Habilitado</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($usuarios as $usuario):?>
+                        <tr>
+                            <td><?php echo $usuario['nickname']; ?></td>
+                            <td><?php echo $usuario['email']; ?></td>
+                            <td>
+                                <?php 
+                                    switch ($usuario['role']) {
+                                        case 1:
+                                            echo "Administrador";
+                                            break;
+                                        case 2:
+                                            echo "Cocinero";
+                                            break;
+                                        case 3:
+                                            echo "Salonero";
+                                            break;
+                                        case 4:
+                                            echo "Ayudante";
+                                            break;
+                                        case 5:
+                                            echo "Mantenimiento";
+                                            break;
+                                        default:
+                                            echo "Rol desconocido";
+                                            break;
+                                    }
+                                ?>
+                            </td>
+                            <td><?php echo ($usuario['habilitado'] == 1) ? "Sí" : "No"; ?></td>
+                            <td class="text-center">
+
+                            <a href="#" class="text-decoration-none text-white mx-3" data-bs-toggle="modal" data-bs-target="#deshabilitarUsuario<?php echo $usuario['id']; ?>">
+                                <i class="bi bi-trash-fill text-white" 
+                                data-bs-toggle='tooltip' 
+                                data-bs-placement='top' 
+                                data-bs-custom-class='custom-tooltip' 
+                                data-bs-title='<?php echo ($usuario["habilitado"] == 1) ? "Deshabilitar usuario" : "Habilitar usuario"; ?>'></i>
+                            </a>
+
+                                <a href="#" data-bs-toggle="modal" data-bs-target="#editarUsuario<?php echo $usuario['id']?>" class="text-decoration-none">
+                                    <i class="bi bi-pencil-square text-white" data-bs-toggle='tooltip' data-bs-placement='top' data-bs-custom-class='custom-tooltip' data-bs-title='Editar usuario'></i>
+                                </a>
+
+                                <!-- Modal eliminar-->
+                                <div class="modal fade" id="deshabilitarUsuario<?php echo $usuario['id']; ?>" tabindex="-1" aria-labelledby="deshabilitarUsuarioLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header text-bg-dark">
+                                                <h5 class="modal-title" id="deshabilitarUsuarioLabel">Confirmar Acción</h5>
+                                                <button type="button" class="btn-close bg-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body text-dark">
+                                                <p><?php echo ($usuario["habilitado"] == 1) ? "¿Estás seguro de que quieres deshabilitar este usuario?" : "¿Estás seguro de que quieres habilitar este usuario?"; ?></p>
+                                            </div>
+                                            <div class="form-group mb-3 px-3">
+                                                <a href="../controllers/controllerUsuarios.php?action=<?php echo ($usuario["habilitado"] == 1) ? "delete" : "activate"; ?>&id=<?php echo $usuario['id']; ?>" class="btn btn-<?php echo ($usuario["habilitado"] == 1) ? "danger" : "success"; ?> w-100 py-3">
+                                                    <i class="bi bi-cursor-fill text-white me-3"></i>
+                                                    <?php echo ($usuario["habilitado"] == 1) ? "Sí, deshabilitar." : "Sí, habilitar."; ?>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Editar usuario -->
+                                <div class="modal fade" id="editarUsuario<?php echo $usuario['id']?>" tabindex="-1" aria-labelledby="editarUsuarioLabel<?php echo $usuario['id']?>" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                    <div class="modal-header bg-dark">
+                                        <h5 class="modal-title" id="editarUsuarioLabel<?php echo $usuario['id']?>">Editar Usuario</h5>
+                                        <button type="button" class="btn-close bg-light" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body text-dark text-start">
+                                        <!-- Edit Form -->
+                                        <form action="../controllers/controllerUsuarios.php" method="post">
+                                            <input type="hidden" name="action" value="editUsuario">
+                                            <input type="hidden" name="id_usuario" value="<?php echo $usuario['id']?>">
+                                            <div class="form-group mb-3">
+                                                <label for="nicknameUsuario" class="form-label">Nickname</label>
+                                                <input type="text" class="form-control" id="nicknameUsuario" name="nicknameUsuario" placeholder="Nickname ..." value="<?php echo $usuario['nickname']?>" required readonly>
+                                            </div>
+                                            <div class="form-group mb-3">
+                                                <label for="nicknameUsuario" class="form-label">Correo</label>
+                                                <input type="email" class="form-control" id="nicknameUsuario" name="nicknameUsuario" placeholder="Nickname ..." value="<?php echo $usuario['email']?>" required readonly>
+                                            </div>
+                                            <div class="form-group mb-3">
+                                                <label for="passwordUsuario" class="form-label">Actualizar Contraseña</label>
+                                                <input type="text" class="form-control" id="passwordUsuario" name="passwordUsuario" placeholder="Escriba acá la nueva contraseña ..." value="">
+                                            </div>
+                                            <?php if ($usuario['role'] !== 1): ?>
+                                                <div class="form-group mb-3">
+                                                    <label for="role" class="form-label">Role de Usuario</label>
+                                                    <select class="form-select" name="role" required>
+                                                        <option value="">Seleccionar</option>
+                                                        <option value="2" <?php if ($usuario['role'] == 2) echo "selected"; ?>>Cocinero</option>
+                                                        <option value="3" <?php if ($usuario['role'] == 3) echo "selected"; ?>>Salonero</option>
+                                                        <option value="4" <?php if ($usuario['role'] == 4) echo "selected"; ?>>Ayudante</option>
+                                                        <option value="5" <?php if ($usuario['role'] == 5) echo "selected"; ?>>Mantenimiento</option>
+                                                    </select>
+                                                </div>
+                                            <?php endif; ?>
+
+
+
+                                            <div class="col-md-12">
+                                                <button type="submit" class="btn btn-primary w-100 p-3">
+                                                <i class="bi bi-cursor-fill text-white me-3"></i>
+                                                Guardar
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    </div>
+                                </div>
+                                </div>
+
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+<!-- modal agregar categoria -->
+<div class="modal fade" id="addTournament" tabindex="-1" aria-labelledby="addTournamentLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                <div class="modal-header text-bg-dark">
+                    <h5 class="modal-title" id="addTournament">Agregar Nuevo Usuario</h5>
+                    <button type="button" class="btn-close bg-light" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                    <div class="modal-body">
+                        <form action="../controllers/controllerUsuarios.php" method="post" class="form-floating">
+                            <input type="hidden" name="action" value="addUsuario">
+                            <div class="form-group mb-3">
+                                <label for="nombreUsuarioNuevo">Nickname</label>
+                                <input class="form-control" id="nombreUsuarioNuevo" name="nombreUsuarioNuevo" placeholder="Nickname..." required>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label for="emailUsuarioNuevo">Email</label>
+                                <input type="email" class="form-control" id="emailUsuarioNuevo" name="emailUsuarioNuevo" placeholder="Correo..." required>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label for="passwordUsuarioNuevo">Contraseña</label>
+                                <input class="form-control" id="passwordUsuarioNuevo" name="passwordUsuarioNuevo" placeholder="Contraseña..." required>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label for="roleNuevo" class="form-label">Role de Usuario</label>
+                                <select class="form-select" name="roleNuevo" required>
+                                    <option value="">Seleccionar</option>
+                                    <option value="2">Cocinero</option>
+                                    <option value="3">Salonero</option>
+                                    <option value="4">Ayudante</option>
+                                    <option value="5">Mantenimiento</option>
+                                </select>
+                            </div>
+                            <div class="form-group mt-3 text-end">
+                                <div class="col-md-12">
+                                <button type="submit" class="btn btn-primary  text-white w-100 p-3">
+                                <i class="bi bi-cursor-fill text-white me-3"></i>
+                                Guardar
+                                </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+<?php
+}else{
+    echo '<div class="container-fluid mt-5 vh-100 p-5">
+            <div class="card p-3">
+                <p class="card-text py-5">No tienes el poder suficiente para poder ver esto. <a href="login.php">Inicia sesión</a>.</p>
+            </div>
+        </div>';
+}
+?>
+
+<?php
+if (isset($_GET['insertedUser'])) {
+    $updatedCategoryStatus = $_GET['insertedUser'];
+    
+    $messageConfig = ($updatedCategoryStatus == 1)
+        ? [
+            'icon' => 'success',
+            'title' => 'Agregado con éxito',
+            'text' => 'El usuario fue añadido.',
+        ]
+        : [
+            'icon' => 'error',
+            'title' => 'Error al agregar',
+            'text' => 'No se pudo añadir el usuario.',
+        ];
+
+    echo '
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        Swal.fire({
+            icon: "' . $messageConfig['icon'] . '",
+            title: "' . $messageConfig['title'] . '",
+            timer: 2500,
+            text: "' . $messageConfig['text'] . '",
+            showConfirmButton: false
+        });
+    </script>
+    ';
+}
+
+
+if (isset($_GET['nickEmail']) && $_GET['nickEmail'] == 1) {
+    echo '
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        Swal.fire({
+            icon: "error",
+            title: "Error al agregar",
+            timer: 3000,
+            text: "El nickname y el correo están en uso.",
+            showConfirmButton: false
+        });
+    </script>
+    ';
+}
+
+if (isset($_GET['nickname']) && $_GET['nickname'] == 1) {
+    echo '
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        Swal.fire({
+            icon: "error",
+            title: "Error al agregar",
+            timer: 3000,
+            text: "El nickname está en uso.",
+            showConfirmButton: false
+        });
+    </script>
+    ';
+}
+
+if (isset($_GET['email']) && $_GET['email'] == 1) {
+    echo '
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        Swal.fire({
+            icon: "error",
+            title: "Error al agregar",
+            timer: 3000,
+            text: "El email está en uso.",
+            showConfirmButton: false
+        });
+    </script>
+    ';
+}
+?>
+
+
+
+
+
+<!-- Move these script tags to the end of the body -->
+<script src="../assets/js/main.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+
+        $(function () {
+            $('[data-bs-toggle="tooltip"]').tooltip();
+        });
+
+        $('#example').DataTable({
+            lengthChange: false,
+            pageLength: 5,
+            info: false,
+            responsive: true,
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
+            },
+            initComplete: function(settings, json) {
+                $(".dataTables_filter label").addClass("text-dark");
+            }
+        });
+
+        $('#detallesHorarios').DataTable({
+            lengthChange: false,
+            pageLength: 5,
+            info: false,
+            responsive: true,
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Spanish.json"
+            },
+            "order": [[1, 'asc']],
+            initComplete: function(settings, json) {
+                $(".dataTables_filter label").addClass("text-dark");
+            }
+        });
+
+
+    });
+
+    
+</script>
+</body>
+</html>
