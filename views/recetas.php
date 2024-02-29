@@ -45,11 +45,12 @@ if (isset($_SESSION["user"]) && (isset($_SESSION['role']) && $_SESSION['role'] =
     <div class="container-fluid p-5">
         <div class="card p-3">
             <h4 class="card-header mb-3 py-3">Mis Recetas</h4>
-            <h6 class="modal-title mb-3">
+            <h5 class="card-text">
                 <a href="#" class="text-decoration-none text-info" data-bs-toggle="modal" data-bs-target="#addTournament">
-                    Agregar una nueva receta.
+                <img src="../assets/images/recetas.png" alt="Crear torneo" class="img-fluid me-2">Nueva receta.
                 </a>
-            </h6>
+            </h5>
+
             <div class="table-responsive">
             <table id="misRecetas" class="table table-dark table-striped table-hover">
                 <thead class="table-warning">

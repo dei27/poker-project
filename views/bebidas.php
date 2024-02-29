@@ -39,15 +39,11 @@ $bebidas = json_decode(getAllBebidas(), true);
     <div class="container-fluid p-5">
         <div class="card p-3">
             <h4 class="card-header mb-3 py-3">Bebidas</h4>
-            <?php
-            if(isset($_SESSION["user"])){
-            echo '<h5 class="card-text">
-                    <a href="#" class="text-decoration-none text-info" data-bs-toggle="modal" data-bs-target="#addTournament">
-                    <img src="../assets/images/bebidas.png" alt="Crear torneo" class="img-fluid">Nueva bebida.
-                    </a>
-                </h5>';
-            }
-            ?>
+            <h5 class="card-text">
+                <a href="#" class="text-decoration-none text-info" data-bs-toggle="modal" data-bs-target="#addTournament">
+                <img src="../assets/images/bebidas.png" alt="Crear torneo" class="img-fluid me-2">Nueva bebida.
+                </a>
+            </h5>
             <div class="table-responsive">
             <table id="example" class="table table-dark table-striped table-hover">
                 <thead class="table-warning">

@@ -82,6 +82,17 @@ class RecetaModel extends BaseModel {
         }
     }
 
+    public function getAllRecetasWeb() {
+        try {
+            $query = "SELECT * FROM `recetas` where web = 1;";
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            die("Error: " . $e->getMessage());
+        }
+    }
+
     public function getAllRecetasComplementarias() {
         try {
             $query = "SELECT r.*, tr.nombre_tipo

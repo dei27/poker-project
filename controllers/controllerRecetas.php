@@ -11,6 +11,12 @@ function getAllRecetas() {
     return json_encode($recetas);
 }
 
+function getAllRecetasWeb() {
+    $recetaWeb = new RecetaModel();
+    $recetasWeb = $recetaWeb->getAllRecetas();
+    return json_encode($recetasWeb);
+}
+
 function getCostoRecetaById($id_receta) {
     $recetaModel = new RecetaModel();
     $recetaModel->setId($id_receta);

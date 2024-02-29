@@ -41,7 +41,7 @@ $pedidos = json_decode($pedidosData, true);
 <?php if (isset($_SESSION["user"])) { ?>
     <div class="container-fluid p-5">
         <div class="card p-3">
-            <h4 class="card-header mb-3 py-3">Mis órdenes</h4>
+            <h4 class="card-header mb-3 py-3">Mis órdenes de hoy <?php echo date('d/m/Y'); ?></h4>
             <h5 class="modal-title mb-3">
                 <a href="tiposOrdenes.php" class="text-decoration-none text-info">
                     <img src="../assets/images/pedidos.png" alt="Crear torneo" class="img-fluid me-2">Agregar nueva orden.

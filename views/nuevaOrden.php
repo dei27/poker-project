@@ -43,65 +43,76 @@ $bebidasPlatillos = json_decode(getAllBebidasAndPlatillos(),true);
             <div class="col-sm-12 col-md-6 mb-3">
                 <div class="card p-3">
                     <h4 class="card-header mb-3 py-3">Comidas y Bebidas</h4>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table id="productosOrden" class="table table-dark table-striped table-hover">
-                                <thead class="table-warning">
-                                    <tr>
-                                        <th>Id</th>  
-                                        <th>Precio</th>  
-                                        <th>Nombre</th> 
-                                        <th>Tipo</th> 
-                                        <?php 
-                                            if(isset($_SESSION["user"])){
-                                                echo '<th class="text-center">Acciones</th>';
-                                            }
-                                        ?>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($bebidasPlatillos as $product):?>
-                                        <tr>
-                                            <td><?php echo $product['id']; ?></td>
-                                            <td><?php echo $product['precio']; ?></td>
-                                            <td><?php echo $product['producto']; ?></td>
-                                            <td>
-                                                <?php
-                                                switch ($product['tipo']) {
-                                                    case null:
-                                                        echo "Bebida";
-                                                        break;
-                                                    case 1:
-                                                        echo "Entradas";
-                                                        break;
-                                                    case 2:
-                                                        echo "Platillos Fuertes";
-                                                        break;
-                                                    case 3:
-                                                        echo "Postres";
-                                                        break;
-                                                    case 4:
-                                                        echo "Extras";
-                                                        break;
-                                                    default:
-                                                        echo "Desconocido";
-                                                        break;
-                                                }
-                                                ?>
-                                            </td>
-                                            <td class="text-center">
-                                                <?php if(isset($_SESSION["user"])): ?>
-                                                    <span id="cart_<?php echo $product['id']; ?>" class="btn cart-button text-white">
-                                                        <i class="bi bi-cart-plus-fill"></i>
-                                                    </span>
-                                                <?php endif; ?>
-                                            </td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
+                    <?php if(empty($bebidasPlatillos)): ?>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col">
+                                    <a href="recetas.php" class="btn btn-primary w-100 p-3">Agregar Platillo</a>
+                                </div>
+                                <div class="col">
+                                    <a href="bebidas.php" class="btn btn-primary w-100 p-3">Agregar Bebida</a>
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    <?php else: ?>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table id="productosOrden" class="table table-dark table-striped table-hover">
+                                    <thead class="table-warning">
+                                        <tr>
+                                            <th>Id</th>  
+                                            <th>Precio</th>  
+                                            <th>Nombre</th> 
+                                            <th>Tipo</th> 
+                                            <?php if(isset($_SESSION["user"])): ?>
+                                                <th class="text-center">Acciones</th>
+                                            <?php endif; ?>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($bebidasPlatillos as $product):?>
+                                            <tr>
+                                                <td><?php echo $product['id']; ?></td>
+                                                <td><?php echo $product['precio']; ?></td>
+                                                <td><?php echo $product['producto']; ?></td>
+                                                <td>
+                                                    <?php
+                                                    switch ($product['tipo']) {
+                                                        case null:
+                                                            echo "Bebida";
+                                                            break;
+                                                        case 1:
+                                                            echo "Entradas";
+                                                            break;
+                                                        case 2:
+                                                            echo "Platillos Fuertes";
+                                                            break;
+                                                        case 3:
+                                                            echo "Postres";
+                                                            break;
+                                                        case 4:
+                                                            echo "Extras";
+                                                            break;
+                                                        default:
+                                                            echo "Desconocido";
+                                                            break;
+                                                    }
+                                                    ?>
+                                                </td>
+                                                <td class="text-center">
+                                                    <?php if(isset($_SESSION["user"])): ?>
+                                                        <span id="cart_<?php echo $product['id']; ?>" class="btn cart-button text-white">
+                                                            <i class="bi bi-cart-plus-fill"></i>
+                                                        </span>
+                                                    <?php endif; ?>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
             <div class="col-sm-12 col-md-6 mb-3">

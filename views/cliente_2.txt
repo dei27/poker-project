@@ -1,5 +1,0 @@
-nombreCliente: Carlos
-telefonoCliente: 12345
-mesa: 7
-servicio: 
-metodoPago: 3
