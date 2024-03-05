@@ -7,6 +7,11 @@ class UsuarioModel extends BaseModel {
     private $id;
     private $nickname;
     private $email;
+    private $cedula;
+    private $telefono_usuario;
+    private $fecha_nacimiento;
+    private $fecha_ingreso;
+    private $fecha_salida;
     private $role;
     private $password;
     private $habilitado;
@@ -35,7 +40,27 @@ class UsuarioModel extends BaseModel {
         $this->habilitado = $habilitado;
     }
 
-    public function __construct($id = null, $nickname = null, $email = null,$role = null,$password = null,$habilitado = null) {
+    public function setCedula($cedula) {
+        $this->cedula = $cedula;
+    }
+
+    public function setTelefonoUsuario($telefono_usuario) {
+        $this->telefono_usuario = $telefono_usuario;
+    }
+
+    public function setFechaNacimiento($fecha_nacimiento) {
+        $this->fecha_nacimiento = $fecha_nacimiento;
+    }
+
+    public function setFechaIngreso($fecha_ingreso) {
+        $this->fecha_ingreso = $fecha_ingreso;
+    }
+
+    public function setFechaSalida($fecha_salida) {
+        $this->fecha_salida = $fecha_salida;
+    }
+
+    public function __construct($id = null, $nickname = null, $email = null,$role = null,$password = null,$habilitado = null, $cedula = null, $telefono_usuario = null, $fecha_nacimiento = null, $fecha_ingreso = null, $fecha_salida = null ) {
         parent::__construct();
         $this->id = $id;
         $this->nickname = $nickname;
@@ -43,6 +68,11 @@ class UsuarioModel extends BaseModel {
         $this->role = $role;
         $this->password = $password;
         $this->habilitado = $habilitado;
+        $this->cedula = $cedula;
+        $this->telefono_usuario = $telefono_usuario;
+        $this->fecha_nacimiento = $fecha_nacimiento;
+        $this->fecha_ingreso = $fecha_ingreso;
+        $this->fecha_salida = $fecha_salida;
     }
 
     public function getAllUsuarios(){
@@ -120,10 +150,14 @@ class UsuarioModel extends BaseModel {
                 return 102;
             } else {
                 // Si no hay conflictos, procede con la inserción
-                $queryInsert = "INSERT INTO usuarios (nickname, email, role, password) VALUES(:nickname,:email,:role,:password)";
+                $queryInsert = "INSERT INTO usuarios (nickname, email, cedula, telefono_usuario, fecha_nacimiento, fecha_ingreso, role, password) VALUES(:nickname,:email,:cedula, :telefono_usuario, :fecha_nacimiento, :fecha_ingreso, :role,:password)";
                 $stmtInsert = $this->conn->prepare($queryInsert);
                 $stmtInsert->bindParam(':nickname', $this->nickname, PDO::PARAM_STR);
                 $stmtInsert->bindParam(':email', $this->email, PDO::PARAM_STR);
+                $stmtInsert->bindParam(':cedula', $this->cedula, PDO::PARAM_STR);
+                $stmtInsert->bindParam(':telefono_usuario', $this->telefono_usuario, PDO::PARAM_STR);
+                $stmtInsert->bindParam(':fecha_nacimiento', $this->fecha_nacimiento, PDO::PARAM_STR);
+                $stmtInsert->bindParam(':fecha_ingreso', $this->fecha_ingreso, PDO::PARAM_STR);
                 $stmtInsert->bindParam(':role', $this->role, PDO::PARAM_INT);
                 $stmtInsert->bindParam(':password', $this->password, PDO::PARAM_STR);
                 $success = $stmtInsert->execute();

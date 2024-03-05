@@ -41,7 +41,7 @@ $pedidos = json_decode($pedidosData, true);
 <?php if (isset($_SESSION["user"])) { ?>
     <div class="container-fluid p-5">
         <div class="card p-3">
-            <h4 class="card-header mb-3 py-3">Mis órdenes de hoy <?php echo date('d/m/Y'); ?></h4>
+            <h4 class="card-header mb-3 py-3">Órdenes de hoy <?php echo date('d/m/Y'); ?></h4>
             <h5 class="modal-title mb-3">
                 <a href="tiposOrdenes.php" class="text-decoration-none text-info">
                     <img src="../assets/images/pedidos.png" alt="Crear torneo" class="img-fluid me-2">Agregar nueva orden.
@@ -96,18 +96,24 @@ $pedidos = json_decode($pedidosData, true);
                                 </a>
                                 <!-- Modal -->
                                 <div class="modal fade" id="modalDetalles<?php echo $pedido['id_pedido']; ?>" tabindex="-1" aria-labelledby="modalDetallesLabel" aria-hidden="true">
-                                    <div class="modal-dialog modal-lg modal-dialog-centered">
+                                    <div class="modal-dialog modal-lg modal-dialog-centered ">
                                         <div class="modal-content">
                                             <div class="modal-header text-bg-dark">
                                                 <h5 class="modal-title" id="modalDetallesLabel">Productos de la orden</h5>
                                                 <button type="button" class="btn-close bg-light" data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
-                                            <div class="modal-body">
-                                                <?php if ($pedido["estado_pedido"] == "Pendiente"): ?>
-                                                    <h5 class="modal-title mb-3">
-                                                        <a href="actualizarOrden.php?idPedido=<?php echo $pedido['id_pedido']; ?>" class="text-decoration-none text-info">Editar orden</a>
-                                                    </h5>
-                                                <?php endif; ?>
+                                            <div class="modal-body text-dark">
+
+                                            <?php if ($pedido["estado_pedido"] == "Pendiente"): ?>
+                                                <h5 class="modal-title mb-3">
+                                                    <a href="actualizarOrden.php?idPedido=<?php echo $pedido['id_pedido']; ?>" class="text-decoration-none text-info">Editar orden</a>
+                                                </h5>
+                                            <?php endif; ?>
+
+                                            <?php if ($pedido["direccion_cliente"] !== null): ?>
+                                                <p>Dirección del express: <?php echo $pedido['direccion_cliente']; ?> ...</p>
+                                            <?php endif; ?>
+
                                                 <div class="table-responsive">
                                                     <table id="detallesProductos" class="table table-dark table-striped table-hover w-100">
                                                         <thead class="table-warning">
@@ -311,61 +317,6 @@ $pedidos = json_decode($pedidosData, true);
                                             </div>
                                         </div>
                                     </div>
-
-
-                                    <!-- <a href="#" class="text-decoration-none text-white" data-bs-toggle="modal" data-bs-target="#editModal<?php echo $pedido['id_pedido']; ?>">
-                                        <i class="bi bi-pencil-fill text-white"></i>
-                                    </a> -->
-                                </td>
-
-                                <!-- <div class="modal fade" id="editModal<?php echo $pedido['id_pedido']; ?>" tabindex="-1" aria-labelledby="editModalLabel<?php echo $pedido['id_pedido']; ?>" aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-centered">
-                                        <div class="modal-content">
-                                            <div class="modal-header text-bg-dark">
-                                                <h5 class="modal-title" id="editModalLabel<?php echo $pedido['id_pedido']; ?>">Editar Orden</h5>
-                                                <button type="button" class="btn-close bg-light" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <form action="../controllers/controllerPedidos.php" method="post" class="form-floating">
-                                                    <input type="hidden" name="id" value="<?php echo $pedido['id_pedido']; ?>">
-                                                    <input type="hidden" name="action" value="edit">
-
-                                                    <div class="form-group mb-3">
-                                                        <label for="nombreCliente">Cliente</label>
-                                                        <input class="form-control" id="nombreCliente" name="nombreCliente" placeholder="Nombre..." value="<?php echo $pedido['nombre_cliente']; ?>" required>
-                                                    </div>
-
-                                                    <div class="form-group mb-3">
-                                                        <label for="mesaCliente">Mesa</label>
-                                                        <input type="number" class="form-control" id="mesaCliente" name="mesaCliente" placeholder="Número de mesa..." value="<?php echo $pedido['mesa']; ?>" required min=1 max=10>
-                                                    </div>
-
-                                                    <div class="form-group mb-3">
-                                                        <label for="telefonoCliente">Teléfono</label>
-                                                        <input class="form-control" id="telefonoCliente" name="telefonoCliente" placeholder="Teléfono..." value="<?php echo $pedido['telefono_cliente']; ?>" required>
-                                                    </div>
-
-                                                    <div class="form-group mb-3">
-                                                        <label for="direccionCliente" class="form-label">Dirección</label>
-                                                        <textarea class="form-control" id="direccionCliente" name="direccionCliente" placeholder="Dirección..."><?php echo htmlspecialchars($pedido['direccion_cliente']); ?></textarea>
-                                                    </div>
-
-                                                    <div class="form-group mb-3">
-                                                        <label for="estadoPedido">Estado</label>
-                                                        <select class="form-select" id="estadoPedido" name="estadoPedido" required readonly>
-                                                            <option value="Pendiente" <?php if($pedido['estado_pedido'] == 'Pendiente') echo 'selected'; ?>>Pendiente</option>
-                                                            <option value="Cancelado" <?php if($pedido['estado_pedido'] == 'Cancelado') echo 'selected'; ?>>Cancelado</option>
-                                                        </select>
-                                                    </div>
-
-                                                    <div class="form-group mb-3 text-end">
-                                                        <input type="submit" class="btn btn-primary" value="Guardar">
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div> -->
                                 <?php endif; ?>
                         </tr>
                     <?php

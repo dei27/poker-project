@@ -136,7 +136,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'addOrden') {
                 
                 foreach ($bebidas as $id_bebida => $cantidad) {
                     if (!empty($cantidad)) {
-                        $insertedBebidas = $pedidosModel->newDetallePedidoBebida($insertedId, $id_bebida, $cantidad);
+                        $insertedBebidas = $pedidosModel->newDetallePedidoBebida($insertedId, $id_bebida, $cantidad, 0);
                     }
                 }
             }
@@ -145,7 +145,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'addOrden') {
 
                 foreach ($platillos as $id_platillo  => $cantidad) {
                     if (!empty($cantidad)) {
-                        $insertedPlatillos = $pedidosModel->newDetallePedidoPlatillo($insertedId, $id_platillo, $cantidad);
+                        $insertedPlatillos = $pedidosModel->newDetallePedidoPlatillo($insertedId, $id_platillo, $cantidad, 0);
                     }
                 }
             }
@@ -223,7 +223,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'addOrdenExpress') {
                 
                 foreach ($bebidas as $id_bebida => $cantidad) {
                     if (!empty($cantidad)) {
-                        $insertedBebidas = $pedidosModel->newDetallePedidoBebida($insertedId, $id_bebida, $cantidad);
+                        $insertedBebidas = $pedidosModel->newDetallePedidoBebida($insertedId, $id_bebida, $cantidad, 0);
                     }
                 }
             }
@@ -232,7 +232,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'addOrdenExpress') {
 
                 foreach ($platillos as $id_platillo  => $cantidad) {
                     if (!empty($cantidad)) {
-                        $insertedPlatillos = $pedidosModel->newDetallePedidoPlatillo($insertedId, $id_platillo, $cantidad);
+                        $insertedPlatillos = $pedidosModel->newDetallePedidoPlatillo($insertedId, $id_platillo, $cantidad, 0);
                     }
                 }
             }
@@ -273,7 +273,6 @@ if (isset($_POST['action']) && $_POST['action'] === 'updateOrden') {
     $mesaOrdenUpdate = isset($_POST['mesaOrdenUpdate']) ? htmlspecialchars($_POST['mesaOrdenUpdate'], ENT_QUOTES, 'UTF-8') : null;
     $telefono = isset($_POST['telefonoClienteUpdate']) ? htmlspecialchars($_POST['telefonoClienteUpdate'], ENT_QUOTES, 'UTF-8') : "Sin teléfono";   
     $servicio = isset($_POST['servicioOrdenUpdate']) ? htmlspecialchars($_POST['servicioOrdenUpdate'], ENT_QUOTES, 'UTF-8') : "0";
-    // $iva = isset($_POST['ivaOrdenUpdate']) ? htmlspecialchars($_POST['ivaOrdenUpdate'], ENT_QUOTES, 'UTF-8') : "13"; 
     $direccion = isset($_POST['direccionClienteUpdate']) ? (trim($_POST['direccionClienteUpdate']) !== '' ? htmlspecialchars($_POST['direccionClienteUpdate'], ENT_QUOTES, 'UTF-8') : "Sin dirección") : null;
     $inputs = $_POST['cantidad'];
     $bebidas = [];
@@ -291,11 +290,11 @@ if (isset($_POST['action']) && $_POST['action'] === 'updateOrden') {
         $updatedPedido = $pedidosModel->updatePedidoById();
 
         $deletedPedidos = $pedidosModel->deleteAllDetallesByIdPedido();
-        
+
         $insertedBebidas = false;
         $insertedPlatillos = false;
         $montoTotal = 0;
-        
+
         if($updatedPedido && $deletedPedidos){
             
             foreach ($inputs as $clave => $valor) {
@@ -310,7 +309,13 @@ if (isset($_POST['action']) && $_POST['action'] === 'updateOrden') {
                 
                 foreach ($bebidas as $id_bebida => $cantidad) {
                     if (!empty($cantidad)) {
-                        $insertedBebidas = $pedidosModel->newDetallePedidoBebida($id_orden, $id_bebida, $cantidad);
+                        $check = "B" . $id_bebida;
+                        $entregado = isset($_POST['productoEntregado'][$check]) ? $_POST['productoEntregado'][$check] : 0;
+                        $insertedBebidas = $pedidosModel->newDetallePedidoBebida($id_orden, $id_bebida, $cantidad, $entregado);
+
+                        if($entregado == 1  && $insertedBebidas){
+                            $pedidosModel->updateInventarioBebidasByIdReceta($id_bebida, $cantidad);
+                        }
                     }
                 }
             }
@@ -319,7 +324,47 @@ if (isset($_POST['action']) && $_POST['action'] === 'updateOrden') {
 
                 foreach ($platillos as $id_platillo  => $cantidad) {
                     if (!empty($cantidad)) {
-                        $insertedPlatillos = $pedidosModel->newDetallePedidoPlatillo($id_orden, $id_platillo, $cantidad);
+                        $check = "R" . $id_platillo;
+                        $entregado = isset($_POST['productoEntregado'][$check]) ? $_POST['productoEntregado'][$check] : 0;
+                        $insertedPlatillos = $pedidosModel->newDetallePedidoPlatillo($id_orden, $id_platillo, $cantidad, $entregado);
+
+                        if($entregado == 1 && $insertedPlatillos){
+
+                            $ingredientesRecetasPrincipal = $pedidosModel->getAllIngredientesRecetaByIdRecta($id_platillo);
+
+                            foreach ($ingredientesRecetasPrincipal as $ingrediente) {
+
+                                $id_ingrediente_receta = $ingrediente['id_ingrediente'];
+                                $id_ingrediente_cantidad = $ingrediente['cantidad'];
+
+                                $cantidad_total_consumida = $id_ingrediente_cantidad * $cantidad;
+
+                                $updateInventarioIngredientes = $pedidosModel->updateInventarioProductosByIdReceta($id_ingrediente_receta, $cantidad_total_consumida);
+                            }
+
+                            $dataRecetas = $pedidosModel->getAllRecetasCombinasById($id_platillo);
+
+                            if(!empty($dataRecetas)){
+
+                                foreach ($dataRecetas as $receta) {
+                                    $id_receta_compuesta = $receta['id_receta_compuesta'];
+                                    $cantidad_receta_compuesta = $receta['cantidad_receta_compuesta'];
+    
+                                    $ingredientesRecetas = $pedidosModel->getAllIngredientesRecetaByIdRecta($id_receta_compuesta);
+
+                                    foreach ($ingredientesRecetas as $ingrediente) {
+
+                                        $id_ingrediente_receta = $ingrediente['id_ingrediente'];
+                                        $id_ingrediente_cantidad = $ingrediente['cantidad'];
+        
+                                        $cantidad_total_consumida = $id_ingrediente_cantidad * $cantidad * $cantidad_receta_compuesta;
+        
+                                        $updateInventarioIngredientes = $pedidosModel->updateInventarioProductosByIdReceta($id_ingrediente_receta, $cantidad_total_consumida);
+                                    }
+                                }
+
+                            }
+                        }
                     }
                 }
             }
@@ -357,7 +402,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'updateOrden') {
         }else{
             header("Location: ../views/ordenes.php?updateData=0");
             exit();
-        }
+        }http://localhost/monchister/views/login.php
         
     }else{
         header("Location: ../views/actualizarOrden.php?idPedido=$id_orden&emptyProducts=0");

@@ -61,10 +61,6 @@ if (isset($_SESSION["user"])) {
                     ?>
                 </div>
             </div>
-            
-
-            
-
             <div class="row">
                 <div class="col-sm-12 col-md-12 col-lg-6 mb-3">
                     <ul>

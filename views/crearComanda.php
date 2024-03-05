@@ -9,7 +9,7 @@ if(isset($_GET["id"])) {
     $productos = new DetallesPedidos();
 
     $datosPedido  = $pedido->getPedidosById($id_factura);
-    $dataProductos = $productos->getAllDetallesPedidosAndPrecios($id_factura);
+    $dataProductos = $productos->getAllDetallesPedidosAndPrecios($id_factura, 0);
 
     $fecha_formateada = date("g:i:s A d-m-Y", strtotime($datosPedido['fecha_pedido']));
 

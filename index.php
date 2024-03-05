@@ -27,7 +27,7 @@ if (session_status() === PHP_SESSION_NONE) {
                     <img src="./assets/images/monchisterLogo.jpeg" alt="logo-clubgg" class="w-50 rounded-circle" >
                 </div>
                 <div class="col-md-12 mt-5">
-                    <a href="views/login.php" class="btn btnRed w-50 p-3 text-white">Administrador</a>
+                    <a href="views/login.php" class="btn btnRed w-50 p-3 text-white"><i class="bi bi-send-fill me-2"></i>Administrador</a>
                 </div>
                 <!-- <div class="col-md-12 my-3">
                     <a href="views/guest.php" class="btn btnGray w-50 p-3 text-white">Cliente</a>

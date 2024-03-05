@@ -159,43 +159,6 @@ class Producto extends BaseModel {
             return false;
         }
     }
-
-    public function updateInventarioByIdReceta($tabla) {
-        try {
-            $query = "UPDATE $tabla SET cantidad = :cantidad WHERE id_producto = :id";
-            $stmt = $this->conn->prepare($query);
-            $stmt->bindParam(':id', $this->id, PDO::PARAM_INT);
-            $stmt->bindParam(':cantidad', $this->cantidad, PDO::PARAM_STR);
-            $success = $stmt->execute();
-            return $success ? true : false;
-        } catch (PDOException $e) {
-            die("Error: " . $e->getMessage());
-        }
-    }
-
-    public function getAllRecetasCombinasById() {
-        try {
-            $query = "SELECT id_receta_compuesta, cantidad_receta_compuesta FROM recetas_combinadas WHERE id_receta_principal = :id";
-            $stmt = $this->conn->prepare($query);
-            $stmt->bindParam(':id', $this->id, PDO::PARAM_INT);
-            $stmt->execute();
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            die("Error: " . $e->getMessage());
-        }
-    }
-
-    public function getAllIngredientesRecetaByIdRecta() {
-        try {
-            $query = "SELECT * FROM recetas_ingredientes WHERE id_receta = :id";
-            $stmt = $this->conn->prepare($query);
-            $stmt->bindParam(':id', $this->id, PDO::PARAM_INT);
-            $stmt->execute();
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            die("Error: " . $e->getMessage());
-        }
-    }
     
     
 }

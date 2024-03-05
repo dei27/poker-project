@@ -296,13 +296,24 @@ $bebidasPlatillos = json_decode(getAllBebidasAndPlatillos(),true);
 
         $("span.cart-button").click(function(){
             let productId = $(this).closest("tr").find("td:first").text();
-            let productPrice = $(this).closest("tr").find("td:eq(1)").text();
-            let productName = $(this).closest("tr").find("td:eq(2)").text();
-            let cantidad = 1;
-            let tableRow = "<tr><td>" + productName + "</td><td>" + productPrice + "</td><td><input type='number' class='form-control cantidad' name='cantidad[" + productId + "]' value='" + cantidad + "' min=1 required></td><td><span class='btn remove-button'><i class='bi bi-cart-x-fill'></i></span></td></tr>";
-
-            $("#tablaProductosTable tbody").append(tableRow);
+            
+            // Verificar si el producto ya está en la tabla
+            let existingProduct = $("#tablaProductosTable tbody").find("input[name='cantidad[" + productId + "]']").closest("tr");
+            
+            // Si el producto ya está en la tabla, puedes actualizar su cantidad en lugar de agregarlo nuevamente
+            if(existingProduct.length > 0) {
+                let currentQuantity = parseInt(existingProduct.find(".cantidad").val());
+                existingProduct.find(".cantidad").val(currentQuantity + 1);
+            } else {
+                // Si el producto no está en la tabla, agrégalo
+                let productPrice = $(this).closest("tr").find("td:eq(1)").text();
+                let productName = $(this).closest("tr").find("td:eq(2)").text();
+                let cantidad = 1;
+                let tableRow = "<tr><td>" + productName + "</td><td>" + productPrice + "</td><td><input type='number' class='form-control cantidad' name='cantidad[" + productId + "]' value='" + cantidad + "' min=1 required></td><td><span class='btn remove-button'><i class='bi bi-cart-x-fill text-danger'></i></span></td></tr>";
+                $("#tablaProductosTable tbody").append(tableRow);
+            }
         });
+
 
         $(document).on("click", ".remove-button", function(){
             $(this).closest("tr").remove();

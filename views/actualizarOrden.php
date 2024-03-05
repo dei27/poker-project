@@ -11,7 +11,8 @@ $products = json_decode(getAll(),true);
 if (isset($_GET['idPedido'])) {
     $id_pedido = $_GET['idPedido'];
     $pedido = getPedidoById($id_pedido);
-    $detallesPedidos =  json_decode(getAllDetallesMontos($id_pedido),true);
+    $detallesPedidos =  json_decode(getAllDetallesMontos($id_pedido, 0),true);
+    $productosEntregados =  json_decode(getAllDetallesMontos($id_pedido, 1),true);
     $bebidasPlatillos = json_decode(getAllBebidasAndPlatillos(),true);
 }
 ?>
@@ -48,7 +49,7 @@ if (isset($_GET['idPedido'])) {
     ?>
     <div class="container-fluid p-5">
         <div class="row">
-            <div class="col-sm-12 col-md-6 mb-3">
+            <div class="col-sm-12 col-md-5 mb-3">
                 <div class="card p-3">
                     <h4 class="card-header mb-3 py-3">Comidas y Bebidas</h4>
                     <?php if(empty($bebidasPlatillos)): ?>
@@ -123,7 +124,7 @@ if (isset($_GET['idPedido'])) {
                     <?php endif; ?>
                 </div>
             </div>
-            <div class="col-sm-12 col-md-6 mb-3">
+            <div class="col-sm-12 col-md-7 mb-3">
                 <div class="card p-3">
                     <h4 class="card-header mb-3 py-3">Orden #<?php echo $id_pedido; ?></h4>
                     <div class="card-body">
@@ -161,20 +162,38 @@ if (isset($_GET['idPedido'])) {
                                 <div class="row mb-3">
                                     <div class="col">
                                         <label for="direccionClienteUpdate" class="form-label">Dirección del Cliente</label>
-                                        <textarea class="form-control" id="direccionClienteUpdate" name="direccionClienteUpdate" rows="3" placeholder="Requisito para envíos..." required><?php echo isset($pedido['direccion_cliente']) ? htmlspecialchars($pedido['direccion_cliente'], ENT_QUOTES, 'UTF-8') : ''; ?></textarea>
+                                        <textarea class="form-control" rows="1" id="direccionClienteUpdate" name="direccionClienteUpdate" rows="3" placeholder="Requisito para envíos..." required><?php echo isset($pedido['direccion_cliente']) ? htmlspecialchars($pedido['direccion_cliente'], ENT_QUOTES, 'UTF-8') : ''; ?></textarea>
                                     </div>
                                 </div>
                             <?php endif; ?>
                             <div class="row mb-3">
                                 <div class="col">
-                                    <h5 class="card-header mb-3 py-3">Productos de la orden</h5>
-                                    <div id="tablaProductos" class="table-responsive">
+                                    <h5 class="card-header mb-3 py-3">Productos de la orden entregados</h5>
+
+                                    <div class="card-body">
+                                        <?php if (!empty($productosEntregados)) { ?>
+                                            <?php foreach ($productosEntregados as $detalle) { ?>
+                                                <ul>
+                                                    <li>
+                                                        <p><?php echo $detalle['producto']; ?> x<?php echo $detalle['cantidad']; ?></p>
+                                                    </li>
+                                                </ul>
+                                            <?php } ?>
+                                        <?php } else { ?>
+                                            <p>Aún no se han entregado productos.</p>
+                                        <?php } ?>
+                                    </div>
+
+                                    <h5 class="card-header mb-3 py-3">Productos por agregar</h5>
+
+                                    <div class="table-responsive">
                                         <table id="tablaProductosTable" class="table table-light table-striped">
                                             <thead>
                                                 <tr>
                                                     <th>Nombre</th>
                                                     <th>Precio</th>
                                                     <th>Cantidad</th>
+                                                    <th>Entregado</th>
                                                     <th>Acción</th>
                                                 </tr>
                                             </thead>
@@ -185,7 +204,8 @@ if (isset($_GET['idPedido'])) {
                                                             <td><?php echo $detalle['producto']; ?></td>
                                                             <td>₡<?php echo $detalle['precio']; ?></td>
                                                             <td><input type="number" class="form-control cantidad" name="cantidad[<?php echo $detalle['product_id']; ?>]" value="<?php echo $detalle['cantidad']; ?>" min=1 required></td>
-                                                            <td><span class="btn remove-button"><i class="bi bi-cart-x-fill" data-bs-toggle='tooltip' data-bs-placement='top' data-bs-custom-class='custom-tooltip' data-bs-title='Remover'></i></span></td>
+                                                            <td><div class='form-check form-switch'><input type="checkbox" class="form-check-input" name="productoEntregado[<?php echo $detalle['product_id']; ?>]" value="1"></div></td>
+                                                            <td><span class="btn remove-button"><i class="bi bi-cart-x-fill text-danger"></i></span></td>
                                                         </tr>
                                                     <?php } ?>
                                                 <?php } ?>
@@ -335,18 +355,28 @@ if (isset($_GET['idPedido'])) {
 
         $("span.cart-button").click(function(){
             let productId = $(this).closest("tr").find("td:first").text();
-            let productPrice = $(this).closest("tr").find("td:eq(1)").text();
-            let productName = $(this).closest("tr").find("td:eq(2)").text();
-            let cantidad = 1;
-            let tableRow = "<tr><td>" + productName + "</td><td>₡" + productPrice + "</td><td><input type='number' class='form-control cantidad' name='cantidad[" + productId + "]' value='" + cantidad + "' min=1 required></td><td><span class='btn remove-button'><i class='bi bi-cart-x-fill' data-bs-toggle='tooltip' data-bs-placement='top' data-bs-custom-class='custom-tooltip' data-bs-title='Remover'></i></span></td></tr>";
+            
+            // Verificar si el producto ya está en la tabla
+            let existingProduct = $("#tablaProductosTable tbody").find("input[name='cantidad[" + productId + "]']").closest("tr");
+            
+            // Si el producto ya está en la tabla, puedes actualizar su cantidad en lugar de agregarlo nuevamente
+            if(existingProduct.length > 0) {
+                let currentQuantity = parseInt(existingProduct.find(".cantidad").val());
+                existingProduct.find(".cantidad").val(currentQuantity + 1);
+            } else {
+                let productPrice = $(this).closest("tr").find("td:eq(1)").text();
+                let productName = $(this).closest("tr").find("td:eq(2)").text();
+                let cantidad = 1;
+                let tableRow = "<tr><td>" + productName + "</td><td>" + productPrice + "</td><td><input type='number' class='form-control cantidad' name='cantidad[" + productId + "]' value='" + cantidad + "' min=1 required></td><td><div class='form-check form-switch'><input class='form-check-input' type='checkbox' id='productoEntregado" + productId + "' name='productoEntregado[" + productId + "]' value='1'></div></td><td><span class='btn remove-button'><i class='bi bi-cart-x-fill text-danger'></i></span></td></tr>";
+                $("#tablaProductosTable tbody").append(tableRow);
 
-            $("#tablaProductosTable tbody").append(tableRow);
+            }
         });
 
         $(document).on("click", ".remove-button", function(){
             $(this).closest("tr").remove();
-        });
-
+        });     
+        
     });  
 </script>
 

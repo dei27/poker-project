@@ -50,6 +50,7 @@ $bebidas = json_decode(getAllBebidas(), true);
                     <tr>
                         <th>Nombre</th>
                         <th>Precio</th>     
+                        <th>Cantidad</th>     
                         <?php 
                             if(isset($_SESSION["user"])){
                                 echo '<th>Acciones</th>';
@@ -62,7 +63,8 @@ $bebidas = json_decode(getAllBebidas(), true);
                     <?php foreach ($bebidas as $bebida):?>
                         <tr>
                             <td><?php echo empty($bebida['nombre_bebida']) ? 'Sin nombre' : $bebida['nombre_bebida']; ?></td>
-                            <td><?php echo empty($bebida['precio_bebida']) ? 'Sin precio' : $bebida['precio_bebida']; ?></td>
+                            <td>¢<?php echo empty($bebida['precio_bebida']) ? 'Sin precio' : $bebida['precio_bebida']; ?></td>
+                            <td><?php echo empty($bebida['cantidad_bebida']) ? 'Sin precio' : $bebida['cantidad_bebida']; ?></td>
                             <td>
                                 <a href="#" class="text-decoration-none text-white mx-3" data-bs-toggle="modal" data-bs-target="#eliminarModalBebida<?php echo $bebida['id_bebida']; ?>">
                                     <i class="bi bi-trash-fill text-white" data-bs-toggle='tooltip' data-bs-placement='top' data-bs-custom-class='custom-tooltip' data-bs-title='Eliminar bebida'></i>
@@ -108,10 +110,22 @@ $bebidas = json_decode(getAllBebidas(), true);
                                                         <input class="form-control" id="nombreBebida" name="nombreBebida" placeholder="Nombre..." value="<?php echo $bebida['nombre_bebida']; ?>" required>
                                                     </div>
 
-                                                    <div class="form-group mb-3">
-                                                        <label for="precioBebida" class="form-label">Precio</label>
-                                                        <input type="number" class="form-control" id="precioBebida" name="precioBebida" placeholder="Precio..." step="any" value="<?php echo htmlspecialchars($bebida['precio_bebida']); ?>" min=1 required>
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <div class="form-group mb-3">
+                                                                <label for="precioBebida" class="form-label">Precio</label>
+                                                                <input type="number" class="form-control" id="precioBebida" name="precioBebida" placeholder="Precio..." step="any" value="<?php echo htmlspecialchars($bebida['precio_bebida']); ?>" min=1 required>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="form-group mb-3">
+                                                                <label for="cantidadBebida" class="form-label">Cantidad</label>
+                                                                <input type="number" class="form-control" id="cantidadBebida" name="cantidadBebida" placeholder="Cantidad..." step="any" value="<?php echo htmlspecialchars($bebida['cantidad_bebida']); ?>" min=1 required>
+                                                            </div>
+                                                        </div>
                                                     </div>
+
+
                                                     <div class="form-group mb-3 text-end">
                                                     <button type="submit" class="btn btn-primary w-100 py-3">
                                                         <i class="bi bi-cursor-fill text-white me-3"></i>
@@ -146,10 +160,22 @@ $bebidas = json_decode(getAllBebidas(), true);
                                 <input class="form-control" id="nombreBebidaI" name="nombreBebidaI" placeholder="Nombre..." value="" required>
                             </div>
 
-                            <div class="form-group mb-3">
-                                <label for="precioBebidaI">Precio</label>
-                                <input type="number" class="form-control" id="precioBebidaI" name="precioBebidaI" placeholder="Precio..." step="any" required min=1>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="precioBebidaI">Precio</label>
+                                        <input type="number" class="form-control" id="precioBebidaI" name="precioBebidaI" placeholder="Precio..." step="any" required min="1">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="cantidadBebidaI">Cantidad</label>
+                                        <input type="number" class="form-control" id="cantidadBebidaI" name="cantidadBebidaI" placeholder="Cantidad..." step="any" required min="1">
+                                    </div>
+                                </div>
                             </div>
+
+
                             <div class="form-group mt-3 text-end">
                                 <div class="col-md-12">
                                 <button type="submit" class="btn btn-primary w-100 py-3">

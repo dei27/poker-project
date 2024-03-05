@@ -28,12 +28,12 @@ if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])
 }
 
 
-function updateInventarioByIdReceta($id_producto, $cantidad, $nombre_tabla){
-    $productModel = new Producto();
-    $productModel->setid($id_producto);
-    $productModel->setCantidad($cantidad);
-    $productModel->updateInventarioByIdReceta($nombre_tabla);
-}
+// function updateInventarioByIdReceta($id_producto, $cantidad, $nombre_tabla){
+//     $productModel = new Producto();
+//     $productModel->setid($id_producto);
+//     $productModel->setCantidad($cantidad);
+//     $productModel->updateInventarioByIdReceta($nombre_tabla);
+// }
 
 if (isset($_POST['id'], $_POST['action']) && $_POST['action'] === 'edit') {
     $id = filter_input(INPUT_POST, 'id', FILTER_SANITIZE_NUMBER_INT);

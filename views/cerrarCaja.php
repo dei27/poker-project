@@ -4,6 +4,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 include('../controllers/controllerPagosPersonas.php');
+// include('../controllers/controllerCierresCajas.php');
 ?>
 
 <!DOCTYPE html>
@@ -63,98 +64,116 @@ if (isset($_SESSION["user"]) && (isset($_SESSION['role']) && $_SESSION['role'] =
     
 ?>
     <div class="container-fluid p-5">
-        <div class="table-responsive card p-3">
-            <div class="card-header mb-5 py-3"><h4>Cierre de Caja <?php echo $dia; ?></h4></div>
-            <div class="row">
-                <?php if ($granTotal > 0): ?>
-                    <h5>El día de hoy se ha facturado un total de: ₡<?php echo number_format($granTotal, 2, '.', ',');?></h5>
-                <?php else: ?>
-                    <h5>El día de hoy aún no se ha facturado.</h5>
-                <?php endif; ?>
-                <div class="col-sm-12 col-md-12 col-lg-4 mb-3">
-                    <table id="table-Efectivo" class="table table-dark table-striped table-hover caption-top">
-                        <caption>Efectivo</caption>
-                        <thead class="table-warning">
-                            <tr>
-                                <th>Factura</th>
-                                <th class="text-center">Monto</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php 
-                                foreach ($facturasEfectivo as $item):
-                                $total += $item['monto'];
-                            ?>
+
+        <form action="../controllers/controllerCierresCajas.php" method="post">
+            <input type="hidden" name="action" value="nuevaCajaCierre">
+            <div class="table-responsive card p-3">
+                <div class="card-header mb-5 py-3"><h4>Cierre de Caja <?php echo $dia; ?></h4></div>
+                <div class="row">
+
+                    <div class="row align-items-center mb-4">
+                        <div class="col mb-3">
+                            <?php if ($granTotal > 0): ?>
+                                <h5>El día de hoy se ha facturado un total de: ₡<?php echo number_format($granTotal, 2, '.', ',');?></h5>
+                                <input type="hidden" name="totalCajaDia" id="totalCajaDia" value="<?php echo $granTotal; ?>" step="any">
+                            <?php else: ?>
+                                <h5>El día de hoy aún no se ha facturado.</h5>
+                                <input type="hidden" name="totalCajaDia" id="totalCajaDia" value="0" step="any">
+                            <?php endif; ?>
+                        </div>
+                        <div class="col  mb-3">
+                            <button type="submit" class="btn btn-info p-3 w-100 text-white">
+                                <i class="bi bi-cursor-fill text-white me-3"></i>Cerrar Día
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-12 col-md-12 col-lg-4 mb-3">
+                        <table id="table-Efectivo" class="table table-dark table-striped table-hover caption-top">
+                            <caption>Efectivo</caption>
+                            <thead class="table-warning">
                                 <tr>
-                                    <td><?php echo $item['id_factura']; ?></td>
-                                    <td><?php echo number_format($item['monto'], 2, '.', ','); ?></td>
+                                    <th>Factura</th>
+                                    <th class="text-center">Monto</th>
                                 </tr>
-                            <?php endforeach; ?>
-                            <tr>
-                                <td><strong>Total</strong></td>
-                                <td><strong><?php echo number_format($total, 2, '.', ','); ?></strong></td>
-
-                            </tr>
-                        </tbody>
-                    </table>
-
-
-                </div>
-                <div class="col-sm-12 col-md-12 col-lg-4 mb-3">
-                    <table id="table-Tarjeta" class="table table-dark table-striped table-hover caption-top">
-                        <caption>Tarjeta</caption>
-                        <thead class="table-warning">
-                            <tr>
-                                <th>Factura</th>
-                                <th class="text-center">Monto</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php 
-                                foreach ($facturasTarjeta as $item):
-                                $total01 += $item['monto'];
-                            ?>
+                            </thead>
+                            <tbody>
+                                <?php 
+                                    foreach ($facturasEfectivo as $item):
+                                    $total += $item['monto'];
+                                ?>
+                                    <tr>
+                                        <td><?php echo $item['id_factura']; ?></td>
+                                        <td><?php echo number_format($item['monto'], 2, '.', ','); ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
                                 <tr>
-                                    <td><?php echo $item['id_factura']; ?></td>
-                                    <td><?php echo number_format($item['monto'], 2, '.', ','); ?></td>
+                                    <td><strong>Total</strong></td>
+                                    <td><strong><?php echo number_format($total, 2, '.', ','); ?></strong></td>
+                                    <input type="hidden" name="efectivoCaja" id="efectivoCaja" value="<?php echo $total; ?>" step="any">
                                 </tr>
-                            <?php endforeach; ?>
-                            <tr>
-                                <td><strong>Total</strong></td>
-                                <td><strong><?php echo number_format($total01, 2, '.', ','); ?></strong></td> 
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="col-sm-12 col-md-12 col-lg-4 mb-3">
-                    <table id="table-Sinpe" class="table table-dark table-striped table-hover caption-top">
-                        <caption>Sinpe</caption>
-                        <thead class="table-warning">
-                            <tr>
-                                <th>Factura</th>
-                                <th class="text-center">Monto</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php 
-                                foreach ($facturasSinpe as $item):
-                                $total02 += $item['monto'];
-                            ?>
-                                <tr>
-                                    <td><?php echo $item['id_factura']; ?></td>
-                                    <td><?php echo number_format($item['monto'], 2, '.', ','); ?></td> 
-                                </tr>
-                            <?php endforeach; ?>
-                            <tr>
-                                <td><strong>Total</strong></td>
-                                <td><strong><?php echo number_format($total02, 2, '.', ','); ?></strong></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>  
-        </div>
+                            </tbody>
+                        </table>
 
+
+                    </div>
+                    <div class="col-sm-12 col-md-12 col-lg-4 mb-3">
+                        <table id="table-Tarjeta" class="table table-dark table-striped table-hover caption-top">
+                            <caption>Tarjeta</caption>
+                            <thead class="table-warning">
+                                <tr>
+                                    <th>Factura</th>
+                                    <th class="text-center">Monto</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php 
+                                    foreach ($facturasTarjeta as $item):
+                                    $total01 += $item['monto'];
+                                ?>
+                                    <tr>
+                                        <td><?php echo $item['id_factura']; ?></td>
+                                        <td><?php echo number_format($item['monto'], 2, '.', ','); ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                                <tr>
+                                    <td><strong>Total</strong></td>
+                                    <td><strong><?php echo number_format($total01, 2, '.', ','); ?></strong></td> 
+                                    <input type="hidden" name="tarjetaCaja" id="tarjetaCaja" value="<?php echo $total01; ?>" step="any">
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-sm-12 col-md-12 col-lg-4 mb-3">
+                        <table id="table-Sinpe" class="table table-dark table-striped table-hover caption-top">
+                            <caption>Sinpe</caption>
+                            <thead class="table-warning">
+                                <tr>
+                                    <th>Factura</th>
+                                    <th class="text-center">Monto</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php 
+                                    foreach ($facturasSinpe as $item):
+                                    $total02 += $item['monto'];
+                                ?>
+                                    <tr>
+                                        <td><?php echo $item['id_factura']; ?></td>
+                                        <td><?php echo number_format($item['monto'], 2, '.', ','); ?></td> 
+                                    </tr>
+                                <?php endforeach; ?>
+                                <tr>
+                                    <td><strong>Total</strong></td>
+                                    <td><strong><?php echo number_format($total02, 2, '.', ','); ?></strong></td>
+                                    <input type="hidden" name="sinpeCaja" id="sinpeCaja" value="<?php echo $total02; ?>" step="any">
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>  
+            </div>
+        </form>
     </div>
 <?php
 }else{
@@ -167,79 +186,19 @@ if (isset($_SESSION["user"]) && (isset($_SESSION['role']) && $_SESSION['role'] =
 ?>
 
 <?php
-if (isset($_GET['deleteCategory'])) {
-    $updatedCategoryStatus = $_GET['deleteCategory'];
-    
-    $messageConfig = ($updatedCategoryStatus == 1)
-        ? [
-            'icon' => 'success',
-            'title' => 'Eliminada con éxito',
-            'text' => 'Categoría eliminada.',
-        ]
-        : [
-            'icon' => 'error',
-            'title' => 'Error al eliminar',
-            'text' => 'No se pudo eliminar la categoría.',
-        ];
-
-    echo '
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        Swal.fire({
-            icon: "' . $messageConfig['icon'] . '",
-            title: "' . $messageConfig['title'] . '",
-            timer: 2500,
-            text: "' . $messageConfig['text'] . '",
-            showConfirmButton: false
-        });
-    </script>
-    ';
-}
-?>
-
-<?php
-if (isset($_GET['updatedCategory'])) {
-    $updatedCategoryStatus = $_GET['updatedCategory'];
+if (isset($_GET['addCaja'])) {
+    $updatedCategoryStatus = $_GET['addCaja'];
     
     $messageConfig = ($updatedCategoryStatus == 1)
         ? [
             'icon' => 'success',
             'title' => 'Actualizado con éxito',
-            'text' => 'Categoría actualizada.',
+            'text' => 'Cierre de día actualizado.',
         ]
         : [
             'icon' => 'error',
             'title' => 'Error al actualizar',
-            'text' => 'No se pudo actualizar la categoría.',
-        ];
-
-    echo '
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        Swal.fire({
-            icon: "' . $messageConfig['icon'] . '",
-            title: "' . $messageConfig['title'] . '",
-            timer: 2500,
-            text: "' . $messageConfig['text'] . '",
-            showConfirmButton: false
-        });
-    </script>
-    ';
-}
-
-if (isset($_GET['insertedCategory'])) {
-    $updatedCategoryStatus = $_GET['insertedCategory'];
-    
-    $messageConfig = ($updatedCategoryStatus == 1)
-        ? [
-            'icon' => 'success',
-            'title' => 'Creada con éxito',
-            'text' => 'Categoría creada.',
-        ]
-        : [
-            'icon' => 'error',
-            'title' => 'Error al crear',
-            'text' => 'No se pudo crear la categoría.',
+            'text' => 'No se pudo actualizar el cierre.',
         ];
 
     echo '
@@ -256,10 +215,6 @@ if (isset($_GET['insertedCategory'])) {
     ';
 }
 ?>
-
-
-
-
 
 <!-- Move these script tags to the end of the body -->
 <script src="../assets/js/main.js"></script>

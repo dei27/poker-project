@@ -58,7 +58,7 @@ class Registros extends BaseModel {
             date_default_timezone_set('America/Costa_Rica');
             $hora_actual = gmdate("Y-m-d", time() - 6 * 3600);
 
-            $query = "SELECT DISTINCT t.id_tipo_registro, t.nombre_tipo FROM tipos_registro_horarios t WHERE t.id_tipo_registro NOT IN (SELECT DISTINCT rh.tipo FROM registros_horarios rh WHERE rh.id_usuario = :id_usuario AND DATE_FORMAT(rh.hora, '%Y-%m-%d') = DATE_FORMAT(:hora_actual, '%Y-%m-%d'))";
+            $query = "SELECT t.id_tipo_registro, t.nombre_tipo FROM tipos_registro_horarios t WHERE t.id_tipo_registro NOT IN (SELECT DISTINCT rh.tipo FROM registros_horarios rh WHERE rh.id_usuario = :id_usuario AND DATE(rh.hora) = DATE(:hora_actual)) LIMIT 1";
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':id_usuario', $this->id_usuario, PDO::PARAM_INT);
             $stmt->bindParam(':hora_actual', $hora_actual, PDO::PARAM_STR);

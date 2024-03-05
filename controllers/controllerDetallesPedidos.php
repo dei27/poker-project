@@ -11,9 +11,9 @@ function getAllDetalles($id_pedido) {
     return json_encode($detalles);
 }
 
-function getAllDetallesMontos($id_pedido) {
+function getAllDetallesMontos($id_pedido, $entregado) {
     $detallesPedidos = new DetallesPedidos();
-    $detalles = $detallesPedidos->getAllDetallesPedidosAndPrecios($id_pedido);
+    $detalles = $detallesPedidos->getAllDetallesPedidosAndPrecios($id_pedido, $entregado);
     return json_encode($detalles);
 }
 

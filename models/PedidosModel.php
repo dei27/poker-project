@@ -190,13 +190,14 @@ class PedidosModel extends BaseModel {
         }
     }
 
-    public function newDetallePedidoPlatillo($id_pedido, $id_platillo, $cantidad) {
+    public function newDetallePedidoPlatillo($id_pedido, $id_platillo, $cantidad, $entregado) {
         try {
-            $query = "INSERT INTO detalles_pedido (id_pedido, id_platillo, cantidad) VALUES (:id_pedido, :id_platillo, :cantidad)";
+            $query = "INSERT INTO detalles_pedido (id_pedido, id_platillo, cantidad, entregado) VALUES (:id_pedido, :id_platillo, :cantidad, :entregado)";
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':id_pedido', $id_pedido, PDO::PARAM_INT);
             $stmt->bindParam(':id_platillo', $id_platillo, PDO::PARAM_INT);
             $stmt->bindParam(':cantidad', $cantidad, PDO::PARAM_INT);
+            $stmt->bindParam(':entregado', $entregado, PDO::PARAM_INT);
             $stmt->execute();
             return true;
         } catch (PDOException $e) {
@@ -205,13 +206,14 @@ class PedidosModel extends BaseModel {
         }
     }
     
-    public function newDetallePedidoBebida($id_pedido, $id_bebida, $cantidad) {
+    public function newDetallePedidoBebida($id_pedido, $id_bebida, $cantidad, $entregado) {
         try {
-            $query = "INSERT INTO detalles_pedido (id_pedido, id_bebida, cantidad) VALUES (:id_pedido, :id_bebida, :cantidad)";
+            $query = "INSERT INTO detalles_pedido (id_pedido, id_bebida, cantidad, entregado) VALUES (:id_pedido, :id_bebida, :cantidad, :entregado)";
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':id_pedido', $id_pedido, PDO::PARAM_INT);
             $stmt->bindParam(':id_bebida', $id_bebida, PDO::PARAM_INT);
             $stmt->bindParam(':cantidad', $cantidad, PDO::PARAM_INT);
+            $stmt->bindParam(':entregado', $entregado, PDO::PARAM_INT);
             $stmt->execute();
             return true;
         } catch (PDOException $e) {
@@ -299,7 +301,7 @@ class PedidosModel extends BaseModel {
 
      public function deleteAllDetallesByIdPedido() {
         try {
-            $query = "DELETE FROM detalles_pedido WHERE id_pedido = :id_pedido";
+            $query = "DELETE FROM detalles_pedido WHERE id_pedido = :id_pedido AND entregado = 0";
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':id_pedido', $this->id_pedido, PDO::PARAM_INT);
             $stmt->execute();
@@ -382,6 +384,57 @@ class PedidosModel extends BaseModel {
         try {
             $stmt = $this->conn->prepare("SELECT dp.id_detalle, dp.id_pedido, CONCAT(CASE WHEN r.id_receta IS NOT NULL THEN 'R' ELSE 'B' END, COALESCE(r.id_receta, b.id_bebida)) AS product_id, COALESCE(r.nombre_receta, b.nombre_bebida) AS producto, COALESCE(r.precio, b.precio_bebida) AS precio, dp.cantidad, r.tipo FROM detalles_pedido dp LEFT JOIN recetas r ON dp.id_platillo = r.id_receta LEFT JOIN bebidas b ON dp.id_bebida = b.id_bebida WHERE id_pedido = :id_pedido ORDER BY dp.cantidad ASC;");
             $stmt->bindParam(':id_pedido', $id_pedido, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            die("Error: " . $e->getMessage());
+        }
+    }
+
+
+    public function updateInventarioProductosByIdReceta($id, $cantidad) {
+        try {
+            $query = "UPDATE productos SET total_cantidad_producto = total_cantidad_producto - :cantidad WHERE id_producto = :id";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            $stmt->bindParam(':cantidad', $cantidad, PDO::PARAM_STR);
+            $success = $stmt->execute();
+            return $success ? true : false;
+        } catch (PDOException $e) {
+            die("Error: " . $e->getMessage());
+        }
+    }
+
+    public function updateInventarioBebidasByIdReceta($id, $cantidad) {
+        try {
+            $query = "UPDATE bebidas SET cantidad_bebida = cantidad_bebida - :cantidad WHERE id_bebida = :id";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            $stmt->bindParam(':cantidad', $cantidad, PDO::PARAM_STR);
+            $success = $stmt->execute();
+            return $success ? true : false;
+        } catch (PDOException $e) {
+            die("Error: " . $e->getMessage());
+        }
+    }
+
+    public function getAllRecetasCombinasById($id) {
+        try {
+            $query = "SELECT id_receta_compuesta, cantidad_receta_compuesta FROM recetas_combinadas WHERE id_receta_principal = :id";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            die("Error: " . $e->getMessage());
+        }
+    }
+
+    public function getAllIngredientesRecetaByIdRecta($id) {
+        try {
+            $query = "SELECT * FROM recetas_ingredientes WHERE id_receta = :id";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {

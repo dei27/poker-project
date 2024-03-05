@@ -124,7 +124,7 @@ if (isset($_SESSION["user"]) && (isset($_SESSION['role']) && $_SESSION['role'] =
 
                                 <!-- Editar usuario -->
                                 <div class="modal fade" id="editarUsuario<?php echo $usuario['id']?>" tabindex="-1" aria-labelledby="editarUsuarioLabel<?php echo $usuario['id']?>" aria-hidden="true">
-                                <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-dialog modal-dialog-centered modal-lg">
                                     <div class="modal-content">
                                     <div class="modal-header bg-dark">
                                         <h5 class="modal-title" id="editarUsuarioLabel<?php echo $usuario['id']?>">Editar Usuario</h5>
@@ -183,7 +183,7 @@ if (isset($_SESSION["user"]) && (isset($_SESSION['role']) && $_SESSION['role'] =
     </div>
 <!-- modal agregar categoria -->
 <div class="modal fade" id="addTournament" tabindex="-1" aria-labelledby="addTournamentLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
                 <div class="modal-content">
                 <div class="modal-header text-bg-dark">
                     <h5 class="modal-title" id="addTournament">Agregar Nuevo Usuario</h5>
@@ -192,29 +192,70 @@ if (isset($_SESSION["user"]) && (isset($_SESSION['role']) && $_SESSION['role'] =
                     <div class="modal-body">
                         <form action="../controllers/controllerUsuarios.php" method="post" class="form-floating">
                             <input type="hidden" name="action" value="addUsuario">
-                            <div class="form-group mb-3">
-                                <label for="nombreUsuarioNuevo">Nickname</label>
-                                <input class="form-control" id="nombreUsuarioNuevo" name="nombreUsuarioNuevo" placeholder="Nickname..." required>
+
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group mb-3">
+                                        <label for="nombreUsuarioNuevo">Nickname</label>
+                                        <input class="form-control" id="nombreUsuarioNuevo" name="nombreUsuarioNuevo" placeholder="Nickname..." required>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="form-group mb-3">
+                                        <label for="emailUsuarioNuevo">Correo</label>
+                                        <input type="email" class="form-control" id="emailUsuarioNuevo" name="emailUsuarioNuevo" placeholder="Correo..." required>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="form-group mb-3">
-                                <label for="emailUsuarioNuevo">Email</label>
-                                <input type="email" class="form-control" id="emailUsuarioNuevo" name="emailUsuarioNuevo" placeholder="Correo..." required>
+                            
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group mb-3">
+                                        <label for="cedulaUsuarioNuevo">Cédula</label>
+                                        <input class="form-control" id="cedulaUsuarioNuevo" name="cedulaUsuarioNuevo" placeholder="Cédula..." required>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="form-group mb-3">
+                                        <label for="telefonoUsuarioNuevo">Teléfono</label>
+                                        <input class="form-control" id="telefonoUsuarioNuevo" name="telefonoUsuarioNuevo" placeholder="Celular..." required>
+                                    </div>
+                                </div>
                             </div>
+
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group mb-3">
+                                        <label for="nacimientoUsuarioNuevo">Fecha Nacimiento</label>
+                                        <input class="form-control" id="nacimientoUsuarioNuevo" name="nacimientoUsuarioNuevo" required type="date">
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="form-group mb-3">
+                                        <label for="ingresoUsuarioNuevo">Fecha de Ingreso</label>
+                                        <input class="form-control" id="ingresoUsuarioNuevo" name="ingresoUsuarioNuevo" required type="date">
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="form-group mb-3">
                                 <label for="passwordUsuarioNuevo">Contraseña</label>
                                 <input class="form-control" id="passwordUsuarioNuevo" name="passwordUsuarioNuevo" placeholder="Contraseña..." required>
                             </div>
 
-                            <div class="form-group mb-3">
-                                <label for="roleNuevo" class="form-label">Role de Usuario</label>
-                                <select class="form-select" name="roleNuevo" required>
-                                    <option value="">Seleccionar</option>
-                                    <option value="2">Cocinero</option>
-                                    <option value="3">Salonero</option>
-                                    <option value="4">Ayudante</option>
-                                    <option value="5">Mantenimiento</option>
-                                </select>
+                            <div class="row">
+                                <div class="form-group mb-3">
+                                    <label for="roleNuevo" class="form-label">Role de Usuario</label>
+                                    <select class="form-select" name="roleNuevo" required>
+                                        <option value="">Seleccionar</option>
+                                        <option value="2">Cocinero</option>
+                                        <option value="3">Salonero</option>
+                                        <option value="4">Ayudante</option>
+                                        <option value="5">Mantenimiento</option>
+                                    </select>
+                                </div>
                             </div>
+
                             <div class="form-group mt-3 text-end">
                                 <div class="col-md-12">
                                 <button type="submit" class="btn btn-primary  text-white w-100 p-3">

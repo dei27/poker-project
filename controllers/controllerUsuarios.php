@@ -15,11 +15,21 @@ if (isset($_POST['action']) && $_POST['action'] === 'addUsuario') {
     $nickname = isset($_POST['nombreUsuarioNuevo']) ? htmlspecialchars($_POST['nombreUsuarioNuevo'], ENT_QUOTES, 'UTF-8') : null;
     $password = isset($_POST['passwordUsuarioNuevo']) ? htmlspecialchars($_POST['passwordUsuarioNuevo'], ENT_QUOTES, 'UTF-8') : null;
     $email = isset($_POST['emailUsuarioNuevo']) ? htmlspecialchars($_POST['emailUsuarioNuevo'], ENT_QUOTES, 'UTF-8') : null;
+
+    $cedulaUsuarioNuevo = isset($_POST['cedulaUsuarioNuevo']) ? htmlspecialchars($_POST['cedulaUsuarioNuevo'], ENT_QUOTES, 'UTF-8') : null;
+    $telefonoUsuarioNuevo = isset($_POST['telefonoUsuarioNuevo']) ? htmlspecialchars($_POST['telefonoUsuarioNuevo'], ENT_QUOTES, 'UTF-8') : null;
+    $nacimientoUsuarioNuevo = isset($_POST['nacimientoUsuarioNuevo']) ? htmlspecialchars($_POST['nacimientoUsuarioNuevo'], ENT_QUOTES, 'UTF-8') : null;
+    $ingresoUsuarioNuevo = isset($_POST['ingresoUsuarioNuevo']) ? htmlspecialchars($_POST['ingresoUsuarioNuevo'], ENT_QUOTES, 'UTF-8') : null;
+
     $role = isset($_POST['roleNuevo']) ? htmlspecialchars($_POST['roleNuevo'], ENT_QUOTES, 'UTF-8') : null;
 
     $usuarioModel = new UsuarioModel();
     $usuarioModel->setNickName($nickname);
     $usuarioModel->setEmail($email);
+    $usuarioModel->setCedula($cedulaUsuarioNuevo);
+    $usuarioModel->setTelefonoUsuario($telefonoUsuarioNuevo);
+    $usuarioModel->setFechaNacimiento($nacimientoUsuarioNuevo);
+    $usuarioModel->setFechaIngreso($ingresoUsuarioNuevo);
     $usuarioModel->setRole($role);
 
     $password_encriptada = hash('sha512', $password);
