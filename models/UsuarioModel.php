@@ -99,6 +99,24 @@ class UsuarioModel extends BaseModel {
         }
     } 
 
+    public function updateUsuarioById() {
+        try {
+            $query = "UPDATE usuarios SET nickname = :nickname, email = :email, cedula = :cedula, telefono_usuario = :telefono_usuario, fecha_nacimiento = :fecha_nacimiento, fecha_ingreso = :fecha_ingreso WHERE id = :id";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id', $this->id, PDO::PARAM_INT);
+            $stmt->bindParam(':nickname', $this->nickname, PDO::PARAM_STR);
+            $stmt->bindParam(':email', $this->email, PDO::PARAM_STR);
+            $stmt->bindParam(':cedula', $this->cedula, PDO::PARAM_STR);
+            $stmt->bindParam(':telefono_usuario', $this->telefono_usuario, PDO::PARAM_STR);
+            $stmt->bindParam(':fecha_nacimiento', $this->fecha_nacimiento, PDO::PARAM_STR);
+            $stmt->bindParam(':fecha_ingreso', $this->fecha_ingreso, PDO::PARAM_STR);
+            $success = $stmt->execute();
+            return $success ? true : false;
+        } catch (PDOException $e) {
+            die("Error: " . $e->getMessage());
+        }
+    } 
+
     public function updateRoleById() {
         try {
             $query = "UPDATE usuarios SET role = :role WHERE id = :id";
@@ -166,5 +184,18 @@ class UsuarioModel extends BaseModel {
         } catch (PDOException $e) {
             die("Error: " . $e->getMessage());
         }
-    }   
+    } 
+    
+    public function verificarExistenciaCampo($campo, $valor) {
+        try {
+            $query = "SELECT COUNT(*) AS total FROM usuarios WHERE $campo = ?";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(1, $valor, PDO::PARAM_STR);
+            $stmt->execute();
+            $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $resultado['total'] > 0;
+        } catch (PDOException $e) {
+            die("Error: " . $e->getMessage());
+        }
+    }
 }
