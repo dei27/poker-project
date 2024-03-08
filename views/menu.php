@@ -10,6 +10,13 @@ if (isset($_SESSION["userId"])) {
     $myWeek = json_decode(getAllTimeWeeks($_SESSION["userId"]), true);
     $todosHorarios = json_decode(getAllHorariosUsuarios(), true);
 
+    
+    if (isset($_GET['user'])) {
+        $usuario = $_GET['user'];
+        $todosLosRegistros = json_decode(getTimesByUsuarioIdAndYearMonthDay($usuario), true); 
+    }
+
+
     if(!empty($myTimeTotal)){
 
         foreach ($myTimeTotal as $time){
@@ -33,6 +40,10 @@ $currentPage = basename($_SERVER['PHP_SELF']);
         case "dashboard.php":
             $link = "../index.php";
             break;
+        case "expedientesUsuarios.php":
+            $link = "usuarios.php";
+            break;
+            
         case "actualizarHorarios.php":
             $link = "horarios.php";
             break;

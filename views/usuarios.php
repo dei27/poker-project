@@ -4,8 +4,13 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 include('../controllers/controllerUsuarios.php');
+include('../controllers/controlleRegistrosFaltas.php');
+include('../controllers/controllerTiposFaltas.php');
+
 
 $usuarios = json_decode(getAllUsuarios(), true);
+$tiposFalta = json_decode(getAllTiposFaltasHorarios(), true);
+// $usuarios = json_decode(getAllUsuarios(), true);
 ?>
 
 <!DOCTYPE html>
@@ -54,6 +59,7 @@ if (isset($_SESSION["user"]) && (isset($_SESSION['role']) && $_SESSION['role'] =
                             <th>Nickname</th>
                             <th>Email</th>
                             <th>Role</th>
+                            <th>Expediente</th>
                             <th>Habilitado</th>
                             <th class="text-center">Acciones</th>
                         </tr>
@@ -87,6 +93,9 @@ if (isset($_SESSION["user"]) && (isset($_SESSION['role']) && $_SESSION['role'] =
                                         }
                                     ?>
                                 </td>
+                                <td>
+                                    <a href="#" class="text-decoration-none text-info" data-bs-toggle="modal" data-bs-target="#registroFaltasHorarios<?php echo $usuario['id']?>"><i class="bi bi-file-earmark-person-fill text-white"></i></a>
+                                </td>
                                 <td><?php echo ($usuario['habilitado'] == 1) ? "Sí" : "No"; ?></td>
                                 <td class="text-center">
 
@@ -118,6 +127,69 @@ if (isset($_SESSION["user"]) && (isset($_SESSION['role']) && $_SESSION['role'] =
                                                         <i class="bi bi-cursor-fill text-white me-3"></i>
                                                         <?php echo ($usuario["habilitado"] == 1) ? "Sí, deshabilitar." : "Sí, habilitar."; ?>
                                                     </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- modal agregar registro falta expediente -->
+                                    <div class="modal fade" id="registroFaltasHorarios<?php echo $usuario['id']?>" tabindex="-1" aria-labelledby="registroFaltasHorariosLabel" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered modal-lg">
+                                            <div class="modal-content">
+                                            <div class="modal-header text-bg-dark">
+                                                <h5 class="modal-title" id="registroFaltasHorarios<?php echo $usuario['id']?>">Agregar Registro Laboral para <?php echo $usuario['nickname']?></h5>
+                                                <button type="button" class="btn-close bg-light" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                                <div class="modal-body text-dark text-start">
+
+                                                    <h5 class="text-info text-end"><a href="expedientesUsuarios.php?user=<?php echo $usuario['id']?>" class="text-decoration-none">Ver expediente</a></h5>
+
+                                                    <form action="../controllers/controlleRegistrosFaltas.php" method="post" class="form-floating">
+                                                        <input type="hidden" name="action" value="addRegistroFalta">
+                                                        <input  id="usuarioRegistroFalta" name="usuarioRegistroFalta" value="<?php echo $usuario['id']?>" type="hidden">
+                                                        <div class="row">
+                                                            <div class="col">
+                                                                <div class="form-group mb-3">
+                                                                    <h6>Tipo de registro</h6>
+                                                                    <select class="form-select" id="tipoRegistroFalta" name="tipoRegistroFalta" required>
+                                                                        <option value="">Seleccionar</option>
+                                                                        <?php foreach ($tiposFalta as $tipoFalta): ?>
+                                                                            <option value="<?php echo $tipoFalta['id_tipo_falta']; ?>"><?php echo $tipoFalta['nombre_tipo_falta']; ?></option>
+                                                                        <?php endforeach; ?>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="row">
+                                                            <div class="col">
+                                                                <div class="form-group mb-3">
+                                                                    <label for="fechaInicioRegistroFalta">Inicio</label>
+                                                                    <input class="form-control" id="fechaInicioRegistroFalta" name="fechaInicioRegistroFalta" required type="date">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col">
+                                                                <div class="form-group mb-3">
+                                                                    <label for="fechaFinRegistroFalta">Final</label>
+                                                                    <input class="form-control" id="fechaFinRegistroFalta" name="fechaFinRegistroFalta" required type="date">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    
+                                                        <div class="form-floating">
+                                                            <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea2" style="height: 100px" id="notasRegistroFalta" name="notasRegistroFalta"></textarea>
+                                                            <label for="floatingTextarea2">Notas</label>
+                                                        </div>
+
+                                                        <div class="form-group mt-3 text-center">
+                                                            <div class="col-md-12">
+                                                                <button type="submit" class="btn btn-primary w-100 p-3">
+                                                                <i class="bi bi-cursor-fill text-white me-3"></i>
+                                                                Guardar
+                                                            </button>
+                                                        </div>
+                                                        </div>
+                                                    </form>
                                                 </div>
                                             </div>
                                         </div>
@@ -220,92 +292,92 @@ if (isset($_SESSION["user"]) && (isset($_SESSION['role']) && $_SESSION['role'] =
     </div>
 <!-- modal agregar usuario nuevo -->
 <div class="modal fade" id="addTournament" tabindex="-1" aria-labelledby="addTournamentLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-lg">
-                <div class="modal-content">
-                <div class="modal-header text-bg-dark">
-                    <h5 class="modal-title" id="addTournament">Agregar Nuevo Usuario</h5>
-                    <button type="button" class="btn-close bg-light" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                    <div class="modal-body">
-                        <form action="../controllers/controllerUsuarios.php" method="post" class="form-floating">
-                            <input type="hidden" name="action" value="addUsuario">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+        <div class="modal-header text-bg-dark">
+            <h5 class="modal-title" id="addTournament">Agregar Nuevo Usuario</h5>
+            <button type="button" class="btn-close bg-light" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+            <div class="modal-body">
+                <form action="../controllers/controllerUsuarios.php" method="post" class="form-floating">
+                    <input type="hidden" name="action" value="addUsuario">
 
-                            <div class="row">
-                                <div class="col">
-                                    <div class="form-group mb-3">
-                                        <label for="nicknameUsuarioNuevo">Nickname</label>
-                                        <input class="form-control" id="nicknameUsuarioNuevo" name="nicknameUsuarioNuevo" placeholder="Nickname..." required>
-                                    </div>
-                                </div>
-                                <div class="col">
-                                    <div class="form-group mb-3">
-                                        <label for="emailUsuarioNuevo">Correo</label>
-                                        <input type="email" class="form-control" id="emailUsuarioNuevo" name="emailUsuarioNuevo" placeholder="Correo..." required>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="row">
-                                <div class="col">
-                                    <div class="form-group mb-3">
-                                        <label for="cedulaUsuarioNuevo">Cédula</label>
-                                        <input class="form-control" id="cedulaUsuarioNuevo" name="cedulaUsuarioNuevo" placeholder="Cédula..." required>
-                                    </div>
-                                </div>
-                                <div class="col">
-                                    <div class="form-group mb-3">
-                                        <label for="telefono_usuarioUsuarioNuevo">Teléfono</label>
-                                        <input class="form-control" id="telefono_usuarioUsuarioNuevo" name="telefono_usuarioUsuarioNuevo" placeholder="Celular..." required>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col">
-                                    <div class="form-group mb-3">
-                                        <label for="nacimientoUsuarioNuevo">Fecha Nacimiento</label>
-                                        <input class="form-control" id="nacimientoUsuarioNuevo" name="nacimientoUsuarioNuevo" required type="date">
-                                    </div>
-                                </div>
-                                <div class="col">
-                                    <div class="form-group mb-3">
-                                        <label for="ingresoUsuarioNuevo">Fecha de Ingreso</label>
-                                        <input class="form-control" id="ingresoUsuarioNuevo" name="ingresoUsuarioNuevo" required type="date">
-                                    </div>
-                                </div>
-                            </div>
-
+                    <div class="row">
+                        <div class="col">
                             <div class="form-group mb-3">
-                                <label for="passwordUsuarioNuevo">Contraseña</label>
-                                <input class="form-control" id="passwordUsuarioNuevo" name="passwordUsuarioNuevo" placeholder="Contraseña..." required>
+                                <label for="nicknameUsuarioNuevo">Nickname</label>
+                                <input class="form-control" id="nicknameUsuarioNuevo" name="nicknameUsuarioNuevo" placeholder="Nickname..." required>
                             </div>
-
-                            <div class="row">
-                                <div class="form-group mb-3">
-                                    <h6 class="form-label">Role de Usuario</h6>
-                                    <select class="form-select" name="roleNuevo" required>
-                                        <option value="">Seleccionar</option>
-                                        <option value="2">Cocinero</option>
-                                        <option value="3">Salonero</option>
-                                        <option value="4">Ayudante</option>
-                                        <option value="5">Mantenimiento</option>
-                                    </select>
-                                </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group mb-3">
+                                <label for="emailUsuarioNuevo">Correo</label>
+                                <input type="email" class="form-control" id="emailUsuarioNuevo" name="emailUsuarioNuevo" placeholder="Correo..." required>
                             </div>
-
-                            <div class="form-group mt-3 text-end">
-                                <div class="col-md-12">
-                                <button type="submit" class="btn btn-primary  text-white w-100 p-3">
-                                <i class="bi bi-cursor-fill text-white me-3"></i>
-                                Guardar
-                                </button>
-                                </div>
-                            </div>
-                        </form>
+                        </div>
                     </div>
-                </div>
+                    
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group mb-3">
+                                <label for="cedulaUsuarioNuevo">Cédula</label>
+                                <input class="form-control" id="cedulaUsuarioNuevo" name="cedulaUsuarioNuevo" placeholder="Cédula..." required>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group mb-3">
+                                <label for="telefono_usuarioUsuarioNuevo">Teléfono</label>
+                                <input class="form-control" id="telefono_usuarioUsuarioNuevo" name="telefono_usuarioUsuarioNuevo" placeholder="Celular..." required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group mb-3">
+                                <label for="nacimientoUsuarioNuevo">Fecha Nacimiento</label>
+                                <input class="form-control" id="nacimientoUsuarioNuevo" name="nacimientoUsuarioNuevo" required type="date">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group mb-3">
+                                <label for="ingresoUsuarioNuevo">Fecha de Ingreso</label>
+                                <input class="form-control" id="ingresoUsuarioNuevo" name="ingresoUsuarioNuevo" required type="date">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="passwordUsuarioNuevo">Contraseña</label>
+                        <input class="form-control" id="passwordUsuarioNuevo" name="passwordUsuarioNuevo" placeholder="Contraseña..." required>
+                    </div>
+
+                    <div class="row">
+                        <div class="form-group mb-3">
+                            <h6 class="form-label">Role de Usuario</h6>
+                            <select class="form-select" name="roleNuevo" required>
+                                <option value="">Seleccionar</option>
+                                <option value="2">Cocinero</option>
+                                <option value="3">Salonero</option>
+                                <option value="4">Ayudante</option>
+                                <option value="5">Mantenimiento</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group mt-3 text-end">
+                        <div class="col-md-12">
+                        <button type="submit" class="btn btn-primary  text-white w-100 p-3">
+                        <i class="bi bi-cursor-fill text-white me-3"></i>
+                        Guardar
+                        </button>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
+    </div>
+</div>
 <?php
 }else{
     echo '<div class="container-fluid mt-5 vh-100 p-5">
@@ -330,6 +402,35 @@ if (isset($_GET['insertedUser'])) {
             'icon' => 'error',
             'title' => 'Error al agregar',
             'text' => 'No se pudo añadir el usuario.',
+        ];
+
+    echo '
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        Swal.fire({
+            icon: "' . $messageConfig['icon'] . '",
+            title: "' . $messageConfig['title'] . '",
+            timer: 2500,
+            text: "' . $messageConfig['text'] . '",
+            showConfirmButton: false
+        });
+    </script>
+    ';
+}
+
+if (isset($_GET['insertedRegistro'])) {
+    $updatedCategoryStatus = $_GET['insertedRegistro'];
+    
+    $messageConfig = ($updatedCategoryStatus == 1)
+        ? [
+            'icon' => 'success',
+            'title' => 'Actualizado con éxito',
+            'text' => 'Registro actualizado.',
+        ]
+        : [
+            'icon' => 'error',
+            'title' => 'Error al actualizar',
+            'text' => 'No se pudo actualizar el registro.',
         ];
 
     echo '

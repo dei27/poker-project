@@ -11,6 +11,14 @@ function getAllUsuarios() {
     return json_encode($usuarios);
 }
 
+
+function getUsuarioById($usuarioId) {
+    $claseUsuario = new UsuarioModel();
+    $claseUsuario->setId($usuarioId);
+    $usuario = $claseUsuario->getUsuarioById();
+    return json_encode($usuario);
+}
+
 if (isset($_POST['action']) && $_POST['action'] === 'addUsuario') {
     $nickname = isset($_POST['nicknameUsuarioNuevo']) ? htmlspecialchars($_POST['nicknameUsuarioNuevo'], ENT_QUOTES, 'UTF-8') : null;
     $password = isset($_POST['passwordUsuarioNuevo']) ? htmlspecialchars($_POST['passwordUsuarioNuevo'], ENT_QUOTES, 'UTF-8') : null;

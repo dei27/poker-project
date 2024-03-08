@@ -69,6 +69,21 @@ class Registros extends BaseModel {
         }
     }
 
+    public function getTimesByUsuarioIdAndYearMonthDay() {
+        try {
+            $query = "SELECT rh.hora, trh.nombre_tipo FROM registros_horarios rh 
+                    INNER JOIN tipos_registro_horarios trh ON rh.tipo = trh.id_tipo_registro 
+                    WHERE rh.id_usuario = :id_usuario";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id_usuario', $this->id_usuario, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            die("Error: " . $e->getMessage());
+        }
+    }
+    
+
     public function getAllHorariosUsuarios(){
         try {
             date_default_timezone_set('America/Costa_Rica');

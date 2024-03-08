@@ -56,6 +56,18 @@ class RegistrosFaltasHorarios extends BaseModel {
         }
     }
 
+    public function getAllRegistrosFaltasHorariosByIdUsuario() {
+        try {
+            $query = "SELECT rhf.*, tfh.nombre_tipo_falta as nombre_tipo FROM registros_horarios_faltas rhf INNER JOIN tipos_faltas_horarios tfh ON rhf.id_tipo_falta = tfh.id_tipo_falta WHERE rhf.id_usuario = :id_usuario;";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id_usuario', $this->id_usuario, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            die("Error: " . $e->getMessage());
+        }
+    }
+
 
     public function newRegistroFalta() {
         try {

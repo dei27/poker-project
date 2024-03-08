@@ -132,6 +132,15 @@ function getAllHorariosUsuarios() {
     return json_encode($record);
 }
 
+function getTimesByUsuarioIdAndYearMonthDay($id_usuario){
+    $recordModel = new Registros();
+    $recordModel->setIdUsuario($id_usuario);
+    $record = $recordModel->getTimesByUsuarioIdAndYearMonthDay();
+    return json_encode($record);
+}
+
+
+
 function uptadeRegistroByIdRegistro($id_registro, $hora) {
     $recordModel = new Registros();
     $recordModel->setIdRegistro($id_registro);
@@ -150,6 +159,9 @@ function getMotivoCambio($id_registro) {
     $record = $recordModel->getMotivoCambio($id_registro);
     return json_encode($record);
 }
+
+
+
 
 
 

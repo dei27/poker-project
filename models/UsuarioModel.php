@@ -86,6 +86,26 @@ class UsuarioModel extends BaseModel {
         }
     }
 
+
+    public function getUsuarioById(){
+        try {
+            $query = "SELECT * FROM usuarios WHERE id = :id";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id', $this->id, PDO::PARAM_INT);
+            $stmt->execute();
+            $usuario = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+            if (empty($usuario)) {
+                return null; // Devolver null si no se encontró ningún usuario
+            }
+    
+            return $usuario[0]; // Devolver el primer usuario encontrado
+        } catch (PDOException $e) {
+            die("Error: " . $e->getMessage());
+        }
+    }
+    
+
     public function updatePasswordById() {
         try {
             $query = "UPDATE usuarios SET password = :password WHERE id = :id";

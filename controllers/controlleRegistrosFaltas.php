@@ -12,12 +12,19 @@ function getAllRegistrosFaltasHorarios() {
     return json_encode($registrosFaltasHorarios);
 }
 
+function getAllRegistrosFaltasHorariosByIdUsuario($id_usuario) {
+    $registroFaltaHorario = new RegistrosFaltasHorarios();
+    $registroFaltaHorario->setIdUsuario($id_usuario);
+    $registrosFaltasHorarios = $registroFaltaHorario->getAllRegistrosFaltasHorariosByIdUsuario();
+    return json_encode($registrosFaltasHorarios);
+}
+
 if (isset($_POST['action']) && $_POST['action'] === 'addRegistroFalta') {
     $tipoRegistroFalta = isset($_POST['tipoRegistroFalta']) ? htmlspecialchars($_POST['tipoRegistroFalta'], ENT_QUOTES, 'UTF-8') : null;
     $usuarioRegistroFalta = isset($_POST['usuarioRegistroFalta']) ? htmlspecialchars($_POST['usuarioRegistroFalta'], ENT_QUOTES, 'UTF-8') : null;
     $fechaInicioRegistroFalta = isset($_POST['fechaInicioRegistroFalta']) ? htmlspecialchars($_POST['fechaInicioRegistroFalta'], ENT_QUOTES, 'UTF-8') : null;
     $fechaFinRegistroFalta = isset($_POST['fechaFinRegistroFalta']) ? htmlspecialchars($_POST['fechaFinRegistroFalta'], ENT_QUOTES, 'UTF-8') : null;
-    $notasRegistroFalta = isset($_POST['notasRegistroFalta']) ? htmlspecialchars($_POST['notasRegistroFalta'], ENT_QUOTES, 'UTF-8') : null;
+    $notasRegistroFalta = isset($_POST['notasRegistroFalta']) ? htmlspecialchars($_POST['notasRegistroFalta'], ENT_QUOTES, 'UTF-8') : 'Sin notas';
 
     $nuevoRegistroFalta = new RegistrosFaltasHorarios();
     $nuevoRegistroFalta->setIdTipoFalta($tipoRegistroFalta);
@@ -29,10 +36,10 @@ if (isset($_POST['action']) && $_POST['action'] === 'addRegistroFalta') {
     $insertedRegistro = $nuevoRegistroFalta->newRegistroFalta();    
 
     if($insertedRegistro){
-        header("Location: ../views/actualizarHorarios.php?insertedRegistro=1");
+        header("Location: ../views/usuarios.php?insertedRegistro=1");
         exit();
     }else{
-        header("Location: ../views/actualizarHorarios.php?insertedRegistro=0");
+        header("Location: ../views/ususarios.php?insertedRegistro=0");
         exit();
     }
 

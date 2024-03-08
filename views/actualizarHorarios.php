@@ -3,13 +3,6 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 
 include('../controllers/controllerUsuarios.php');
-include('../controllers/controlleRegistrosFaltas.php');
-include('../controllers/controllerTiposFaltas.php');
-
-
-$tiposFalta = json_decode(getAllTiposFaltasHorarios(), true);
-$usuarios = json_decode(getAllUsuarios(), true);
-
 }
 ?>
 
@@ -47,11 +40,6 @@ if (isset($_SESSION["user"]) && (isset($_SESSION['role']) && $_SESSION['role'] =
     <div class="container-fluid p-5">
         <div class="table-responsive card p-3">
             <h4 class="card-header mb-3 py-3">Horarios</h4>
-            <h5 class="card-text">
-                <a href="#" class="text-decoration-none text-info" data-bs-toggle="modal" data-bs-target="#registroFaltasHorarios">
-                <img src="../assets/images/calendario.png" alt="logo calendario" class="img-fluid me-2">Agregar registro laboral.
-                </a>
-            </h5>
             <div class="row">
                 <div class="col-sm-12 col-md-12 col-lg-12 mb-3">
                     <div class="table-responsive">
@@ -177,84 +165,13 @@ if (isset($_SESSION["user"]) && (isset($_SESSION['role']) && $_SESSION['role'] =
             </div> 
         </div>
     </div>
-
-<!-- modal agregar receta -->
-<div class="modal fade" id="registroFaltasHorarios" tabindex="-1" aria-labelledby="registroFaltasHorariosLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content">
-        <div class="modal-header text-bg-dark">
-            <h6 class="modal-title" id="registroFaltasHorarios">Agregar Registro Laboral</h6>
-            <button type="button" class="btn-close bg-light" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-            <div class="modal-body">
-                <form action="../controllers/controlleRegistrosFaltas.php" method="post" class="form-floating">
-                    <input type="hidden" name="action" value="addRegistroFalta">
-
-                    <div class="row">
-                        <div class="col">
-                            <div class="form-group mb-3">
-                                <h6>Tipo de registro</h6>
-                                <select class="form-select" id="tipoRegistroFalta" name="tipoRegistroFalta" required>
-                                    <option value="">Seleccionar</option>
-                                    <?php foreach ($tiposFalta as $tipoFalta): ?>
-                                        <option value="<?php echo $tipoFalta['id_tipo_falta']; ?>"><?php echo $tipoFalta['nombre_tipo_falta']; ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col">
-                            <div class="form-group mb-3">
-                                <h6>Usuario</h6>
-                                <select class="form-select" id="usuarioRegistroFalta" name="usuarioRegistroFalta" required>
-                                    <option value="">Seleccionar</option>
-                                    <?php foreach ($usuarios as $usuario): ?>
-                                        <option value="<?php echo $usuario['id']; ?>"><?php echo $usuario['nickname']; ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col">
-                            <div class="form-group mb-3">
-                                <label for="fechaInicioRegistroFalta">Inicio</label>
-                                <input class="form-control" id="fechaInicioRegistroFalta" name="fechaInicioRegistroFalta" required type="date">
-                            </div>
-                        </div>
-                        <div class="col">
-                            <div class="form-group mb-3">
-                                <label for="fechaFinRegistroFalta">Final</label>
-                                <input class="form-control" id="fechaFinRegistroFalta" name="fechaFinRegistroFalta" required type="date">
-                            </div>
-                        </div>
-                    </div>
-                
-                    <div class="form-floating">
-                        <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea2" style="height: 100px" id="notasRegistroFalta" name="notasRegistroFalta"></textarea>
-                        <label for="floatingTextarea2">Notas</label>
-                    </div>
-
-                    <div class="form-group mt-3 text-center">
-                        <div class="col-md-12">
-                            <button type="submit" class="btn btn-primary w-100 p-3">
-                            <i class="bi bi-cursor-fill text-white me-3"></i>
-                            Guardar
-                        </button>
-                    </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
 <?php
 }else{
     echo '<div class="container-fluid mt-5 vh-100 p-5">
-            <div class="card p-3">
-                <p class="card-text py-5">No tienes el poder suficiente para poder ver esto. <a href="login.php">Inicia sesión</a>.</p>
-            </div>
-        </div>';
+        <div class="card p-3">
+        <p class="card-text py-5">No tienes el poder suficiente para poder ver esto. <a href="login.php">Inicia sesión</a>.</p>
+        </div>
+    </div>';
 }
 ?>
 
@@ -287,37 +204,6 @@ if (isset($_GET['updateRecord'])) {
     </script>
     ';
 }
-
-if (isset($_GET['insertedRegistro'])) {
-    $updatedCategoryStatus = $_GET['insertedRegistro'];
-    
-    $messageConfig = ($updatedCategoryStatus == 1)
-        ? [
-            'icon' => 'success',
-            'title' => 'Actualizado con éxito',
-            'text' => 'Registro actualizado.',
-        ]
-        : [
-            'icon' => 'error',
-            'title' => 'Error al actualizar',
-            'text' => 'No se pudo actualizar el registro.',
-        ];
-
-    echo '
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        Swal.fire({
-            icon: "' . $messageConfig['icon'] . '",
-            title: "' . $messageConfig['title'] . '",
-            timer: 2500,
-            text: "' . $messageConfig['text'] . '",
-            showConfirmButton: false
-        });
-    </script>
-    ';
-}
-
-
 ?>
 
 <script src="../assets/js/main.js"></script>
