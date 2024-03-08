@@ -5,6 +5,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 include(__DIR__ . '/../models/CerrarCajaModel.php');
 
+
 function getAllCierresCajas() {
     $cierreCaja = new CerrarCajaModel();
     $cierresCajas = $cierreCaja->getAllCierresCajas();
@@ -48,9 +49,34 @@ if (isset($_POST['action']) && $_POST['action'] === 'nuevaCajaCierre') {
         header("Location: ../views/CerrarCaja.php?addCaja=0");
         exit();
     }
-
-
 }
+
+if (isset($_GET['year']) && isset($_GET['action']) && $_GET['action'] === 'crearPie') {
+    // Obtener el año de la URL
+    $anio_consulta = $_GET['year'];
+
+    // Realizar la consulta para obtener los datos de cierres de cajas por año
+    $cierreCaja = new CerrarCajaModel();
+    $cierreCaja->setAnioConsulta($anio_consulta);
+    $cierresCajas = $cierreCaja->getAllCierresCajasByAnio();
+
+    // Devolver los resultados como JSON
+    echo json_encode($cierresCajas);
+}
+
+if (isset($_GET['year']) && isset($_GET['action']) && $_GET['action'] === 'crearPieMensual') {
+    // Obtener el año de la URL
+    $anio_consulta = $_GET['year'];
+
+    // Realizar la consulta para obtener los datos de cierres de cajas por año
+    $cierreCaja = new CerrarCajaModel();
+    $cierreCaja->setAnioConsulta($anio_consulta);
+    $cierresCajas = $cierreCaja->getAllCierresCajasByAnioAndMonth();
+
+    // Devolver los resultados como JSON
+    echo json_encode($cierresCajas);
+}
+
 
 
 

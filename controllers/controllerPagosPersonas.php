@@ -11,5 +11,11 @@ function getAllPagosByPersonas($metodoPago) {
     return json_encode($pagosPersona);
 }
 
+function getAllPagos() {
+    $pagoPersona = new PagosPersona();
+    $pagos = $pagoPersona->getAllPagos();
+    return json_encode($pagos);
+}
+
 
 

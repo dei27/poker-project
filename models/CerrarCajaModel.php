@@ -9,6 +9,7 @@ class CerrarCajaModel extends BaseModel {
     private $tarjeta;
     private $sinpe;
     private $total_dia;
+    private $anio_consulta;
 
     public function __construct($fecha_cierre = null, $efectivo = null, $tarjeta = null, $sinpe = null, $total_dia = null) {
         parent::__construct();
@@ -43,6 +44,10 @@ class CerrarCajaModel extends BaseModel {
         $this->total_dia = $total_dia;
     }
 
+    public function setAnioConsulta($anio_consulta) {
+        $this->anio_consulta = $anio_consulta;
+    }
+
     public function getAllCierresCajas() {
         try {
             $query = "SELECT * FROM cierres_cajas";
@@ -53,6 +58,55 @@ class CerrarCajaModel extends BaseModel {
             die("Error: " . $e->getMessage());
         }
     }
+
+    public function getAllCierresCajasByAnio() {
+        try {
+            $query = "SELECT 
+                        meses.mes AS mes,
+                        COALESCE(SUM(cc.efectivo), 0) AS efectivo,
+                        COALESCE(SUM(cc.tarjeta), 0) AS tarjeta,
+                        COALESCE(SUM(cc.sinpe), 0) AS sinpe,
+                        COALESCE(SUM(cc.total_dia), 0) AS total
+                    FROM 
+                        (SELECT 0 AS mes UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9 UNION ALL SELECT 10 UNION ALL SELECT 11) meses
+                    LEFT JOIN 
+                        cierres_cajas cc ON MONTH(cc.fecha_cierre) = meses.mes AND YEAR(cc.fecha_cierre) = :anio_consulta
+                    GROUP BY 
+                        meses.mes
+                    ORDER BY 
+                        meses.mes;";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':anio_consulta', $this->anio_consulta, PDO::PARAM_STR);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            die("Error: " . $e->getMessage());
+        }
+    }
+
+    public function getAllCierresCajasByAnioAndMonth() {
+        try {
+            $query = "SELECT 
+                        meses.mes AS mes,
+                        COALESCE(SUM(cc.efectivo), 0) + COALESCE(SUM(cc.tarjeta), 0) + COALESCE(SUM(cc.sinpe), 0) AS total_mes
+                    FROM 
+                        (SELECT 0 AS mes UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9 UNION ALL SELECT 10 UNION ALL SELECT 11) meses
+                    LEFT JOIN 
+                        cierres_cajas cc ON MONTH(cc.fecha_cierre) = meses.mes AND YEAR(cc.fecha_cierre) = :anio_consulta
+                    GROUP BY 
+                        meses.mes
+                    ORDER BY 
+                        meses.mes;";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':anio_consulta', $this->anio_consulta, PDO::PARAM_STR);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            die("Error: " . $e->getMessage());
+        }
+    }
+
+
 
     public function nuevoCierreCaja() {
         try {

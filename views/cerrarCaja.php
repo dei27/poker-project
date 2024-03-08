@@ -72,7 +72,7 @@ if (isset($_SESSION["user"]) && (isset($_SESSION['role']) && $_SESSION['role'] =
                 <div class="row">
 
                     <div class="row align-items-center mb-4">
-                        <div class="col mb-3">
+                        <div class="col-6 mb-3">
                             <?php if ($granTotal > 0): ?>
                                 <h5>El día de hoy se ha facturado un total de: ₡<?php echo number_format($granTotal, 2, '.', ',');?></h5>
                                 <input type="hidden" name="totalCajaDia" id="totalCajaDia" value="<?php echo $granTotal; ?>" step="any">
@@ -81,10 +81,17 @@ if (isset($_SESSION["user"]) && (isset($_SESSION['role']) && $_SESSION['role'] =
                                 <input type="hidden" name="totalCajaDia" id="totalCajaDia" value="0" step="any">
                             <?php endif; ?>
                         </div>
-                        <div class="col  mb-3">
-                            <button type="submit" class="btn btn-info p-3 w-100 text-white">
-                                <i class="bi bi-cursor-fill text-white me-3"></i>Cerrar Día
-                            </button>
+                        <div class="row col">
+                            <div class="col mb-3">
+                                <a href="graficosCajas.php" class="btn btn-info p-3 w-100 text-white">
+                                    <i class="bi bi-clipboard2-data-fill text-white me-3"></i>Estadísticas
+                                </a>
+                            </div>
+                            <div class="col mb-3">
+                                <button type="submit" class="btn btn-primary p-3 w-100 text-white">
+                                    <i class="bi bi-cursor-fill text-white me-3"></i>Cerrar Día
+                                </button>
+                            </div>
                         </div>
                     </div>
 

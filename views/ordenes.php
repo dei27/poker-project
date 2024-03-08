@@ -42,11 +42,23 @@ $pedidos = json_decode($pedidosData, true);
     <div class="container-fluid p-5">
         <div class="card p-3">
             <h4 class="card-header mb-3 py-3">Órdenes de hoy <?php echo date('d/m/Y'); ?></h4>
-            <h5 class="modal-title mb-3">
-                <a href="tiposOrdenes.php" class="text-decoration-none text-info">
-                    <img src="../assets/images/pedidos.png" alt="Crear torneo" class="img-fluid me-2">Agregar nueva orden.
-                </a>
-            </h5>
+
+            <div class="row mb-3 align-items-center">
+                <div class="col-sm-12 col-md-12 col-lg-6 mb-3">
+                    <h5>
+                        <a href="tiposOrdenes.php" class="text-decoration-none text-info">
+                            <img src="../assets/images/pedidos.png" alt="Crear torneo" class="img-fluid me-2">Agregar nueva orden.
+                        </a>
+                    </h5>                
+                </div>
+                <div class="col-sm-12 col-md-12 col-lg-6 mb-3 text-end">
+                    <a href="graficosPedidos.php" class="btn btn-info p-3 w-100 text-white">
+                        <i class="bi bi-clipboard2-data-fill text-white me-3"></i>Estadísticas
+                    </a>
+                </div>
+            </div>
+            
+
             
             <div class="table-responsive">
             <table id="example" class="table table-dark table-striped table-hover">

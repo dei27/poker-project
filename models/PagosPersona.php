@@ -15,8 +15,16 @@ class PagosPersona extends BaseModel {
     private $id_producto;
     private $metodo_pago;
     private $mesa;
+    private $mesConsulta;
+    private $anioConsulta;
 
+    public function setMesConsulta($mesConsulta) {
+        $this->mesConsulta = $mesConsulta;
+    }
 
+    public function setAnioConsulta($anioConsulta) {
+        $this->anioConsulta = $anioConsulta;
+    }
 
     public function setIdPago($id_pago) {
         $this->id_pago = $id_pago;
@@ -115,6 +123,17 @@ class PagosPersona extends BaseModel {
             die("Error: " . $e->getMessage());
         }
     }    
+
+    public function getAllPagos() {
+        try {
+            $query = "SELECT * FROM `pagos_por_persona`;";
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            die("Error: " . $e->getMessage());
+        }
+    } 
 
     public function deleteProductById($id) {
         try {
