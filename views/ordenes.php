@@ -51,11 +51,13 @@ $pedidos = json_decode($pedidosData, true);
                         </a>
                     </h5>                
                 </div>
-                <div class="col-sm-12 col-md-12 col-lg-6 mb-3 text-end">
-                    <a href="graficosPedidos.php" class="btn btn-info p-3 w-100 text-white">
-                        <i class="bi bi-clipboard2-data-fill text-white me-3"></i>Estadísticas
-                    </a>
-                </div>
+                <?php if ($_SESSION['role'] === 1) : ?>
+                    <div class="col-sm-12 col-md-12 col-lg-6 mb-3 text-end">
+                        <a href="graficosPedidos.php" class="btn btn-info p-3 w-100 text-white">
+                            <i class="bi bi-clipboard2-data-fill text-white me-3"></i>Estadísticas
+                        </a>
+                    </div>
+                <?php endif; ?>
             </div>
             
 

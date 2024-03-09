@@ -40,6 +40,19 @@ $currentPage = basename($_SERVER['PHP_SELF']);
         case "dashboard.php":
             $link = "../index.php";
             break;
+        case "graficosPedidos.php":
+            $link = "ordenes.php";
+            break;
+        case "graficosCajas.php":
+            $link = "cerrarCaja.php";
+            break;
+        case "graficosRecetas.php":
+            $link = "recetas.php";
+            break;
+        case "graficosBebidas.php":
+            $link = "bebidas.php";
+            break;
+                
         case "expedientesUsuarios.php":
             $link = "usuarios.php";
             break;

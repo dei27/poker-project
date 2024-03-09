@@ -68,7 +68,7 @@ class CerrarCajaModel extends BaseModel {
                         COALESCE(SUM(cc.sinpe), 0) AS sinpe,
                         COALESCE(SUM(cc.total_dia), 0) AS total
                     FROM 
-                        (SELECT 0 AS mes UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9 UNION ALL SELECT 10 UNION ALL SELECT 11) meses
+                        (SELECT 1 AS mes UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9 UNION ALL SELECT 10 UNION ALL SELECT 11 UNION ALL SELECT 12) meses
                     LEFT JOIN 
                         cierres_cajas cc ON MONTH(cc.fecha_cierre) = meses.mes AND YEAR(cc.fecha_cierre) = :anio_consulta
                     GROUP BY 
@@ -90,7 +90,7 @@ class CerrarCajaModel extends BaseModel {
                         meses.mes AS mes,
                         COALESCE(SUM(cc.efectivo), 0) + COALESCE(SUM(cc.tarjeta), 0) + COALESCE(SUM(cc.sinpe), 0) AS total_mes
                     FROM 
-                        (SELECT 0 AS mes UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9 UNION ALL SELECT 10 UNION ALL SELECT 11) meses
+                        (SELECT 1 AS mes UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9 UNION ALL SELECT 10 UNION ALL SELECT 11 UNION ALL SELECT 12) meses
                     LEFT JOIN 
                         cierres_cajas cc ON MONTH(cc.fecha_cierre) = meses.mes AND YEAR(cc.fecha_cierre) = :anio_consulta
                     GROUP BY 

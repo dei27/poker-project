@@ -52,9 +52,13 @@ if (isset($_SESSION["user"]) && (isset($_SESSION['role']) && $_SESSION['role'] =
         <div class="card py-5 mb-5">
             <div class="row row-cols-1 row-cols-md-3 g-4 calendario-container-mensual"></div>
             <div class="row">
-                <div class="col">
+                <div class="card-body">
+                    <h5 class="card-tile text-center mb-3">Montos totales por mes</h5>
+                    <div class="col">
                     <canvas id="lineChart"></canvas>
                 </div>
+                </div>
+                
             </div>
         </div>
 
@@ -250,7 +254,7 @@ if (isset($_GET['insertedCategory'])) {
                     return obj.total_mes;
                 }));
 
-                var nombresMeses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+                var nombresMeses = ['','Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 
                 var labels = data.map(function(obj) {
                     return nombresMeses[obj.mes];
@@ -271,7 +275,7 @@ if (isset($_GET['insertedCategory'])) {
                     data: {
                         labels: labels, // Nombres de los meses
                         datasets: [{
-                        label: 'Montos totales por mes',
+                        label: 'Mes',
                         data: valores, // Valores del total para cada mes
                         backgroundColor: '#36A2EB',
                         borderColor: 'rgba(54, 162, 235, 1)',
@@ -280,7 +284,14 @@ if (isset($_GET['insertedCategory'])) {
                     },
                     options: {
                         responsive: true,
+                        maintainAspectRatio: false,
                         plugins: {
+                        },
+                        animation: {
+                            duration: 3000,
+                            easing: 'easeInOutQuart',
+                            animateRotate: true,
+                            animateScale: true
                         },
                         scales: {
                         x: {
@@ -292,7 +303,7 @@ if (isset($_GET['insertedCategory'])) {
                             min: 0,
                             max: max,
                             ticks: {
-                            stepSize: Math.ceil(max / 5)
+                            stepSize: Math.ceil(max / 10)
                             }
                         }
                         }
@@ -321,7 +332,7 @@ if (isset($_GET['insertedCategory'])) {
                     data = {
                         labels: ['No hay datos'],
                         datasets: [{
-                            data: [100],
+                            data: [0],
                             backgroundColor: ['#CCCCCC']
                         }]
                     };
@@ -417,7 +428,7 @@ if (isset($_GET['insertedCategory'])) {
             container.appendChild(pieChartContainer);
 
             // Generar el gráfico de pastel para el mes actual
-            generarPieChart(pieChartId, mes, anio, nombreMes);
+            generarPieChart(pieChartId, mes+1, anio, nombreMes);
         }
     }
 </script>

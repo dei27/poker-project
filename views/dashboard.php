@@ -34,7 +34,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 <main>
     <?php
-    if (isset($_SESSION['role']) && $_SESSION['role'] === 1) {
+    if (isset($_SESSION["user"]) && isset($_SESSION['role']) && $_SESSION['role'] === 1) {
         
         echo "<div class='container mt-5 px-5'>
                 <div class='card p-3 border-0 bg-transparent'>
@@ -64,7 +64,7 @@ if (session_status() === PHP_SESSION_NONE) {
                     </div>
                 </div>
             </div>";
-    }else if(isset($_SESSION['role']) && $_SESSION['role'] === 2){
+    }else if(isset($_SESSION["user"]) && isset($_SESSION['role']) && $_SESSION['role'] !== 1){
         echo "<div class='container mt-5 px-5'>
                 <div class='card p-3 border-0 bg-transparent'>
                     <div class='row'>

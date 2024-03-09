@@ -3,7 +3,8 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-include('../controllers/controllerCierresCajas.php');
+include('../controllers/controllerPedidos.php');
+$pagos = json_decode( getAllPedidos(),true);
 ?>
 
 <!DOCTYPE html>
@@ -57,50 +58,26 @@ if (isset($_SESSION["user"]) && (isset($_SESSION['role']) && $_SESSION['role'] =
             </div>
         </div>
 
-        <div class="card py-5 mb-5">
-            <div class="row row-cols-1 row-cols-md-3 g-4 calendario-container-mensual"></div>
-            <div class="row">
-                <div class="col">
-                    <canvas id="lineChart"></canvas>
+        <div class="row">
+            <div class="col">
+                <div class="card py-5 mb-3">
+                    <!-- Contenedor para el gráfico de pastel -->
+                    <div class="card-body">
+                        <h5 class="card-tile text-center mb-3">Montos por pedidos durante el mes</h5>
+                        <div id="pieChartContainer" class="text-center"></div>
+                    </div>  
                 </div>
             </div>
-        </div>
-
-
-        <div class="card py-5">
-            <div class="row row-cols-1 row-cols-md-3 g-4 calendario-container"></div>
+            <div class="col">
+                <div class="card py-5 mb-3">
+                    <div class="card-body">
+                        <h5 class="card-tile text-center mb-3">Montos por pedidos durante el año</h5>
+                        <div id="pieChartContainerYear" class="text-center"></div>
+                    </div>  
+                </div>
+            </div>
         </div>
     </div>
-
-
-<!-- modal agregar categoria -->
-<div class="modal fade" id="addTournament" tabindex="-1" aria-labelledby="addTournamentLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                <div class="modal-header text-bg-dark">
-                    <h5 class="modal-title" id="addTournament">Agregar Nueva Categoría</h5>
-                    <button type="button" class="btn-close bg-light" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                    <div class="modal-body">
-                        <form action="../controllers/controllerCategories.php" method="post" class="form-floating">
-                            <input type="hidden" name="action" value="add">
-                            <div class="form-group mb-3">
-                                <label for="nombreCategoriaI">Nombre</label>
-                                <input class="form-control" id="nombreCategoriaI" name="nombreCategoriaI" placeholder="Nombre categoría..." value="" required>
-                            </div>
-                            <div class="form-group mt-3 text-end">
-                                <div class="col-md-12">
-                                <button type="submit" class="btn btn-primary  text-white w-100 p-3">
-                                <i class="bi bi-cursor-fill text-white me-3"></i>
-                                Guardar
-                                </button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
 <?php
 }else{
     echo '<div class="container-fluid mt-5 vh-100 p-5">
@@ -209,6 +186,10 @@ if (isset($_GET['insertedCategory'])) {
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+
+    var coloresGenerados = [];
+
+
     $(document).ready(function() {
 
         $(function () {
@@ -245,138 +226,6 @@ if (isset($_GET['insertedCategory'])) {
 
     });
 
-    function generarPieChart(chartId, mes, anio, nombreMes) {
-        
-        var ctxLine = document.getElementById('lineChart').getContext('2d');
-
-        $.ajax({
-            url: '../controllers/controllerCierresCajas.php?action=crearPieMensual&year=' + anio,
-            method: 'GET',
-            dataType: 'json',
-            success: function(data) {
-                var max = Math.max.apply(Math, data.map(function(obj) {
-                    return obj.total_mes;
-                }));
-
-                var nombresMeses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-
-                var labels = data.map(function(obj) {
-                    return nombresMeses[obj.mes];
-                });
-
-                var valores = data.map(function(obj) {
-                    return obj.total_mes;
-                });
-
-                // Destruir el gráfico existente si existe
-                if (typeof barChart !== 'undefined') {
-                    barChart.destroy();
-                }
-
-                // Crear el nuevo gráfico de barras
-                barChart = new Chart(ctxLine, {
-                    type: 'bar',
-                    data: {
-                        labels: labels, // Nombres de los meses
-                        datasets: [{
-                        label: 'Montos totales por mes',
-                        data: valores, // Valores del total para cada mes
-                        backgroundColor: '#36A2EB',
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                        },
-                        scales: {
-                        x: {
-                            grid: {
-                            display: false
-                            }
-                        },
-                        y: {
-                            min: 0,
-                            max: max,
-                            ticks: {
-                            stepSize: Math.ceil(max / 5)
-                            }
-                        }
-                        }
-                    }
-                });
-            },
-            error: function(xhr, status, error) {
-                console.error('Error al obtener los datos de la base de datos:', error);
-            }
-        });
-
-        $.ajax({
-            url: '../controllers/controllerCierresCajas.php?action=crearPie&year=' + anio,
-            method: 'GET',
-            dataType: 'json',
-            success: function(dataPie) {
-                var ctx = document.getElementById(chartId).getContext('2d');
-                var data;
-
-                var datosMes = dataPie.find(item => item.mes === mes);
-
-                if (parseFloat(datosMes.efectivo) === 0 && parseFloat(datosMes.tarjeta) === 0 && parseFloat(datosMes.sinpe) === 0) {
-                    data = {
-                        labels: ['No hay datos'],
-                        datasets: [{
-                            data: [100],
-                            backgroundColor: ['#CCCCCC']
-                        }]
-                    };
-                } else {
-                    data = {
-                        labels: ['Efectivo', 'Tarjeta', 'Sinpe'],
-                        datasets: [{
-                            data: [parseFloat(datosMes.efectivo), parseFloat(datosMes.tarjeta), parseFloat(datosMes.sinpe)],
-                            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56']
-                        }]
-                    };
-                }
-
-                var options = {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        title: {
-                            display: true,
-                            text: nombreMes,
-                        },
-                        datalabels: {
-                            color: '#FFFFFF', // Color del texto de las etiquetas
-                            formatter: (value, ctx) => { // Formato de las etiquetas
-                                // Obtener el valor y el índice del conjunto de datos
-                                let labelIndex = ctx.dataIndex;
-                                return data.datasets[0].data[labelIndex] !== 0 ? value : ''; // Mostrar el valor si no es cero, de lo contrario, mostrar cadena vacía
-                            }
-                        }
-                    },
-                    animation: {
-                            duration: 2000,
-                            easing: 'easeInOutQuart',
-                            animateRotate: true,
-                            animateScale: true
-                    }
-                };
-
-                new Chart(ctx, {
-                    type: 'pie',
-                    data: data,
-                    options: options
-                });
-            },
-            error: function(xhr, status, error) {
-                console.error('Error al obtener los datos de la base de datos:', error);
-            }
-        });
-    }
-
     window.onload = function() {
         var anioInput = document.getElementById('anioInput');
         var mesInput = document.getElementById('mesInput');
@@ -384,13 +233,12 @@ if (isset($_GET['insertedCategory'])) {
         var mesActual = new Date().getMonth();
         for (var i = 0; i < 12; i++) {
             var option = document.createElement('option');
-            option.value = i;
+            option.value = i + 1; // Asumiendo que el mes en tu backend está basado en 1-12
             option.textContent = obtenerNombreMes(i);
             mesInput.appendChild(option);
         }
-        mesInput.value = mesActual;
+        mesInput.value = mesActual + 1; // +1 para coincidir con el valor esperado por tu backend
 
-        // Llenar el select de año desde el año actual hasta el 2030 y seleccionar el año actual
         var anioActual = new Date().getFullYear();
         for (var i = anioActual; i <= 2030; i++) {
             var option = document.createElement('option');
@@ -400,47 +248,206 @@ if (isset($_GET['insertedCategory'])) {
         }
         anioInput.value = anioActual;
 
-        // Llamar a la función generarCalendario con el año seleccionado
-        generarCalendario(mesActual, anioActual);
+        // Llama a generarPieChart aquí para inicializar el gráfico al cargar la página
+        generarPieChart('pieChart', mesInput.value, anioInput.value, obtenerNombreMes(mesActual));
+        generarPieChartYear('pieChartYear', anioInput.value);
 
-
-        // Llamar a la función generarCalendario cada vez que cambie el año seleccionado
         anioInput.addEventListener('change', function() {
-            var mesSeleccionado = parseInt(this.value);
-            var anioSeleccionado = parseInt(this.value);
-            generarCalendario(anioSeleccionado);
+            // Corrección: se debe pasar el mes y año seleccionado correctamente
+            generarPieChart('pieChart', mesInput.value, this.value, obtenerNombreMes(mesInput.selectedIndex));
+            generarPieChartYear('pieChartYear', anioInput.value);
+        });
+
+        mesInput.addEventListener('change', function() {
+            // Corrección: se debe pasar el mes y año seleccionado correctamente
+            generarPieChart('pieChart', this.value, anioInput.value, obtenerNombreMes(this.selectedIndex));
         });
     };
 
-    function obtenerNombreMes(numeroMes) {
+    function obtenerNombreMes(indice) {
         var meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-        return meses[numeroMes];
+        return meses[indice];
     }
 
-    function generarCalendario(mes, anio) {
-        var container = document.querySelector('.calendario-container');
-        container.innerHTML = '';
+    function generarPieChart(chartId, mes, anio, nombreMes) {
+        var container = document.getElementById('pieChartContainer');
+        container.innerHTML = ''; // Limpiar el contenedor
+        var canvas = document.createElement('canvas');
+        canvas.id = chartId;
+        container.appendChild(canvas);
 
-        // Generar un gráfico de pastel para cada mes del año seleccionado
-        var meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-        for (var mes = 0; mes < 12; mes++) {
-            var nombreMes = meses[mes]; // Obtener el nombre del mes
-            var pieChartId = 'pieChart' + mes; // Id único para cada gráfico de pastel
-            var pieChartContainer = document.createElement('div');
-            pieChartContainer.classList.add('col', 'col-md-4');
+        var ctx = canvas.getContext('2d');
 
-            // Crear el elemento canvas donde se renderizará el gráfico
-            var canvas = document.createElement('canvas');
-            canvas.id = pieChartId;
-            canvas.width = 300;
-            canvas.height = 300;
+        var arrayPedidosObtenidos = <?php echo json_encode($pagos); ?>;
 
-            pieChartContainer.appendChild(canvas);
-            container.appendChild(pieChartContainer);
+        var pedidosFiltrados = [];
 
-            // Generar el gráfico de pastel para el mes actual
-            generarPieChart(pieChartId, mes, anio, nombreMes);
+        if (typeof arrayPedidosObtenidos !== 'undefined') {
+
+            let estadoPedido = "Cancelado";
+
+            pedidosFiltrados = arrayPedidosObtenidos.filter(function(pedido) {
+                var fechaPedido = new Date(pedido.fecha_pedido);
+                return fechaPedido.getMonth() + 1 == mes && fechaPedido.getFullYear() == anio && pedido.estado_pedido == estadoPedido;
+            });
         }
+
+        console.log(pedidosFiltrados);
+
+        var labels = [];
+        var values = [];
+        var backgroundColors = [];
+
+        if (pedidosFiltrados.length > 0) {
+            var recetasAgrupadas = {
+                'Local': 0,
+                'Express': 0
+            }; // Objeto para almacenar las recetas agrupadas por tipo de pedido
+
+            pedidosFiltrados.forEach(function(pedido) {
+                var nombreProducto = pedido.nombre_producto;
+                var cantidad = parseFloat(pedido.total_pedido);
+
+                // Determinar si el pedido es Local o Express
+                var tipoPedido = pedido.mesa !== null ? 'Local' : 'Express';
+
+                // Sumar la cantidad al tipo de pedido correspondiente
+                recetasAgrupadas[tipoPedido] += cantidad;
+            });
+
+            // Procesar los datos agrupados para el gráfico
+            labels = Object.keys(recetasAgrupadas);
+            values = Object.values(recetasAgrupadas);
+
+            // Generar colores aleatorios
+            backgroundColors = labels.map(function() {
+                return generarColorAleatorio();
+            });
+        }else {
+            labels = ['Sin datos'];
+            values = [1]; // Asegúrate de tener al menos un valor
+            backgroundColors = ['#CCCCCC'];
+        }
+
+        // Configuración del gráfico
+        var myPieChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: values,
+                    backgroundColor: backgroundColors,
+                    borderColor: backgroundColors.map(function(color) {
+                        return color.replace('0.9)', '1)'); // Reemplaza la transparencia por opacidad completa
+                    }),
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                }
+            }
+        });
+    }
+
+    function generarPieChartYear(chartId, anio) {
+        var container = document.getElementById('pieChartContainerYear');
+        container.innerHTML = ''; // Limpiar el contenedor
+        var canvas = document.createElement('canvas');
+        canvas.id = chartId;
+        container.appendChild(canvas);
+
+        var ctx = canvas.getContext('2d');
+
+        var arrayPedidosObtenidos = <?php echo json_encode($pagos); ?>;
+
+        var pedidosFiltrados = [];
+
+        if (typeof arrayPedidosObtenidos !== 'undefined') {
+
+            let estadoPedido = "Cancelado";
+
+            pedidosFiltrados = arrayPedidosObtenidos.filter(function(pedido) {
+                var fechaPedido = new Date(pedido.fecha_pedido);
+                return fechaPedido.getFullYear() == anio && pedido.estado_pedido == estadoPedido;
+            });
+        }
+
+        var labels = [];
+        var values = [];
+        var backgroundColors = [];
+
+        if (pedidosFiltrados.length > 0) {
+            var pedidosAgrupados = {
+                'Local': 0,
+                'Express': 0
+            }; // Objeto para almacenar los pedidos agrupados por tipo
+
+            pedidosFiltrados.forEach(function(pedido) {
+                var tipoPedido = pedido.mesa !== null ? 'Local' : 'Express';
+                pedidosAgrupados[tipoPedido] += parseFloat(pedido.total_pedido);
+            });
+
+            // Procesar los datos agrupados para el gráfico
+            labels = Object.keys(pedidosAgrupados);
+            values = Object.values(pedidosAgrupados);
+
+            // Generar colores aleatorios
+            backgroundColors = labels.map(function() {
+                return generarColorAleatorio();
+            });
+        } else {
+            // Si no hay datos, establecer el label y el color de fondo predeterminados
+            labels.push('Sin datos');
+            values.push(1); // Asegúrate de tener al menos un valor
+            backgroundColors.push('#CCCCCC');
+        }
+
+        // Configuración del gráfico
+        var myPieChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: values,
+                    backgroundColor: backgroundColors,
+                    borderColor: backgroundColors.map(function(color) {
+                        return color.replace('0.9)', '1)'); // Reemplaza la transparencia por opacidad completa
+                    }),
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                }
+            }
+        });
+    }
+
+
+    function generarColorAleatorio() {
+        var r, g, b;
+        var color;
+
+        do {
+            r = Math.floor(Math.random() * 256); // Componente rojo
+            g = Math.floor(Math.random() * 256); // Componente verde
+            b = Math.floor(Math.random() * 256); // Componente azul
+            color = 'rgba(' + r + ', ' + g + ', ' + b + ', 0.9)'; // Color generado
+        } while (coloresGenerados.includes(color)); // Verificar si el color generado ya está en la lista de colores
+
+        coloresGenerados.push(color); // Agregar el nuevo color a la lista de colores generados
+        return color;
     }
 </script>
 </body>

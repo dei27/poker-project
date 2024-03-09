@@ -142,7 +142,10 @@ if (isset($_SESSION["user"]) && (isset($_SESSION['role']) && $_SESSION['role'] =
                                             </div>
                                                 <div class="modal-body text-dark text-start">
 
-                                                    <h5 class="text-info text-end"><a href="expedientesUsuarios.php?user=<?php echo $usuario['id']?>" class="text-decoration-none">Ver expediente</a></h5>
+                                                <div class="col text-end mb-3">
+                                                    <a href="expedientesUsuarios.php?user=<?php echo $usuario['id']?>" class="btn btn-info p-3 w-50 text-white"><i class="bi bi-cursor-fill text-white me-3"></i>Ver expediente</a>
+                                                </div>
+                                                    
 
                                                     <form action="../controllers/controlleRegistrosFaltas.php" method="post" class="form-floating">
                                                         <input type="hidden" name="action" value="addRegistroFalta">
